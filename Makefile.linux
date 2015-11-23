@@ -1,0 +1,160 @@
+
+# makfile for a tinylib library written by huangsanyi
+
+CC = gcc
+LD = gcc
+AR = ar -r
+
+CFLAGS = -Wall -Werror -g -I. -I./linux
+LDFLAGS = -L./output
+
+BIN = output/libtinylib.a
+
+UTIL_OBJS = \
+	util/base64.o \
+	util/log.o \
+	util/md5.o \
+	util/url.o \
+	util/time_wheel.o \
+	util/url.o \
+	util/util.o
+
+NET_OBJS = \
+	linux/net/async_task_queue.o \
+	linux/net/buffer.o \
+	linux/net/channel.o \
+	linux/net/inetaddr.o \
+	linux/net/loop.o \
+	linux/net/socket.o \
+	linux/net/tcp_client.o \
+	linux/net/tcp_connection.o \
+	linux/net/tcp_server.o \
+	linux/net/timer_queue.o \
+	linux/net/udp_peer.o \
+
+RTSP_OBJS = \
+	rtsp/rtsp_message_codec.o \
+	rtsp/rtsp_request.o \
+	rtsp/rtsp_server.o \
+	rtsp/rtsp_session.o \
+	rtsp/sdp.o
+	
+RTP_OBJS = \
+	rtp/rtp_peer.o
+	
+# unit test
+
+## atomic
+TEST_ATOMIC_BIN = build/test_atomic
+TEST_ATOMIC_OBJS = test/test_atomic.o
+
+## concurrence
+TEST_CONCURRENCE_BIN = build/test_concurrence
+TEST_CONCURRENCE_OBJS = test/test_concurrence.o
+
+## log
+TEST_LOG_BIN = build/test_log
+TEST_LOG_OBJS = test/test_log.o
+
+## loop_timer
+TEST_LOOP_TIMER_BIN = build/test_loop_timer
+TEST_LOOP_TIMER_OBJS = test/test_loop_timer.o
+
+## md5
+TEST_MD5_BIN = build/test_md5
+TEST_MD5_OBJS = test/test_md5.o
+
+## pingpong
+TEST_PINGPONG_BIN = build/test_pingpong
+TEST_PINGPONG_OBJS = test/test_pingpong.o
+
+## rtsp msg codec
+TEST_MSG_CODEC_BIN = build/test_rtsp_msg_codec
+TEST_MSG_CODEC_OBJS = test/test_rtsp_msg_codec.o
+
+## rtsp request
+TEST_RTSP_REQUEST_BIN = build/test_rtsp_request
+TEST_RTSP_REQUEST_OBJS = test/test_rtsp_request.o
+
+## rtsp server
+TEST_RTSP_SERVER_BIN = build/test_rtsp_server
+TEST_RTSP_SERVER_OBJS = test/test_rtsp_server.o
+
+## SDP
+TEST_SDP_BIN = build/test_sdp_parser
+TEST_SDP_OBJS = test/test_sdp_parser.o
+
+## tcp client
+TEST_TCP_CLIENT_BIN = build/test_tcp_client
+TEST_TCP_CLIENT_OBJS = test/test_tcp_client.o
+
+## tcp server
+TEST_TCP_SERVER_BIN = build/test_tcp_server
+TEST_TCP_SERVER_OBJS = test/test_tcp_server.o
+
+## time_wheel
+TEST_TIME_WHEEL_BIN = build/test_time_wheel
+TEST_TIME_WHEEL_OBJS = test/test_time_wheel.o
+
+## url
+TEST_URL_BIN = build/test_url
+TEST_URL_OBJS = test/test_url.o
+
+.PHONY: all clean test
+
+all: tinylib
+
+tinylib: $(UTIL_OBJS) $(NET_OBJS) $(RTSP_OBJS) $(RTP_OBJS)
+	$(AR) $(BIN) $^
+
+net: $(NET_OBJS) $(UTIL_OBJS)
+	$(AR) $(NET) $^
+
+test: tinylib \
+	  $(TEST_ATOMIC_OBJS) \
+	  $(TEST_CONCURRENCE_OBJS) \
+	  $(TEST_LOG_OBJS) \
+	  $(TEST_LOOP_TIMER_OBJS) \
+	  $(TEST_MD5_OBJS) \
+	  $(TEST_PINGPONG_OBJS) \
+	  $(TEST_MSG_CODEC_OBJS) \
+	  $(TEST_RTSP_REQUEST_OBJS) \
+	  $(TEST_RTSP_SERVER_OBJS) \
+	  $(TEST_SDP_OBJS) \
+	  $(TEST_TCP_CLIENT_OBJS) \
+	  $(TEST_TCP_SERVER_OBJS) \
+	  $(TEST_TIME_WHEEL_OBJS) \
+	  $(TEST_URL_OBJS)
+	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) $(LDFLAGS) -ltinylib -lpthread
+	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_PINGPONG_OBJS) -o $(TEST_PINGPONG_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_RTSP_SERVER_OBJS) -o $(TEST_RTSP_SERVER_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_SDP_OBJS) -o $(TEST_SDP_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) $(LDFLAGS) -ltinylib
+	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) $(LDFLAGS) -ltinylib
+
+%.o: %.c
+	$(CC) -c $^ -o $@ $(CFLAGS)
+
+clean:
+	rm -f $(BIN) $(UTIL_OBJS) $(NET_OBJS) $(RTSP_OBJS) $(RTP_OBJS)
+	rm -f $(TEST_ATOMIC_OBJS) $(TEST_ATOMIC_BIN)
+	rm -f $(TEST_CONCURRENCE_OBJS) $(TEST_CONCURRENCE_BIN)
+	rm -f $(TEST_LOG_OBJS) $(TEST_LOG_BIN)
+	rm -f $(TEST_LOOP_TIMER_OBJS) $(TEST_LOOP_TIMER_BIN)
+	rm -f $(TEST_MD5_OBJS) $(TEST_MD5_BIN)
+	rm -f $(TEST_PINGPONG_OBJS) $(TEST_PINGPONG_BIN)
+	rm -f $(TEST_MSG_CODEC_OBJS) $(TEST_MSG_CODEC_BIN)
+	rm -f $(TEST_RTSP_REQUEST_OBJS) $(TEST_RTSP_REQUEST_BIN)
+	rm -f $(TEST_RTSP_SERVER_OBJS) $(TEST_RTSP_SERVER_BIN)
+	rm -f $(TEST_SDP_OBJS) $(TEST_SDP_BIN)
+	rm -f $(TEST_TCP_CLIENT_OBJS) $(TEST_TCP_CLIENT_BIN)
+	rm -f $(TEST_TCP_SERVER_OBJS) $(TEST_TCP_SERVER_BIN)
+	rm -f $(TEST_TIME_WHEEL_OBJS) $(TEST_TIME_WHEEL_BIN)
+	rm -f $(TEST_URL_OBJS) $(TEST_URL_BIN)

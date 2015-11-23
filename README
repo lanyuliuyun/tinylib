@@ -1,0 +1,7 @@
+又一个同时支持window/linux平台的EventLoop实现，包含IO事件/timer/异步事件的处理
+在此之上实现了tcp/udp/rtsp通讯框架，包括client/server端的功能
+
+其基本实现是仿照了陈硕的muduo网络库，算是它的一个初级的C语言精简版，这里向陈硕致敬！
+除此之外，还额外提供了atomic/base64/md5/time_wheel/url解析/基本log框架，适用于基本的开发需要。
+
+具体的使用方法见test目录下的用例。

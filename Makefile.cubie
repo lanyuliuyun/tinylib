@@ -1,0 +1,169 @@
+
+# makfile for a tinylib library written by huangsanyi
+
+GCC_PREFIX=/d/SysGCC/cubieboard/bin/arm-linux-gnueabihf-
+
+CC = $(GCC_PREFIX)gcc
+LD = $(GCC_PREFIX)gcc
+AR = $(GCC_PREFIX)ar -r
+
+CFLAGS = -Wall -Werror -g -I. -I./linux
+LDFLAGS = -L./output
+
+BIN = output/libtinylib.cubie.a
+
+UTIL_OBJS = \
+	util/base64.o.cubie \
+	util/log.o.cubie \
+	util/md5.o.cubie \
+	util/url.o.cubie \
+	util/time_wheel.o.cubie \
+	util/url.o.cubie \
+	util/util.o.cubie
+
+NET_OBJS = \
+	linux/net/async_task_queue.o.cubie \
+	linux/net/buffer.o.cubie \
+	linux/net/channel.o.cubie \
+	linux/net/inetaddr.o.cubie \
+	linux/net/loop.o.cubie \
+	linux/net/socket.o.cubie \
+	linux/net/tcp_client.o.cubie \
+	linux/net/tcp_connection.o.cubie \
+	linux/net/tcp_server.o.cubie \
+	linux/net/timer_queue.o.cubie \
+	linux/net/udp_peer.o.cubie \
+
+RTSP_OBJS = \
+	rtsp/rtsp_message_codec.o.cubie \
+	rtsp/rtsp_request.o.cubie \
+	rtsp/rtsp_server.o.cubie \
+	rtsp/rtsp_session.o.cubie \
+	rtsp/sdp.o.cubie
+	
+RTP_OBJS = \
+	rtp/rtp_peer.o.cubie
+	
+# unit test
+
+## atomic
+TEST_ATOMIC_BIN = build/test_atomic_cubie
+TEST_ATOMIC_OBJS = test/test_atomic.o.cubie
+
+## async_task
+TEST_ASYNC_TASK_BIN = build/test_async_task.cubie
+TEST_ASYNC_TASK_OBJS = build/test_async_task.o.cubie
+
+## concurrence
+TEST_CONCURRENCE_BIN = build/test_concurrence_cubie
+TEST_CONCURRENCE_OBJS = test/test_concurrence.o.cubie
+
+## log
+TEST_LOG_BIN = build/test_log_cubie
+TEST_LOG_OBJS = test/test_log.o.cubie
+
+## loop_timer
+TEST_LOOP_TIMER_BIN = build/test_loop_timer_cubie
+TEST_LOOP_TIMER_OBJS = test/test_loop_timer.o.cubie
+
+## md5
+TEST_MD5_BIN = build/test_md5_cubie
+TEST_MD5_OBJS = test/test_md5.o.cubie
+
+## pingpong
+TEST_PINGPONG_BIN = build/test_pingpong_cubie
+TEST_PINGPONG_OBJS = test/test_pingpong.o.cubie
+
+## rtsp msg codec
+TEST_MSG_CODEC_BIN = build/test_rtsp_msg_codec_cubie
+TEST_MSG_CODEC_OBJS = test/test_rtsp_msg_codec.o.cubie
+
+## rtsp request
+TEST_RTSP_REQUEST_BIN = build/test_rtsp_request_cubie
+TEST_RTSP_REQUEST_OBJS = test/test_rtsp_request.o.cubie
+
+## rtsp server
+TEST_RTSP_SERVER_BIN = build/test_rtsp_server_cubie
+TEST_RTSP_SERVER_OBJS = test/test_rtsp_server.o.cubie
+
+## SDP
+TEST_SDP_BIN = build/test_sdp_parser_cubie
+TEST_SDP_OBJS = test/test_sdp_parser.o.cubie
+
+## tcp client
+TEST_TCP_CLIENT_BIN = build/test_tcp_client_cubie
+TEST_TCP_CLIENT_OBJS = test/test_tcp_client.o.cubie
+
+## tcp server
+TEST_TCP_SERVER_BIN = build/test_tcp_server_cubie
+TEST_TCP_SERVER_OBJS = test/test_tcp_server.o.cubie
+
+## time_wheel
+TEST_TIME_WHEEL_BIN = build/test_time_wheel_cubie
+TEST_TIME_WHEEL_OBJS = test/test_time_wheel.o.cubie
+
+## url
+TEST_URL_BIN = build/test_url_cubie
+TEST_URL_OBJS = test/test_url.o.cubie
+
+.PHONY: all clean test
+
+all: tinylib
+
+tinylib: $(UTIL_OBJS) $(NET_OBJS) $(RTSP_OBJS) $(RTP_OBJS)
+	$(AR) $(BIN) $^
+
+net: $(NET_OBJS) $(UTIL_OBJS)
+	$(AR) $(NET) $^
+
+test: tinylib \
+	  $(TEST_ATOMIC_OBJS) \
+	  $(TEST_ASYNC_TASK_OBJS) \
+	  $(TEST_CONCURRENCE_OBJS) \
+	  $(TEST_LOG_OBJS) \
+	  $(TEST_LOOP_TIMER_OBJS) \
+	  $(TEST_MD5_OBJS) \
+	  $(TEST_PINGPONG_OBJS) \
+	  $(TEST_MSG_CODEC_OBJS) \
+	  $(TEST_RTSP_REQUEST_OBJS) \
+	  $(TEST_RTSP_SERVER_OBJS) \
+	  $(TEST_SDP_OBJS) \
+	  $(TEST_TCP_CLIENT_OBJS) \
+	  $(TEST_TCP_SERVER_OBJS) \
+	  $(TEST_TIME_WHEEL_OBJS) \
+	  $(TEST_URL_OBJS)
+	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) $(LDFLAGS) -ltinylib.cubie -lpthread
+	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_PINGPONG_OBJS) -o $(TEST_PINGPONG_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_RTSP_SERVER_OBJS) -o $(TEST_RTSP_SERVER_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_SDP_OBJS) -o $(TEST_SDP_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) $(LDFLAGS) -ltinylib.cubie
+	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) $(LDFLAGS) -ltinylib.cubie
+
+%.o.cubie: %.c
+	$(CC) -c $^ -o $@ $(CFLAGS)
+
+clean:
+	rm -f $(BIN) $(UTIL_OBJS) $(NET_OBJS) $(RTSP_OBJS) $(RTP_OBJS)
+	rm -f $(TEST_ATOMIC_OBJS) $(TEST_ATOMIC_BIN)
+	rm -f $(TEST_ASYNC_TASK_OBJS) $(TEST_ASYNC_TASK_BIN)
+	rm -f $(TEST_CONCURRENCE_OBJS) $(TEST_CONCURRENCE_BIN)
+	rm -f $(TEST_LOG_OBJS) $(TEST_LOG_BIN)
+	rm -f $(TEST_LOOP_TIMER_OBJS) $(TEST_LOOP_TIMER_BIN)
+	rm -f $(TEST_MD5_OBJS) $(TEST_MD5_BIN)
+	rm -f $(TEST_PINGPONG_OBJS) $(TEST_PINGPONG_BIN)
+	rm -f $(TEST_MSG_CODEC_OBJS) $(TEST_MSG_CODEC_BIN)
+	rm -f $(TEST_RTSP_REQUEST_OBJS) $(TEST_RTSP_REQUEST_BIN)
+	rm -f $(TEST_RTSP_SERVER_OBJS) $(TEST_RTSP_SERVER_BIN)
+	rm -f $(TEST_SDP_OBJS) $(TEST_SDP_BIN)
+	rm -f $(TEST_TCP_CLIENT_OBJS) $(TEST_TCP_CLIENT_BIN)
+	rm -f $(TEST_TCP_SERVER_OBJS) $(TEST_TCP_SERVER_BIN)
+	rm -f $(TEST_TIME_WHEEL_OBJS) $(TEST_TIME_WHEEL_BIN)
+	rm -f $(TEST_URL_OBJS) $(TEST_URL_BIN)

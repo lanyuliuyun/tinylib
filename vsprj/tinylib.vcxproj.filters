@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="windows">
+      <UniqueIdentifier>{c5ed84ad-deb0-4d21-b5bb-d896208d35b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="windows\net">
+      <UniqueIdentifier>{d98c963b-da53-41f8-9115-091fdc20ddf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtsp">
+      <UniqueIdentifier>{27f2ead4-5b4a-4902-a84d-2486d0363797}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rtp">
+      <UniqueIdentifier>{75514962-e68f-4798-bedc-aeefe2784707}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="util">
+      <UniqueIdentifier>{e65d2578-e794-4385-a33d-c7ca8eaadccf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\windows\net\udp_peer.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\async_task_queue.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\buffer.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\channel.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\inetaddr.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\loop.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\socket.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\tcp_client.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\tcp_connection.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\tcp_server.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\timer.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\windows\net\timer_queue.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rtsp\sdp.h">
+      <Filter>rtsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rtsp\rtsp_message_codec.h">
+      <Filter>rtsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rtsp\rtsp_request.h">
+      <Filter>rtsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rtsp\rtsp_server.h">
+      <Filter>rtsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rtsp\rtsp_session.h">
+      <Filter>rtsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\rtp\rtp_peer.h">
+      <Filter>rtp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\atomic.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\log.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\md5.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\time_wheel.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\url.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\util.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\base64.h">
+      <Filter>util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\util\lock.h">
+      <Filter>util</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\windows\net\async_task_queue.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\buffer.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\channel.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\inetaddr.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\loop.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\socket.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\tcp_client.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\tcp_connection.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\tcp_server.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\timer_queue.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\windows\net\udp_peer.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rtsp\rtsp_message_codec.c">
+      <Filter>rtsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rtsp\rtsp_request.c">
+      <Filter>rtsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rtsp\rtsp_server.c">
+      <Filter>rtsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rtsp\rtsp_session.c">
+      <Filter>rtsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rtsp\sdp.c">
+      <Filter>rtsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\rtp\rtp_peer.c">
+      <Filter>rtp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\log.c">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\md5.c">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\time_wheel.c">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\url.c">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\util.c">
+      <Filter>util</Filter>
+    </ClCompile>
+    <ClCompile Include="..\util\base64.c">
+      <Filter>util</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
