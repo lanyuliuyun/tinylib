@@ -1,7 +1,7 @@
 
-/* time wheelÊÇÓÃÓÚÊµÏÖÔÚÖ´ĞĞ¶àÉÙ²½(time_wheel_step)Ö®ºóÖ´ĞĞÓÃ»§Ö¸¶¨µÄº¯Êı
- * ¿ÉÓÃÓÚÊµÏÖ¶¨Ê±Æ÷£¬µ«ÆäÌØµãÊÇ¿ÉÒÔÔÚ³£ÊıÊ±¼äÄÚ¼à²â¶à¸öµ¥ÔªµÄ³¬Ê±ÊÂ¼ş
- *  ÏÖÍ³³ÆÎªtimer
+/* time wheelæ˜¯ç”¨äºå®ç°åœ¨æ‰§è¡Œå¤šå°‘æ­¥(time_wheel_step)ä¹‹åæ‰§è¡Œç”¨æˆ·æŒ‡å®šçš„å‡½æ•°
+ * å¯ç”¨äºå®ç°å®šæ—¶å™¨ï¼Œä½†å…¶ç‰¹ç‚¹æ˜¯å¯ä»¥åœ¨å¸¸æ•°æ—¶é—´å†…ç›‘æµ‹å¤šä¸ªå•å…ƒçš„è¶…æ—¶äº‹ä»¶
+ *  ç°ç»Ÿç§°ä¸ºtimer
  */
 
 #ifndef UTIL_TIME_WHEEL_H
@@ -19,8 +19,8 @@ typedef enum{
 extern "C" {
 #endif 
 
-/* Èç¹û·µ»ØÖµÊÇoneshot£¬Ôò¸ÃtimerÊÇÒ»´ÎĞÔµÄ£¬³¬Ê±Ö®ºó²»ÔÙ»î¶¯
- * ·´Ö®·µ»ØÖµÊÇÆäËûÖµÊ±Ê±Ä¬ÈÏÎªloop£¬¸ÃtimerÊÇÑ­»·timer£¬Ö±ÖÁÆä·µ»Øoneshot»ò±»cancelÎªÖ¹
+/* å¦‚æœè¿”å›å€¼æ˜¯oneshotï¼Œåˆ™è¯¥timeræ˜¯ä¸€æ¬¡æ€§çš„ï¼Œè¶…æ—¶ä¹‹åä¸å†æ´»åŠ¨
+ * åä¹‹è¿”å›å€¼æ˜¯å…¶ä»–å€¼æ—¶æ—¶é»˜è®¤ä¸ºloopï¼Œè¯¥timeræ˜¯å¾ªç¯timerï¼Œç›´è‡³å…¶è¿”å›oneshotæˆ–è¢«cancelä¸ºæ­¢
  */
 typedef int(*onexpire_f)(void *userdata);
 
@@ -28,12 +28,12 @@ time_wheel_t* time_wheel_create(unsigned max_step);
 
 void time_wheel_destroy(time_wheel_t* wheel);
 
-/* ·µ»ØÖµÎªtimerµÄhandle£¬ÔÚtime_wheel_refreshÊ±Ê¹ÓÃ */
+/* è¿”å›å€¼ä¸ºtimerçš„handleï¼Œåœ¨time_wheel_refreshæ—¶ä½¿ç”¨ */
 void* time_wheel_submit(time_wheel_t* wheel, onexpire_f func, void* userdata, unsigned steps);
 
 void time_wheel_cancel(time_wheel_t* wheel, void *handle);
 
-/* ÖØÖÃhandleÖ¸¶¨µÄtimer£¬Ê¹Æä¿ÉÔÙÖ´ĞĞÒ»´Î */
+/* é‡ç½®handleæŒ‡å®šçš„timerï¼Œä½¿å…¶å¯å†æ‰§è¡Œä¸€æ¬¡ */
 void time_wheel_refresh(time_wheel_t* wheel, void *handle);
 
 void time_wheel_step(time_wheel_t* wheel);

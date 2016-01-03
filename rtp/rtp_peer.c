@@ -34,10 +34,6 @@ void rtp_peer_pool_init(unsigned short start_port, unsigned peer_count)
 	g_rtp_peer_pool.start_port = start_port;
 	g_rtp_peer_pool.peer_count = peer_count;
 	g_rtp_peer_pool.peer_bitmap = (atomic_t*)calloc(1, peer_count * sizeof(atomic_t));
-	if (NULL == g_rtp_peer_pool.peer_bitmap)
-	{
-		log_error("rtp_peer_pool_init: calloc() failed");
-	}
 
 	return;
 }
@@ -76,11 +72,6 @@ rtp_peer_t* rtp_peer_alloc
 	}
 
 	peer = (rtp_peer_t*)calloc(1, sizeof(*peer));
-	if (NULL == peer)
-	{
-		log_error("rtp_peer_alloc: memory out");
-		return NULL;
-	}
 
 	rtp_udppeer = NULL;
 	rtcp_udppeer = NULL;

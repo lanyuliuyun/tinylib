@@ -142,7 +142,7 @@ void time_wheel_cancel(time_wheel_t* wheel, void *handle)
         next->prev = prev;
     }
 
-    /* 摘除的是头结点，则将之后的节点作为新的头 */
+    /* 鎽橀櫎鐨勬槸澶寸粨鐐癸紝鍒欏皢涔嬪悗鐨勮妭鐐逛綔涓烘柊鐨勫ご */
     if (wheel->buckets[index] == bucket)
     {
         wheel->buckets[index] = next;
@@ -171,7 +171,7 @@ void time_wheel_refresh(time_wheel_t* wheel, void *handle)
     prev = bucket->prev;
     next = bucket->next;
 
-    /* 将当前的的bucket节点从当前位置摘除，放入下一个超时的位置 */
+    /* 灏嗗綋鍓嶇殑鐨刡ucket鑺傜偣浠庡綋鍓嶄綅缃憳闄わ紝鏀惧叆涓嬩竴涓秴鏃剁殑浣嶇疆 */
 
     if (NULL != prev)
     {
@@ -183,13 +183,13 @@ void time_wheel_refresh(time_wheel_t* wheel, void *handle)
     }
 
     index = bucket->index;
-    /* 摘除的是头结点，则将之后的节点作为新的头 */
+    /* 鎽橀櫎鐨勬槸澶寸粨鐐癸紝鍒欏皢涔嬪悗鐨勮妭鐐逛綔涓烘柊鐨勫ご */
     if (wheel->buckets[index] == bucket)
     {
         wheel->buckets[index] = next;
     }
 
-    /* 新的位置 */
+    /* 鏂扮殑浣嶇疆 */
 	index = wheel->index - bucket->steps;
 	if (index < 0)
 	{
@@ -243,7 +243,7 @@ void time_wheel_step(time_wheel_t* wheel)
         }
         else /* if (TIME_WHEEL_EXPIRE_LOOP == bucket->callback(bucket->userdata))  */
         {
-            /* 进入下一个周期的计时 */
+            /* 杩涘叆涓嬩竴涓懆鏈熺殑璁℃椂 */
         	index = wheel->index - bucket->steps + 1;
         	if (index < 0)
     		{

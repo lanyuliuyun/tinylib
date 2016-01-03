@@ -132,23 +132,23 @@ int socketpair(SOCKET fds[2])
 	SOCKET fd_s;
 	struct sockaddr_in addr;
 	struct sockaddr_in c_addr;
+	int addr_len;
+	
+	BOOL flag;
+	unsigned long value;
 	
 	unsigned short port_begin = 65535;
-	
-	int addr_len;
-	unsigned long value;
-	BOOL flag;
 
 	SOCKET fd_client;
 	SOCKET fd_accept;
 
 	do
 	{
-
 		fd_s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		
 		flag = TRUE;
 		setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
-		
+
 		memset(&addr, 0, sizeof(addr));
 		addr.sin_family = AF_INET;
 		addr.sin_addr.s_addr = 0x100007f;
@@ -156,7 +156,13 @@ int socketpair(SOCKET fds[2])
 		if (bind(fd_s, (struct sockaddr*)&addr, sizeof(addr)))
 		{
 			closesocket(fd_s);
+
 			port_begin--;
+			if (port_begin < 2)
+			{
+				return -1;
+			}
+
 			continue;
 		}
 
@@ -165,7 +171,7 @@ int socketpair(SOCKET fds[2])
 		fd_client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		flag = TRUE;
 		setsockopt(fd_client, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
-		
+
 		memset(&c_addr, 0, sizeof(c_addr));
 		c_addr.sin_family = AF_INET;
 		c_addr.sin_addr.s_addr = 0x100007f;
@@ -174,7 +180,13 @@ int socketpair(SOCKET fds[2])
 		{
 			closesocket(fd_s);
 			closesocket(fd_client);
+
 			port_begin -= 2;
+			if (port_begin < 2)
+			{
+				return -1;
+			}
+
 			continue;
 		}
 
@@ -184,23 +196,36 @@ int socketpair(SOCKET fds[2])
 		{
 			closesocket(fd_s);
 			closesocket(fd_client);
+
 			port_begin -= 2;
+			if (port_begin < 2)
+			{
+				return -1;
+			}
+
 			continue;
 		}
 
 		fd_accept = accept(fd_s, (struct sockaddr*)&addr, &addr_len);
 		if (fd_accept == INVALID_SOCKET)
 		{
-			closesocket(fd_client);
 			closesocket(fd_s);
+			closesocket(fd_client);
+
 			port_begin -= 2;
+			if (port_begin < 2)
+			{
+				return -1;
+			}
+
 			continue;
 		}
 
 		closesocket(fd_s);
+
 		break;
 	} while(1);
-
+	
 	value = 1;
 	ioctlsocket(fd_client, FIONBIO, &value);
 	value = 1;

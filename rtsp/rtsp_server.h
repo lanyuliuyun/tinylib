@@ -23,7 +23,7 @@ rtsp_server_t* rtsp_server_new
 
 void rtsp_server_destroy(rtsp_server_t *server);
 
-void rtsp_server_start(rtsp_server_t *server);
+int rtsp_server_start(rtsp_server_t *server);
 
 void rtsp_server_stop(rtsp_server_t *server);
 

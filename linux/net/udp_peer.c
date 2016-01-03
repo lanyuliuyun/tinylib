@@ -248,11 +248,6 @@ on_message_f udp_peer_onmessage(udp_peer_t* peer, on_message_f messagecb, void *
 	old_messagecb = peer->messagecb;
 
 	notify = (struct udp_peer_notify *)malloc(sizeof(*notify));	
-	if (NULL == notify)
-	{
-		log_error("udp_peer_onmessage: memory out, peer: %s:%u", peer->ip, peer->port);
-		return old_messagecb;
-	}
 	memset(notify, 0, sizeof(*notify));
 
 	(void)atomic_inc(&peer->ref_count);
@@ -310,11 +305,6 @@ on_writable_f udp_peer_onwrite(udp_peer_t* peer, on_writable_f writecb, void *us
 	old_writecb = peer->writecb;
 
 	notify = (struct udp_peer_notify *)malloc(sizeof(*notify));	
-	if (NULL == notify)
-	{
-		log_error("udp_peer_onwrite: memory out, peer: %s:%u", peer->ip, peer->port);
-		return old_writecb;
-	}
 	memset(notify, 0, sizeof(*notify));
 
 	(void)atomic_inc(&peer->ref_count);

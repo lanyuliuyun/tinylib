@@ -34,6 +34,7 @@ timer_queue_t* timer_queue_create(void)
 	timer_queue = (timer_queue_t*)malloc(sizeof(timer_queue_t));
 	memset(timer_queue, 0, sizeof(*timer_queue));
 	timer_queue->timer_list = NULL;
+	timer_queue->timer_list_end = NULL;
 	get_current_timestamp(&timer_queue->min_timestamp);
 
 	return timer_queue;

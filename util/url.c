@@ -45,12 +45,12 @@ url_t* url_parse(const char* url, unsigned len)
         return NULL;
     }
 
-	/* ´Ë´¦¶îÍâ¼Ó3³ýÁËÎª\0°üÀ¨¿Õ¼äÖ®Íâ£¬
-	 * ÔÚÏÂÃæµÄÁ½ÖÖÇé¿öÖÐ£¬ÐèÒª¶îÍâ¿Õ¼ä
-	 * 1, ´æÔÚpathÊ±£¬ÐèÒª½«path²¿·ÖÍùºóÒÆ¶¯Ò»¸ö×Ö·ûÎ»ÖÃ, ¶îÍâÐèÒªÒ»¸öbyte
-	 * 2, ²»´æÔÚpathÊ±£¬ÐèÒªÊÖ¶¯Ö¸¶¨pathÎª"/", ¶îÍâÐèÒª2¸öbyte
+	/* æ­¤å¤„é¢å¤–åŠ 3é™¤äº†ä¸º\0åŒ…æ‹¬ç©ºé—´ä¹‹å¤–ï¼Œ
+	 * åœ¨ä¸‹é¢çš„ä¸¤ç§æƒ…å†µä¸­ï¼Œéœ€è¦é¢å¤–ç©ºé—´
+	 * 1, å­˜åœ¨pathæ—¶ï¼Œéœ€è¦å°†pathéƒ¨åˆ†å¾€åŽç§»åŠ¨ä¸€ä¸ªå­—ç¬¦ä½ç½®, é¢å¤–éœ€è¦ä¸€ä¸ªbyte
+	 * 2, ä¸å­˜åœ¨pathæ—¶ï¼Œéœ€è¦æ‰‹åŠ¨æŒ‡å®špathä¸º"/", é¢å¤–éœ€è¦2ä¸ªbyte
 	 * 
-	 * ¹Ê´Ë´¦Îª+3
+	 * æ•…æ­¤å¤„ä¸º+3
 	 */	
     u = (url_t*)malloc(sizeof(url_t)+len+3);   
 	
@@ -76,25 +76,25 @@ url_t* url_parse(const char* url, unsigned len)
     }
 
     pos++;
-    *pos = '\0';	/* ½ØÈ¡schema²¿·ÖÍê³É */
+    *pos = '\0';	/* æˆªå–schemaéƒ¨åˆ†å®Œæˆ */
     u->schema = part;
 
-    pos += 2;		/* Ö¸ÕëÒÆ¶¯µ½ user:pwd@host:port/path?query#hash ²¿·Ö */
+    pos += 2;		/* æŒ‡é’ˆç§»åŠ¨åˆ° user:pwd@host:port/path?query#hash éƒ¨åˆ† */
     part = pos;
 	
 	pos = strchr(part, '/');
 	if (NULL == pos)
 	{
-		/* Ã»ÓÐpath²¿·Ö£¬ÊÖ¶¯½«pathÈ·¶¨Îª"/" */
+		/* æ²¡æœ‰pathéƒ¨åˆ†ï¼Œæ‰‹åŠ¨å°†pathç¡®å®šä¸º"/" */
 		pos = part + strlen(part) + 1;
 		*pos = '/';
 		u->path = pos;
 	}
 	else
 	{
-		/* ´æÔÚpath£¬½«/¿ªÊ¼²¿·ÖÏòºóÒÆ¶¯Ò»¸ö×Ö·û£¬¶îÍâµÄ¿Õ¼ä·ÖÅäÊ±ºòÒÑ¾­Ìá¹©ÁË */
+		/* å­˜åœ¨pathï¼Œå°†/å¼€å§‹éƒ¨åˆ†å‘åŽç§»åŠ¨ä¸€ä¸ªå­—ç¬¦ï¼Œé¢å¤–çš„ç©ºé—´åˆ†é…æ—¶å€™å·²ç»æä¾›äº† */
 		memmove(pos+1, pos, strlen(pos));
-		*pos = '\0';	/* pathÖ®Ç°µÄ²¿·Ö½ØÈ¡Íê±Ï */
+		*pos = '\0';	/* pathä¹‹å‰çš„éƒ¨åˆ†æˆªå–å®Œæ¯• */
 
 		pos++;
 		u->path = pos;
@@ -106,18 +106,18 @@ url_t* url_parse(const char* url, unsigned len)
     pos = strrchr(part, '@');
     if (NULL != pos)
     {
-		/* ´æÔÚ user@pwd ²¿·Ö */
-        *pos = '\0';	/* ½ØÈ¡ user:pwd ²¿·ÖÍê³É */
+		/* å­˜åœ¨ user@pwd éƒ¨åˆ† */
+        *pos = '\0';	/* æˆªå– user:pwd éƒ¨åˆ†å®Œæˆ */
         u->user = part;
         
         pos1 = strchr(part, ':');
         if (NULL != pos1)
         {
-            *pos1 = '\0';	/* ½ØÈ¡user²¿·ÖÍê³É */
+            *pos1 = '\0';	/* æˆªå–useréƒ¨åˆ†å®Œæˆ */
             pos1++;
             if (pos1 == pos)
             {
-				/* user:@host Çé¾°ÈÏÎªÃ»ÓÐÃÜÂë */
+				/* user:@host æƒ…æ™¯è®¤ä¸ºæ²¡æœ‰å¯†ç  */
                 pos1 = NULL;
             }
         }
@@ -132,10 +132,10 @@ url_t* url_parse(const char* url, unsigned len)
     pos = strchr(u->host, ':');
     if (NULL != pos)
     {
-        /* urlÖÐÓÐ¶Ë¿Ú */
-        *pos = '\0';	/* ½ØÈ¡host²¿·ÖÍê³É */
+        /* urlä¸­æœ‰ç«¯å£ */
+        *pos = '\0';	/* æˆªå–hostéƒ¨åˆ†å®Œæˆ */
 
-		/* atoi("123/path")½á¹ûÎª123£¬atoi("/path")½á¹ûÎª0£¬ËùÒÔ¿ÉÒÔÖ±½Ó»ñÈ¡¶Ë¿Ú */
+		/* atoi("123/path")ç»“æžœä¸º123ï¼Œatoi("/path")ç»“æžœä¸º0ï¼Œæ‰€ä»¥å¯ä»¥ç›´æŽ¥èŽ·å–ç«¯å£ */
         pos++;
 		part = pos;
 		u->port = atoi(part);

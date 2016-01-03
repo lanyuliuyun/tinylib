@@ -20,7 +20,7 @@ void get_current_timestamp(unsigned long long *timestamp)
 	GetSystemTimeAsFileTime(&now);
 	memcpy(&ularg, &now, sizeof(ularg));
 
-	/* ulargµ¥Î»Îª100ns£¬³ıÒÔ10000×ª»»³Éms */
+	/* ulargå•ä½ä¸º100nsï¼Œé™¤ä»¥10000è½¬æ¢æˆms */
 	*timestamp = ularg.QuadPart / 10000;
 
 	return;

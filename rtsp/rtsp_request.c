@@ -46,7 +46,7 @@ struct rtsp_request
     int server_methods;             /* 远端rtsp服务器所支持的方法 */
 
 	int got_sessionid;
-    char sessionid[32];             /* 在setup请求之后服务器返回的Session ID */
+    char *sessionid;           		/* 在setup请求之后服务器返回的Session ID */
     int timeout;                    /* request timeout seconds */
 
     int need_auth;                  /* 服务器告知是否需要认证 */
@@ -59,6 +59,7 @@ static inline
 void request_delete(rtsp_request_t *request)
 {
     tcp_client_destroy(request->client);
+	free(request->sessionid);
     url_release(request->u);
     free(request->url);
     free(request);
@@ -145,17 +146,19 @@ static void request_filt_response
         {
             if (head->key == RTSP_HEAD_SESSION)
             {
-                memset(request->sessionid, 0, sizeof(request->sessionid));
                 request->timeout = 0;
+				free(request->sessionid);
+				request->sessionid = NULL;
+				
                 pos = strchr(head->value, ';');
                 if (NULL == pos)
                 {
-                    strncpy(request->sessionid, head->value, sizeof(request->sessionid)-1);
+					request->sessionid = strdup(head->value);
                 }
                 else
                 {
                     *pos = '\0';
-                    strncpy(request->sessionid, head->value, sizeof(request->sessionid)-1);
+					request->sessionid = strdup(head->value);
                     
                     pos++;
                     while(*pos == ' ' || *pos == '\t')++pos;
@@ -446,6 +449,7 @@ rtsp_request_t* rtsp_request_new
     request->cseq = 0;
     request->current_request = RTSP_METHOD_NONE;
 	request->got_sessionid = 0;
+	request->sessionid = NULL;
     request->timeout = 0;
     request->need_auth = 0;
     request->is_in_handler = 0;

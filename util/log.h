@@ -4,37 +4,37 @@
 
 #include <stdarg.h>  /* for va_list */
 
-/** ÏûÏ¢¼¶±ð¶¨Òå*/
+/** æ¶ˆæ¯çº§åˆ«å®šä¹‰*/
 typedef enum log_level{
-    LOG_LEVEL_NONE,     /** ÎÞÈÎºÎ´òÓ¡ */
-    LOG_LEVEL_LOG,      /** Ò»°ãÔËÐÐÈÕÖ¾ */
-    LOG_LEVEL_ERROR,    /** ´íÎóÐÅÏ¢ */
-    LOG_LEVEL_WARN,     /** ¸æ¾¯ÐÔµÄÏûÏ¢£¬±³ºó¿ÉÄÜ´æÔÚ´íÎó */
-	LOG_LEVEL_INFO,		/** ÌáÊ¾ÐÔµÄÐÅÏ¢Êä³ö */
-	LOG_LEVEL_DEBUG,	/** µ÷ÊÔÐÅÏ¢Êä³ö£¬ÓÃÓÚ¹¦ÄÜÁ÷³ÌÕï¶Ï */
+    LOG_LEVEL_NONE,     /** æ— ä»»ä½•æ‰“å° */
+    LOG_LEVEL_LOG,      /** ä¸€èˆ¬è¿è¡Œæ—¥å¿— */
+    LOG_LEVEL_ERROR,    /** é”™è¯¯ä¿¡æ¯ */
+    LOG_LEVEL_WARN,     /** å‘Šè­¦æ€§çš„æ¶ˆæ¯ï¼ŒèƒŒåŽå¯èƒ½å­˜åœ¨é”™è¯¯ */
+	LOG_LEVEL_INFO,		/** æç¤ºæ€§çš„ä¿¡æ¯è¾“å‡º */
+	LOG_LEVEL_DEBUG,	/** è°ƒè¯•ä¿¡æ¯è¾“å‡ºï¼Œç”¨äºŽåŠŸèƒ½æµç¨‹è¯Šæ–­ */
 }log_level_e;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* ×¢ÒâÏÂÃæÁ½ÖÖÈÕÖ¾Êä³öµÄ·½Ê½ log_init() Ö¸¶¨Êä³öº¯ÊýµÄ·½Ê½ÓÅÏÈ¼¶¸ü¸ß
- * ´ËÊ±¼¶±ð¿ØÖÆÓÉËùÖ¸¶¨µÄÊä³öº¯ÊýÍê³É£¬ log_file()/log_setlevel() µ÷ÓÃÎÞÊµ¼ÊÐ§¹û£¡
+/* æ³¨æ„ä¸‹é¢ä¸¤ç§æ—¥å¿—è¾“å‡ºçš„æ–¹å¼ log_init() æŒ‡å®šè¾“å‡ºå‡½æ•°çš„æ–¹å¼ä¼˜å…ˆçº§æ›´é«˜
+ * æ­¤æ—¶çº§åˆ«æŽ§åˆ¶ç”±æ‰€æŒ‡å®šçš„è¾“å‡ºå‡½æ•°å®Œæˆï¼Œ log_file()/log_setlevel() è°ƒç”¨æ— å®žé™…æ•ˆæžœï¼
  *
- * ²»×öÈÎºÎÉèÖÃÊ±£¬È«²¿Êä³öµ½ stderr £¬¼¶±ðÎª LOG_LEVEL_INFO
+ * ä¸åšä»»ä½•è®¾ç½®æ—¶ï¼Œå…¨éƒ¨è¾“å‡ºåˆ° stderr ï¼Œçº§åˆ«ä¸º LOG_LEVEL_INFO
  */
 
-/* ÉèÖÃÈÕÖ¾µÄÊä³öº¯Êý£¬²¢·¢»·¾³ÖÐµÄÖØÈëÎÊÌâÓÉËùÖ¸¶¨µÄº¯Êý×ÔÐÐ½â¾ö */
+/* è®¾ç½®æ—¥å¿—çš„è¾“å‡ºå‡½æ•°ï¼Œå¹¶å‘çŽ¯å¢ƒä¸­çš„é‡å…¥é—®é¢˜ç”±æ‰€æŒ‡å®šçš„å‡½æ•°è‡ªè¡Œè§£å†³ */
 typedef void (*print_f)(log_level_e level, const char *file, int line, const char *fmt, va_list ap);
 void log_init(print_f printcb);
 
-/* ÉèÖÃÈÕÖ¾Êä³öÎÄ¼þºÍÊä³ö¼¶±ð */
+/* è®¾ç½®æ—¥å¿—è¾“å‡ºæ–‡ä»¶å’Œè¾“å‡ºçº§åˆ« */
 void log_file(const char *file);
 void log_setlevel(log_level_e level);
 
 void log_print(log_level_e level, const char *file, int line, const char *fmt, ...);
 
-/* Êµ¼Ê´òÓ¡¿ÉÊ¹ÓÃÏÂÃæµÄºê */
+/* å®žé™…æ‰“å°å¯ä½¿ç”¨ä¸‹é¢çš„å® */
 #ifdef _MSC_VER
 
 #define log_debug(arg, ...) log_print(LOG_LEVEL_DEBUG, __FILE__, __LINE__, arg, __VA_ARGS__)

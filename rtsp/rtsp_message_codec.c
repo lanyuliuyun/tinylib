@@ -637,7 +637,6 @@ int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, u
 	const char *pos;
 	const char *data_end;
 	char ch;
-	char c;
 	const char *method;
 	
     enum rtsp_msg_parse_state state;
@@ -817,14 +816,8 @@ int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, u
 				{
 					break;
 				}
-
-				c = (ch | 0x20);
-				if (c < 'a' || c > 'z')
-				{
-					log_error("rtsp_request_msg_decode: bad rtsp url begin");
-					return -1;
-				}
-
+				
+				/* 可能请求的 uri 为相对path，不是完整的绝对uri，故此处不检查uri起始字符串 */
 				priv->uri_start = pos;
 				state = sw_uri;
 				priv->state = state;
@@ -848,29 +841,8 @@ int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, u
 							return -1;
 						}
 					}
-					else if ((priv->uri_end - priv->uri_start) < 7)
-					{
-						/* uri太短，为非法的uri 最短rtsp的uri为rtsp://[a-z|0-9]{1},至少8个字符 */
-						log_error("rtsp_request_msg_decode: rtps uri is too short");
-						return -1;
-					}
-					else
-					{
-						char url_scheme[8];
-						memset(url_scheme, 0, sizeof(0));
-						memcpy(url_scheme, priv->uri_start, 8);
-						url_scheme[0] |= 0x20;
-						url_scheme[1] |= 0x20;
-						url_scheme[2] |= 0x20;
-						url_scheme[3] |= 0x20;
-
-						if (!ngx_str7cmp(url_scheme, 'r', 't', 's', 'p', ':', '/', '/'))
-						{
-							/* uri不是以'rtsp://'开始的，为非法消息 */
-							log_error("rtsp_request_msg_decode: rtsp uri is started with 'rtsp://'");
-							return -1;
-						}
-					}
+					
+					/* 可能请求的 uri 为相对path，不是完整的绝对uri，故此处不检查uri起始字符串 */
 
 					request_msg->url = malloc(priv->uri_end - priv->uri_start + 2);
 					memcpy(request_msg->url, priv->uri_start, (priv->uri_end - priv->uri_start + 1));

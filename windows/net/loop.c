@@ -48,14 +48,8 @@ loop_t* loop_new(unsigned hint)
 
 	/* 此处×2，额外的channel是用于保存活跃的channel */
     loop->channels = (channel_t**)malloc(loop->max_count * sizeof(channel_t*) * 2);
-    if (NULL == loop->channels)
-    {
-		log_error("loop_new: malloc() failed");
-		free(loop->pollfds);
-        free(loop);
-		return NULL;
-    }
     memset(loop->channels, 0, loop->max_count * sizeof(channel_t*) * 2);
+
 	loop->active_channels = loop->channels + loop->max_count;
 
     loop->task_queue = async_task_queue_create(loop);

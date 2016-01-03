@@ -1,5 +1,5 @@
 
-/** »ù±¾µÄ¹¤¾ßÏà¹Ø
+/** åŸºæœ¬çš„å·¥å…·ç›¸å…³
   */
 
 #ifndef UTIL_H
@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-/* »ñÈ¡µ±Ç°µÄÊ±¼ä´Á£¬ÒÔmsÎªµ¥Î» */
+/* è·å–å½“å‰çš„æ—¶é—´æˆ³ï¼Œä»¥msä¸ºå•ä½ */
 void get_current_timestamp(unsigned long long *timestamp);
 
 #ifdef __cplusplus

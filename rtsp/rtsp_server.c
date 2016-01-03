@@ -13,6 +13,9 @@ struct rtsp_server
 	rtsp_session_interleaved_packet_f interleaved_sink;
     void* userdata;
 	
+	char ip[16];
+	unsigned short port;
+
 	int started;
 	int is_in_callback;
 	int is_alive;
@@ -69,9 +72,13 @@ rtsp_server_t* rtsp_server_new
 
     server = (rtsp_server_t*)malloc(sizeof(rtsp_server_t));
     memset(server, 0, sizeof(*server));
+
     server->session_handler = session_handler;
 	server->interleaved_sink = interleaved_sink;
     server->userdata = userdata;
+	strncpy(server->ip, ip, sizeof(server->ip)-1);
+	server->port = port;
+
     server->server = tcp_server_new(loop, server_onconnection, server, port, ip);
     if (NULL == server->server)
     {
@@ -87,24 +94,30 @@ rtsp_server_t* rtsp_server_new
     return server;
 }
 
-void rtsp_server_start(rtsp_server_t *server)
+int rtsp_server_start(rtsp_server_t *server)
 {
     if (NULL == server)
     {
         log_error("rtsp_server_start: bad server");
-        return;
+        return -1;
     }
 
     if (server->started)
     {
         log_warn("rtsp_server_start: server has already been started");
-        return;
+        return 0;
     }
 
-    tcp_server_start(server->server);
-    server->started = 1;
+    if (tcp_server_start(server->server) != 0)
+	{
+		log_error("rtsp_server_start: failed to start tcp server at %s:%u", 
+			server->ip, server->port);
+		return -1;
+	}
 
-    return;
+	server->started = 1;
+
+    return 0;
 }
 
 void rtsp_server_stop(rtsp_server_t *server)
