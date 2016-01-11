@@ -26,6 +26,8 @@ static void on_close(tcp_connection_t* connection, void* userdata)
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
     printf("connectionto %s:%u will be closed\n", addr->ip, addr->port);
 
+	tcp_connection_destroy(connection);
+	
     g_run--;
     if (0 == g_run)
     {
@@ -56,7 +58,7 @@ int main(int argc, char *argv[])
     g_loop = loop_new(1);
     assert(g_loop);
 
-    ip = NULL;
+    ip = "0.0.0.0";
     if (argc > 2)
     {
         ip = argv[1];

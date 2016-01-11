@@ -15,15 +15,14 @@
 
 #include <pthread.h>
 
-#define MAX_EP_EVENT    (128)
-
 struct loop
 {
     unsigned run;
 	pthread_t threadId;
 
     int epfd;
-    struct epoll_event events[MAX_EP_EVENT];
+    struct epoll_event *events;
+	int max_event_count;
 
 	async_task_queue_t *task_queue;
     timer_queue_t *timer_queue;
@@ -37,6 +36,11 @@ loop_t* loop_new(unsigned hint)
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
     loop->run = 0;
+	
+	if (hint < 64)
+	{
+		hint = 64;
+	}
 
     epfd = epoll_create(hint);
     if (epfd < 0)
@@ -47,6 +51,11 @@ loop_t* loop_new(unsigned hint)
     }
 
     loop->epfd = epfd;
+
+	loop->max_event_count = hint;
+	loop->events = (struct epoll_event*)malloc(sizeof(struct epoll_event) * hint);
+	
+	loop->max_event_count = hint;
 
     loop->task_queue = async_task_queue_create(loop);
     loop->timer_queue = timer_queue_create();
@@ -60,6 +69,7 @@ void loop_destroy(loop_t *loop)
     {
         timer_queue_destroy(loop->timer_queue);
 		async_task_queue_destroy(loop->task_queue);
+		free(loop->events);
 		close(loop->epfd);
         free(loop);
     }
@@ -169,7 +179,8 @@ void loop_loop(loop_t *loop)
     while (loop->run != 0)
     {
         timeout = timer_queue_gettimeout(loop->timer_queue);
-        result = epoll_wait(loop->epfd, loop->events, MAX_EP_EVENT, timeout);
+		memset(loop->events, 0, loop->max_event_count * sizeof(struct epoll_event));
+        result = epoll_wait(loop->epfd, loop->events, loop->max_event_count, timeout);
 		error = errno;
         if (result > 0)
         {
@@ -184,6 +195,12 @@ void loop_loop(loop_t *loop)
 				event = &(loop->events[i]);
                 channel = (channel_t*)event->data.ptr;
 				channel_onevent(channel);
+			}
+
+			if (result == loop->max_event_count)
+			{
+				loop->events = realloc(loop->events, 2*result*sizeof(struct epoll_event));
+				loop->max_event_count = 2*result;
 			}
         }
         else if (0 > result && EINTR != error)
