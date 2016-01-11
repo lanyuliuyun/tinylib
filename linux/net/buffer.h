@@ -14,7 +14,7 @@ extern "C" {
 /** 按指定尺寸创建的buffer */
 buffer_t* buffer_new(unsigned size);
 
-/** 释放给定的对象，之后可重新使用buffer_init()重新初始化  */
+/** 释放给定的对象  */
 void buffer_destory(buffer_t* buffer);
 
 /** 获取给定buffer中有效数据的起始地址  */
