@@ -1,9 +1,9 @@
 
-#include "net/tcp_server.h"
-#include "net/socket.h"
-#include "net/buffer.h"
-#include "net/inetaddr.h"
-#include "util/log.h"
+#include "tinylib/linux/net/tcp_server.h"
+#include "tinylib/linux/net/socket.h"
+#include "tinylib/linux/net/buffer.h"
+#include "tinylib/linux/net/inetaddr.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <assert.h>

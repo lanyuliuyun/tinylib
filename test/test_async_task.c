@@ -1,6 +1,12 @@
 
-#include "net/loop.h"
-#include "util/log.h"
+#ifdef OS_WINDOWS
+	#include "tinylib/net/loop.h"
+	#include <winsock2.h>
+#else
+	#include "tinylib/linux/loop.h"
+#endif
+
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 

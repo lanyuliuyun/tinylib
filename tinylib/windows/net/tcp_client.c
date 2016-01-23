@@ -1,10 +1,10 @@
 
-#include "net/tcp_client.h"
-#include "net/channel.h"
-#include "net/inetaddr.h"
-#include "net/socket.h"
+#include "tinylib/windows/net/tcp_client.h"
+#include "tinylib/windows/net/channel.h"
+#include "tinylib/windows/net/inetaddr.h"
+#include "tinylib/windows/net/socket.h"
 
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -9,9 +9,9 @@
 struct tcp_connection;
 typedef struct tcp_connection tcp_connection_t;
 
-#include "net/buffer.h"
-#include "net/loop.h"
-#include "net/inetaddr.h"
+#include "tinylib/windows/net/buffer.h"
+#include "tinylib/windows/net/loop.h"
+#include "tinylib/windows/net/inetaddr.h"
 
 #include <winsock2.h>		/* fo SOCKET */
 

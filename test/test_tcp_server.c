@@ -1,12 +1,13 @@
 
-#include "net/tcp_server.h"
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/tcp_server.h"
+	#include <winsock2.h>
+#else
+	#include "tinylib/linux/net/tcp_server.h"
+#endif
 
 #include <stdio.h>
 #include <assert.h>
-
-#ifdef WIN32
-#include <winsock2.h>
-#endif
 
 int g_run = 10;
 static loop_t *g_loop = NULL;
@@ -50,7 +51,7 @@ int main(int argc, char *argv[])
     tcp_server_t *server;
     const char *ip;
 
-    #ifdef WIN32
+    #ifdef OS_WINDOWS
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif    
@@ -73,7 +74,7 @@ int main(int argc, char *argv[])
     tcp_server_destroy(server);
     loop_destroy(g_loop);
 
-    #ifdef WIN32
+    #ifdef OS_WINDOWS
     WSACleanup();
     #endif    
 

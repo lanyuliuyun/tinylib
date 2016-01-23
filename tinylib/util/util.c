@@ -1,8 +1,8 @@
 
-#include "util.h"
-#include "log.h"
+#include "tinylib/util/util.h"
+#include "tinylib/util/log.h"
 
-#ifdef _MSC_VER
+#ifdef OS_WINDOWS
 
 #include <windows.h>
 

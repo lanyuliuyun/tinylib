@@ -1,10 +1,10 @@
 
-#include "net/inetaddr.h"
-#include "util/log.h"
+#include "tinylib/linux/net/inetaddr.h"
+#include "tinylib/util/log.h"
 
 #include <string.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
+#include <netitinylib/linux/net/in.h>
 #include <arpa/inet.h>
 
 void inetaddr_init(inetaddr_t *addr, struct sockaddr_in *addr_in)

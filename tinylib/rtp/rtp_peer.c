@@ -2,11 +2,11 @@
 #include "rtp_peer.h"
 #include "rtp_rtcp_packet.h"
 
-#include "util/util.h"
-#include "util/log.h"
-#include "util/atomic.h"
+#include "tinylib/util/util.h"
+#include "tinylib/util/log.h"
+#include "tinylib/util/atomic.h"
 
-#include "net/udp_peer.h"
+#include "tinylib/linux/net/udp_peer.h"
 
 #include <stdlib.h>
 #include <string.h>

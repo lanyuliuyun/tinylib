@@ -1,14 +1,14 @@
 
-#include "net/socket.h"
-#include "util/log.h"
+#include "tinylib/linux/net/socket.h"
+#include "tinylib/util/log.h"
 
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
+#include <netitinylib/linux/net/in.h>
+#include <netitinylib/linux/net/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>

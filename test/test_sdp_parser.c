@@ -1,5 +1,5 @@
 
-#include "rtsp/sdp.h"
+#include "tinylib/rtsp/sdp.h"
 
 #include <string.h>
 #include <assert.h>

@@ -4,7 +4,7 @@
 
 typedef long atomic_t;
 
-#if defined(_WIN32)
+#ifdef OS_WINDOWS
 
 #include <windows.h>
 

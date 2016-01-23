@@ -4,8 +4,13 @@
 struct rtsp_server;
 typedef struct rtsp_server rtsp_server_t;
 
-#include "rtsp/rtsp_session.h"
-#include "net/loop.h"
+#include "tinylib/rtsp/rtsp_session.h"
+
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/loop.h"
+#else
+	#include "tinylib/linux/net/loop.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {

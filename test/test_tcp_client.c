@@ -1,13 +1,14 @@
 
-#include "net/tcp_client.h"
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/tcp_client.h"
+	#include <winsock2.h>
+#else
+	#include "tinylib/linux/net/tcp_client.h"
+#endif
 
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-
-#ifdef WIN32
-#include <winsock2.h>
-#endif
 
 static loop_t *g_loop = NULL;
 
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
     tcp_client_t* client1;
     const char *ip;
 
-    #ifdef WIN32
+    #ifdef OS_WINDOWS
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif
@@ -68,7 +69,7 @@ int main(int argc, char *argv[])
     tcp_client_destroy(client1);
     loop_destroy(g_loop);
 
-    #ifdef WIN32
+    #ifdef OS_WINDOWS
     WSACleanup();
     #endif
 

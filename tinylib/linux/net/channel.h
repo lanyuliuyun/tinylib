@@ -5,7 +5,7 @@
 struct channel;
 typedef struct channel channel_t;
 
-#include "net/loop.h"
+#include "tinylib/linux/net/loop.h"
 
 #ifdef __cplusplus
 extern "C" {

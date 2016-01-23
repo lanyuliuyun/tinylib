@@ -1,10 +1,10 @@
 
-#include "net/tcp_server.h"
-#include "net/socket.h"
-#include "net/buffer.h"
-#include "net/inetaddr.h"
+#include "tinylib/windows/net/tcp_server.h"
+#include "tinylib/windows/net/socket.h"
+#include "tinylib/windows/net/buffer.h"
+#include "tinylib/windows/net/inetaddr.h"
 
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <assert.h>

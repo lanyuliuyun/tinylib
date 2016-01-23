@@ -1,6 +1,6 @@
 
-#include "time_wheel.h"
-#include "log.h"
+#include "tinylib/util/time_wheel.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -1,20 +1,24 @@
 
-#include "net/tcp_connection.h"
-#include "net/buffer.h"
-#include "rtsp_message_codec.h"
-#include "rtsp_session.h"
-#include "util/log.h"
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/tcp_connection.h"
+	#include "tinylib/windows/net/buffer.h"
+	
+	#include <winsock2.h>
+#else
+	#include "tinylib/linux/net/tcp_connection.h"
+	#include "tinylib/linux/net/buffer.h"
+	
+	#include <arpa/inet.h>
+#endif
+
+#include "tinylib/rtsp/rtsp_message_codec.h"
+#include "tinylib/rtsp/rtsp_session.h"
+#include "tinylib/util/log.h"
 
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-
-#ifdef WIN32
-#include <winsock2.h>
-#else
-#include <arpa/inet.h>
-#endif
 
 struct rtsp_session
 {

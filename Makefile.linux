@@ -5,40 +5,40 @@ CC = gcc
 LD = gcc
 AR = ar -r
 
-CFLAGS = -Wall -Werror -g -march=i686 -I. -I./linux
+CFLAGS = -Wall -Werror -g -march=native -I. -I./linux
 LDFLAGS = -L./output -lpthread
 
 TINYLIB = output/libtinylib.a
 
 UTIL_OBJS = \
-	util/log.o \
-	util/md5.o \
-	util/time_wheel.o \
-	util/url.o \
-	util/util.o
+	tinylib/util/log.o \
+	tinylib/util/md5.o \
+	tinylib/util/time_wheel.o \
+	tinylib/util/url.o \
+	tinylib/util/util.o
 
 NET_OBJS = \
-	linux/net/async_task_queue.o \
-	linux/net/buffer.o \
-	linux/net/channel.o \
-	linux/net/inetaddr.o \
-	linux/net/loop.o \
-	linux/net/socket.o \
-	linux/net/tcp_client.o \
-	linux/net/tcp_connection.o \
-	linux/net/tcp_server.o \
-	linux/net/timer_queue.o \
-	linux/net/udp_peer.o
+	tinylib/linux/net/async_task_queue.o \
+	tinylib/linux/net/buffer.o \
+	tinylib/linux/net/channel.o \
+	tinylib/linux/net/inetaddr.o \
+	tinylib/linux/net/loop.o \
+	tinylib/linux/net/socket.o \
+	tinylib/linux/net/tcp_client.o \
+	tinylib/linux/net/tcp_connection.o \
+	tinylib/linux/net/tcp_server.o \
+	tinylib/linux/net/timer_queue.o \
+	tinylib/linux/net/udp_peer.o
 
 RTSP_OBJS = \
-	rtsp/rtsp_message_codec.o \
-	rtsp/rtsp_request.o \
-	rtsp/rtsp_server.o \
-	rtsp/rtsp_session.o \
-	rtsp/sdp.o
+	tinylib/rtsp/rtsp_message_codec.o \
+	tinylib/rtsp/rtsp_request.o \
+	tinylib/rtsp/rtsp_server.o \
+	tinylib/rtsp/rtsp_session.o \
+	tinylib/rtsp/sdp.o
 	
 RTP_OBJS = \
-	rtp/rtp_peer.o
+	tinylib/rtp/rtp_peer.o
 
 # unit test
 

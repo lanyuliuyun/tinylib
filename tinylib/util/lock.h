@@ -2,9 +2,9 @@
 #ifndef UTIL_LOCK_H
 #define UTIL_LOCK_H
 
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
-#ifdef WIN32
+#ifdef OS_WINDOWS
 
 #include <windows.h>
 

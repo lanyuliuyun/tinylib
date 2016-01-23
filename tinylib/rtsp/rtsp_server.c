@@ -1,7 +1,13 @@
 
-#include "rtsp_server.h"
-#include "net/tcp_server.h"
-#include "util/log.h"
+#include "tinylib/rtsp/rtsp_server.h"
+
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/tcp_server.h"
+#else
+	#include "tinylib/linux/net/tcp_server.h"
+#endif
+
+#include "tinylib/util/log.h"
 
 #include <string.h>
 #include <stdlib.h>

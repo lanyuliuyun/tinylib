@@ -1,14 +1,14 @@
 
-#include "net/async_task_queue.h"
-#include "net/socket.h"
+#include "tinylib/windows/net/async_task_queue.h"
+#include "tinylib/windows/net/socket.h"
 
-#include "util/log.h"
-#include "util/lock.h"
+#include "tinylib/util/log.h"
+#include "tinylib/util/lock.h"
 
 #include <stdlib.h>
 #include <string.h>
 
-#include <windows.h>
+#include <winsock2.h>
 
 struct async_task
 {

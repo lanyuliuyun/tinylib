@@ -9,9 +9,9 @@
 struct tcp_connection;
 typedef struct tcp_connection tcp_connection_t;
 
-#include "net/buffer.h"
-#include "net/loop.h"
-#include "net/inetaddr.h"
+#include "tinylib/linux/net/buffer.h"
+#include "tinylib/linux/net/loop.h"
+#include "tinylib/linux/net/inetaddr.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -1,11 +1,11 @@
 
-#include "net/udp_peer.h"
-#include "net/socket.h"
-#include "net/channel.h"
-#include "net/buffer.h"
+#include "tinylib/linux/net/udp_peer.h"
+#include "tinylib/linux/net/socket.h"
+#include "tinylib/linux/net/channel.h"
+#include "tinylib/linux/net/buffer.h"
 
-#include "util/log.h"
-#include "util/atomic.h"
+#include "tinylib/util/log.h"
+#include "tinylib/util/atomic.h"
 
 #include <stdlib.h>
 #include <string.h>

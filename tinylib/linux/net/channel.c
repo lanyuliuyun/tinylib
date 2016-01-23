@@ -1,7 +1,7 @@
 
-#include "util/util.h"
-#include "util/log.h"
-#include "net/channel.h"
+#include "tinylib/util/util.h"
+#include "tinylib/util/log.h"
+#include "tinylib/linux/net/channel.h"
 
 #include <stdlib.h>
 #include <assert.h>

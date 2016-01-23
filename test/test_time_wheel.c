@@ -3,14 +3,14 @@
 #include <stdio.h>
 #include <assert.h>
 
-#ifdef WIN32
-#include <windows.h>
-#define usleep Sleep
+#ifdef OS_WINDOWS
+	#include <windows.h>
+	#define usleep Sleep
 #else
-#include <unistd.h>
+	#include <unistd.h>
 #endif
 
-#include "util/time_wheel.h"
+#include "tinylib/util/time_wheel.h"
 
 static int g_count1 = 10;
 static int onexpire1(void *userdata)

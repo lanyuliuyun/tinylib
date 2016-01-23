@@ -5,8 +5,8 @@
 struct loop;
 typedef struct loop loop_t;
 
-#include "net/timer.h"
-#include "net/channel.h"
+#include "tinylib/windows/net/timer.h"
+#include "tinylib/windows/net/channel.h"
 
 #ifdef __cplusplus
 extern "C" {

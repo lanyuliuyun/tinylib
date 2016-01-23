@@ -1,11 +1,11 @@
 
 
-#include "net/channel.h"
-#include "net/tcp_connection.h"
-#include "net/inetaddr.h"
-#include "net/buffer.h"
+#include "tinylib/windows/net/channel.h"
+#include "tinylib/windows/net/tcp_connection.h"
+#include "tinylib/windows/net/inetaddr.h"
+#include "tinylib/windows/net/buffer.h"
 
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <assert.h>

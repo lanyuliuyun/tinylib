@@ -1,19 +1,15 @@
 
-/*
+#ifdef OS_WINDOWS
+	#include "tinylib/net/udp_peer.h"
+	#include <winsock2.h>
+#else
+	#include "tinylib/linux/udp_peer.h"
+#endif
 
-cl test_pingpong.c ..\output\tinylib.lib ws2_32.lib /I..\windows\ /I..\ /MDd /Zi
-
- */
-
-#include "net/udp_peer.h"
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <stdio.h>
-
-#ifdef WIN32
-#include <winsock2.h>
-#endif
 
 static loop_t *g_loop;
 static udp_peer_t *g_udp_peer;
@@ -39,7 +35,7 @@ static void on_expire(void* userdata)
 
 int main(int argc, char *argv[])
 {
-	#ifdef WIN32
+	#ifdef OS_WINDOWS
 	WSADATA wsa_data;
 	
 	WSAStartup(MAKEWORD(2, 2), &wsa_data);
@@ -66,7 +62,7 @@ int main(int argc, char *argv[])
 	udp_peer_destroy(g_udp_peer);
 	loop_destroy(g_loop);
 
-	#ifdef WIN32
+	#ifdef OS_WINDOWS
 	WSACleanup();
 	#endif
 	

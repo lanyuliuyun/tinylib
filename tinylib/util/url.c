@@ -1,6 +1,6 @@
 
-#include "url.h"
-#include "log.h"
+#include "tinylib/util/url.h"
+#include "tinylib/util/log.h"
 
 #include <string.h>
 #include <stdlib.h>

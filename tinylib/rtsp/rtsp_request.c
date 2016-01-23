@@ -1,23 +1,27 @@
 
 
-#include "rtsp_request.h"
-#include "rtsp_message_codec.h"
-#include "util/url.h"
-#include "util/log.h"
-#include "net/tcp_client.h"
-#include "net/tcp_connection.h"
+#include "tinylib/rtsp/rtsp_request.h"
+#include "tinylib/rtsp/rtsp_message_codec.h"
+#include "tinylib/util/url.h"
+#include "tinylib/util/log.h"
+
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/tcp_client.h"
+	#include "tinylib/windows/net/tcp_connection.h"
+	
+	#include <winsock2.h>
+#else
+	#include "tinylib/linux/net/tcp_client.h"
+	#include "tinylib/linux/net/tcp_connection.h"
+	
+	#include <arpa/inet.h>
+#endif
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
-
-#ifdef WIN32
-#include <winsock2.h>
-#else
-#include <arpa/inet.h>
-#endif
 
 struct rtsp_request
 {

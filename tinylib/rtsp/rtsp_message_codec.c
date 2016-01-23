@@ -1,11 +1,11 @@
 
 /** 主要是基于builder模式对rtsp请求消息和响应消息进行解析 */
 
-#include "rtsp_message_codec.h"
+#include "tinylib/rtsp/rtsp_message_codec.h"
 
-#include "util/log.h"
-#include "util/atomic.h"
-#include "util/md5.h"     /* for MD5() */
+#include "tinylib/util/log.h"
+#include "tinylib/util/atomic.h"
+#include "tinylib/util/md5.h"     /* for MD5() */
 
 #include <stdlib.h>
 #include <string.h>

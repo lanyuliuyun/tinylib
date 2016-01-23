@@ -1,6 +1,11 @@
 
-#include "net/loop.h"
-#include "util/log.h"
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/loop.h"
+#else
+	#include "tinylib/linux/net/loop.h"
+#endif
+
+#include "tinylib/util/log.h"
 
 #include <time.h>
 #include <stdio.h>

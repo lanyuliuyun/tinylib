@@ -1,17 +1,17 @@
 
-#include "log.h"
+#include "tinylib/util/log.h"
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
 #include <string.h>
 
-#ifdef WIN32
-#include <windows.h>		/* for GetLocalTime() */
+#ifdef OS_WINDOWS
+	#include <windows.h>		/* for GetLocalTime() */
 #else
-#include <sys/time.h>		/* for gettimeofday() */
-#include <sys/syscall.h>	/* for SYS_gettid */
-#include <unistd.h>			/* for syscall() */
+	#include <sys/time.h>		/* for gettimeofday() */
+	#include <sys/syscall.h>	/* for SYS_gettid */
+	#include <unistd.h>			/* for syscall() */
 #endif
 
 static log_level_e g_log_level = LOG_LEVEL_INFO;

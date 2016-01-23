@@ -1,13 +1,13 @@
 
-#include "rtsp/rtsp_server.h"
+#include "tinylib/rtsp/rtsp_server.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 
-#ifdef WIN32
-#include <winsock2.h>
+#ifdef OS_WINDOWS
+	#include <winsock2.h>
 #endif
 
 static loop_t *g_loop = NULL;
@@ -183,7 +183,7 @@ int main()
 {
     rtsp_server_t *server;
 
-    #ifdef WIN32
+    #ifdef OS_WINDOWS
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif  
@@ -200,7 +200,7 @@ int main()
     rtsp_server_destroy(server);
     loop_destroy(g_loop);
 
-    #ifdef WIN32
+    #ifdef OS_WINDOWS
     WSACleanup();
     #endif    
 

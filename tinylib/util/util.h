@@ -2,8 +2,8 @@
 /** 基本的工具相关
   */
 
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef TINYLIB_UTIL_H
+#define TINYLIB_UTIL_H
 
 #include <string.h>
 #include <assert.h>
@@ -19,4 +19,4 @@ void get_current_timestamp(unsigned long long *timestamp);
 }
 #endif
 
-#endif /* !UTIL_H */
+#endif /* !TINYLIB_UTIL_H */

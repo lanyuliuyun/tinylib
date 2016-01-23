@@ -1,7 +1,7 @@
 
-#include "net/async_task_queue.h"
+#include "tinylib/linux/net/async_task_queue.h"
 
-#include "util/lock.h"
+#include "tinylib/util/lock.h"
 
 #include <stdlib.h>		/* for NULL */
 #include <string.h>		/* for memset() */

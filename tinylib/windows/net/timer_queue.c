@@ -1,7 +1,7 @@
 
-#include "net/timer_queue.h"
-#include "util/log.h"
-#include "util/util.h"
+#include "tinylib/windows/net/timer_queue.h"
+#include "tinylib/util/log.h"
+#include "tinylib/util/util.h"
 
 #include <stdlib.h>
 #include <string.h>

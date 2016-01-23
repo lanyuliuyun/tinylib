@@ -5,8 +5,8 @@
 struct tcp_client;
 typedef struct tcp_client tcp_client_t;
 
-#include "net/tcp_connection.h"
-#include "net/loop.h"
+#include "tinylib/windows/net/tcp_connection.h"
+#include "tinylib/windows/net/loop.h"
 
 #ifdef __cplusplus
 extern "C" {

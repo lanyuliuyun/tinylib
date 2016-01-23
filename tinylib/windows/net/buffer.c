@@ -1,6 +1,6 @@
 
-#include "net/buffer.h"
-#include "util/log.h"
+#include "tinylib/windows/net/buffer.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <assert.h>

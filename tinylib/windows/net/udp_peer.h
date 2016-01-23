@@ -5,8 +5,8 @@
 struct udp_peer;
 typedef struct udp_peer udp_peer_t;
 
-#include "net/loop.h"
-#include "net/inetaddr.h"
+#include "tinylib/windows/net/loop.h"
+#include "tinylib/windows/net/inetaddr.h"
 
 #include <winsock2.h>
 

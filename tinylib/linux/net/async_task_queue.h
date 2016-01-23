@@ -5,7 +5,7 @@
 struct async_task_queue;
 typedef struct async_task_queue async_task_queue_t;
 
-#include "net/loop.h"
+#include "tinylib/linux/net/loop.h"
 
 #ifdef __cplusplus
 extern "C" {

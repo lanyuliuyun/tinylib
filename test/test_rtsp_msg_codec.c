@@ -105,7 +105,7 @@ const char* rtsp_response_msgs[] = {
     "\r\n"
 };
 
-#include "rtsp/rtsp_message_codec.h"
+#include "tinylib/rtsp/rtsp_message_codec.h"
 
 #include <stdio.h>
 #include <stdlib.h>

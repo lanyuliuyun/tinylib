@@ -5,7 +5,7 @@
 struct timer_queue;
 typedef struct timer_queue timer_queue_t;
 
-#include "net/timer.h"
+#include "tinylib/windows/net/timer.h"
 
 #ifdef __cplusplus
 extern "C" {

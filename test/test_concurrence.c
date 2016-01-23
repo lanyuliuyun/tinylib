@@ -1,18 +1,14 @@
 
-/*
+#ifdef OS_WINDOWS
+	#include "tinylib/net/udp_peer.h"
+	#include <winsock2.h>
+#else
+	#include "tinylib/linux/udp_peer.h"
+#endif
 
-cl test_concurrence.c ..\output\tinylib.lib ws2_32.lib /I..\windows\ /I..\ /MDd /Zi
-
-*/
-
-#include "net/udp_peer.h"
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
-
-#ifdef WIN32
-#include <winsock2.h>
-#endif
 
 static void on_message(udp_peer_t *udp_peer, void *message, unsigned size, void* userdata, const inetaddr_t *peer_addr)
 {
@@ -32,7 +28,7 @@ int main(int argc, char *argv[])
 	udp_peer_t *udp_peers[1024];
 	int i;
 	
-	#ifdef WIN32
+	#ifdef OS_WINDOWS
 	WSADATA wsa_data;
 	
 	WSAStartup(MAKEWORD(2, 2), &wsa_data);
@@ -57,7 +53,7 @@ int main(int argc, char *argv[])
 	
 	loop_destroy(loop);
 	
-	#ifdef WIN32
+	#ifdef OS_WINDOWS
 	WSACleanup();
 	#endif
 	

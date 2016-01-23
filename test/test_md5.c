@@ -1,5 +1,5 @@
 
-#include "util/md5.h"
+#include "tinylib/util/md5.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -1,5 +1,5 @@
 
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
 #include <stdio.h>
 #include <assert.h>

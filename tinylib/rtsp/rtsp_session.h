@@ -5,8 +5,13 @@
 struct rtsp_session;
 typedef struct rtsp_session rtsp_session_t;
 
-#include "net/tcp_connection.h"
-#include "rtsp/rtsp_message_codec.h"
+#ifdef OS_WINDOWS
+	#include "tinylib/windows/net/tcp_connection.h"
+#else
+	#include "tinylib/linux/net/tcp_connection.h"
+#endif
+
+#include "tinylib/rtsp/rtsp_message_codec.h"
 
 #ifdef __cplusplus
 extern "C" {

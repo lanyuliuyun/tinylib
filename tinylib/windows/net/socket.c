@@ -1,6 +1,6 @@
 
-#include "net/socket.h"
-#include "util/log.h"
+#include "tinylib/windows/net/socket.h"
+#include "tinylib/util/log.h"
 
 #include <string.h>
 

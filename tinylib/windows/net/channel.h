@@ -5,7 +5,7 @@
 struct channel;
 typedef struct channel channel_t;
 
-#include "net/loop.h"
+#include "tinylib/windows/net/loop.h"
 
 #include <winsock2.h>
 

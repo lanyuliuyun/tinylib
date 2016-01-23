@@ -1,7 +1,7 @@
 
-#include "net/inetaddr.h"
+#include "tinylib/windows/net/inetaddr.h"
 
-#include "util/log.h"
+#include "tinylib/util/log.h"
 #include <string.h>
 
 #include <winsock2.h>

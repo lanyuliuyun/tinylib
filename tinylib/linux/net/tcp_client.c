@@ -1,11 +1,11 @@
 
-#include "net/tcp_connection.h"
-#include "net/tcp_client.h"
-#include "net/channel.h"
-#include "net/inetaddr.h"
-#include "net/socket.h"
+#include "tinylib/linux/net/tcp_connection.h"
+#include "tinylib/linux/net/tcp_client.h"
+#include "tinylib/linux/net/channel.h"
+#include "tinylib/linux/net/inetaddr.h"
+#include "tinylib/linux/net/socket.h"
 
-#include "util/log.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <string.h>

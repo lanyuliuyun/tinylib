@@ -5,41 +5,41 @@ CC = gcc
 LD = gcc
 AR = ar -r
 
-CFLAGS = -Wall -Werror -g -I. -I./windows -D_WIN32_WINNT=0x0601 -DWIN32_LEAN_AND_MEAN
+CFLAGS = -Wall -Werror -g -I. -DOS_WINDOWS -D_WIN32_WINNT=0x0601 -DWIN32_LEAN_AND_MEAN
 LDFLAGS = -L./output
 
 TINYLIB = output/libtinylib.a
 
 UTIL_OBJS = \
-	util/base64.o \
-	util/log.o \
-	util/md5.o \
-	util/time_wheel.o \
-	util/url.o \
-	util/util.o
+	tinylib/util/base64.o \
+	tinylib/util/log.o \
+	tinylib/util/md5.o \
+	tinylib/util/time_wheel.o \
+	tinylib/util/url.o \
+	tinylib/util/util.o
 
 NET_OBJS = \
-	windows/net/async_task_queue.o \
-	windows/net/buffer.o \
-	windows/net/channel.o \
-	windows/net/inetaddr.o \
-	windows/net/loop.o \
-	windows/net/socket.o \
-	windows/net/tcp_client.o \
-	windows/net/tcp_connection.o \
-	windows/net/tcp_server.o \
-	windows/net/timer_queue.o \
-	windows/net/udp_peer.o
+	tinylib/windows/net/async_task_queue.o \
+	tinylib/windows/net/buffer.o \
+	tinylib/windows/net/channel.o \
+	tinylib/windows/net/inetaddr.o \
+	tinylib/windows/net/loop.o \
+	tinylib/windows/net/socket.o \
+	tinylib/windows/net/tcp_client.o \
+	tinylib/windows/net/tcp_connection.o \
+	tinylib/windows/net/tcp_server.o \
+	tinylib/windows/net/timer_queue.o \
+	tinylib/windows/net/udp_peer.o
 
 RTSP_OBJS = \
-	rtsp/rtsp_message_codec.o \
-	rtsp/rtsp_request.o \
-	rtsp/rtsp_server.o \
-	rtsp/rtsp_session.o \
-	rtsp/sdp.o
+	tinylib/rtsp/rtsp_message_codec.o \
+	tinylib/rtsp/rtsp_request.o \
+	tinylib/rtsp/rtsp_server.o \
+	tinylib/rtsp/rtsp_session.o \
+	tinylib/rtsp/sdp.o
 	
 RTP_OBJS = \
-	rtp/rtp_peer.o
+	tinylib/rtp/rtp_peer.o
 
 # unit test
 

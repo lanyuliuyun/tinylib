@@ -1,5 +1,5 @@
 
-#include "util/atomic.h"
+#include "tinylib/util/atomic.h"
 
 #include <stdio.h>
 #include <string.h>

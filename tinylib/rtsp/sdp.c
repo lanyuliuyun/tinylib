@@ -1,6 +1,6 @@
 
-#include "sdp.h"
-#include "util/log.h"
+#include "tinylib/rtsp/sdp.h"
+#include "tinylib/util/log.h"
 
 #include <stdlib.h>
 #include <string.h>

@@ -4,8 +4,8 @@
 struct tcp_server;
 typedef struct tcp_server tcp_server_t;
 
-#include "net/tcp_connection.h"
-#include "net/loop.h"
+#include "tinylib/linux/net/tcp_connection.h"
+#include "tinylib/linux/net/loop.h"
 
 #ifdef __cplusplus
 extern "C" {
