@@ -2,7 +2,7 @@
 #include "tinylib/util/util.h"
 #include "tinylib/util/log.h"
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 
 #include <windows.h>
 
@@ -26,7 +26,7 @@ void get_current_timestamp(unsigned long long *timestamp)
 	return;
 }
 
-#else
+#elif defined(__linux__)
 
 #include <sys/time.h>
 

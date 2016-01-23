@@ -11,7 +11,7 @@ typedef enum rtcp_packet_type{
 	RTCP_PACKET_TYPE_APP = 204,
 }rtcp_packet_type_e;
 
-#ifdef USE_LITTLE_ENDIAN
+#ifndef USE_BIG_ENDIAN
 typedef struct rtp_head
 {
 	uint16_t CC:4;

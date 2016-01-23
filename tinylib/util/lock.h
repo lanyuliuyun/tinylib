@@ -4,7 +4,7 @@
 
 #include "tinylib/util/log.h"
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 
 #include <windows.h>
 
@@ -52,7 +52,7 @@ void unlock_it(lock_t *lock)
 	return;
 }
 
-#else
+#elif defined(__linux__)
 	
 #include <pthread.h>
 

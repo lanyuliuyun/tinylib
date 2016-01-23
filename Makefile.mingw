@@ -5,7 +5,7 @@ CC = gcc
 LD = gcc
 AR = ar -r
 
-CFLAGS = -Wall -Werror -g -I. -DOS_WINDOWS -D_WIN32_WINNT=0x0601 -DWIN32_LEAN_AND_MEAN
+CFLAGS = -Wall -Werror -g -I. -D_WIN32_WINNT=0x0601 -DWIN32_LEAN_AND_MEAN
 LDFLAGS = -L./output
 
 TINYLIB = output/libtinylib.a

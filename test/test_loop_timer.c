@@ -1,7 +1,7 @@
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include "tinylib/windows/net/loop.h"
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/net/loop.h"
 #endif
 

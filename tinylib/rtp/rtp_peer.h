@@ -2,9 +2,9 @@
 #ifndef RTP_PEER_H
 #define RTP_PEER_H
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include "tinylib/windows/net/udp_peer.h"
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/net/udp_peer.h"
 #endif
 

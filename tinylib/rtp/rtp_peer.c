@@ -6,8 +6,6 @@
 #include "tinylib/util/log.h"
 #include "tinylib/util/atomic.h"
 
-#include "tinylib/linux/net/udp_peer.h"
-
 #include <stdlib.h>
 #include <string.h>
 

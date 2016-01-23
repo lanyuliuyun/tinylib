@@ -1,8 +1,8 @@
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include "tinylib/net/loop.h"
 	#include <winsock2.h>
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/loop.h"
 #endif
 

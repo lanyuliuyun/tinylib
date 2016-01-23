@@ -5,9 +5,9 @@
 struct rtsp_session;
 typedef struct rtsp_session rtsp_session_t;
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include "tinylib/windows/net/tcp_connection.h"
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/net/tcp_connection.h"
 #endif
 

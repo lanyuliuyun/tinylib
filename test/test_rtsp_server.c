@@ -6,7 +6,7 @@
 #include <string.h>
 #include <assert.h>
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include <winsock2.h>
 #endif
 
@@ -183,7 +183,7 @@ int main()
 {
     rtsp_server_t *server;
 
-    #ifdef OS_WINDOWS
+    #ifdef WINNT
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif  
@@ -200,7 +200,7 @@ int main()
     rtsp_server_destroy(server);
     loop_destroy(g_loop);
 
-    #ifdef OS_WINDOWS
+    #ifdef WINNT
     WSACleanup();
     #endif    
 

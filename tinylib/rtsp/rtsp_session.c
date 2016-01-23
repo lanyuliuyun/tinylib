@@ -1,10 +1,10 @@
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include "tinylib/windows/net/tcp_connection.h"
 	#include "tinylib/windows/net/buffer.h"
 	
 	#include <winsock2.h>
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/net/tcp_connection.h"
 	#include "tinylib/linux/net/buffer.h"
 	

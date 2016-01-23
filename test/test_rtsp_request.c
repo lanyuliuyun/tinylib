@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 #include <winsock2.h>
 #endif
 
@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
 {
     const char *url;
 
-    #ifdef OS_WINDOWS
+    #ifdef WINNT
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif    
@@ -190,7 +190,7 @@ int main(int argc, char* argv[])
     rtsp_request_destroy(g_request);
     loop_destroy(g_loop);
 
-    #ifdef OS_WINDOWS
+    #ifdef WINNT
     WSACleanup();
     #endif
 

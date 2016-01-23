@@ -4,7 +4,7 @@
 
 typedef long atomic_t;
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 
 #include <windows.h>
 
@@ -43,10 +43,6 @@ typedef long atomic_t;
 #define atomic_cas(atomic, comp, value)	(__sync_val_compare_and_swap((atomic), (comp), (value)))
 
 #define atomic_cas_ptr(pptr, ptr_comp, ptr_value)		(__sync_val_compare_and_swap((pptr), (ptr_comp), (ptr_value)))
-
-#else
-
-#error "un-supported compiler"	
 
 #endif
 

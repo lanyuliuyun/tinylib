@@ -7,9 +7,9 @@
 struct rtsp_request;
 typedef struct rtsp_request rtsp_request_t;
 
-#if OS_WINDOWS
+#if WINNT
 	#include "tinylib/windows/net/tcp_connection.h"
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/net/tcp_connection.h"
 #endif
 

@@ -1,9 +1,9 @@
 
 #include "tinylib/rtsp/rtsp_server.h"
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include "tinylib/windows/net/tcp_server.h"
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/net/tcp_server.h"
 #endif
 

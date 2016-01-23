@@ -1,8 +1,8 @@
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include "tinylib/windows/net/tcp_server.h"
 	#include <winsock2.h>
-#else
+#elif defined(__linux__)
 	#include "tinylib/linux/net/tcp_server.h"
 #endif
 
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     tcp_server_t *server;
     const char *ip;
 
-    #ifdef OS_WINDOWS
+    #ifdef WINNT
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif    
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     tcp_server_destroy(server);
     loop_destroy(g_loop);
 
-    #ifdef OS_WINDOWS
+    #ifdef WINNT
     WSACleanup();
     #endif    
 

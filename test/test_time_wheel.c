@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <assert.h>
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include <windows.h>
 	#define usleep Sleep
-#else
+#elif defined(__linux__)
 	#include <unistd.h>
 #endif
 

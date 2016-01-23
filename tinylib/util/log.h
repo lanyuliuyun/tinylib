@@ -47,7 +47,7 @@ void log_print(log_level_e level, const char *file, int line, const char *fmt, .
 
 #define log_log(arg, ...) log_print(LOG_LEVEL_LOG, __FILE__, __LINE__, arg, __VA_ARGS__)
 
-#else
+#elif defined(__GNUC__)
 
 #define log_debug(arg...) log_print(LOG_LEVEL_DEBUG, __FILE__, __LINE__, ##arg)
 

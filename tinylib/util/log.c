@@ -6,9 +6,9 @@
 #include <time.h>
 #include <string.h>
 
-#ifdef OS_WINDOWS
+#ifdef WINNT
 	#include <windows.h>		/* for GetLocalTime() */
-#else
+#elif defined(__linux__)
 	#include <sys/time.h>		/* for gettimeofday() */
 	#include <sys/syscall.h>	/* for SYS_gettid */
 	#include <unistd.h>			/* for syscall() */
@@ -26,10 +26,10 @@ void log_write(log_level_e level, const char *file, int line, const char *fmt, v
 	
 	FILE *fp;
 
-  #ifdef WIN32
+  #ifdef WINNT
 	SYSTEMTIME systime;
 	DWORD threadId;
-  #else
+  #elif defined(__linux__)
 	struct timeval tv;
     time_t tt;
     struct tm *tm;
@@ -63,12 +63,12 @@ void log_write(log_level_e level, const char *file, int line, const char *fmt, v
     }
 
 	memset(time_head, 0, sizeof(time_head));
-  #ifdef WIN32
+  #ifdef WINNT
 	GetLocalTime(&systime);
 	snprintf(time_head, sizeof(time_head)-1, "%u-%02u-%02u %02u:%02u:%02u.%03u", 
 		systime.wYear, systime.wMonth, systime.wDay, systime.wHour, systime.wMinute, systime.wSecond, systime.wMilliseconds);
 	threadId = GetCurrentThreadId();
-  #else
+  #elif defined(__linux__)
 	gettimeofday(&tv, NULL);
     tt = tv.tv_sec;
     tm = localtime(&tt);
