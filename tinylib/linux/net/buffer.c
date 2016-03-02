@@ -164,13 +164,8 @@ unsigned buffer_readFd(buffer_t* buffer, int fd)
 void buffer_retrieve(buffer_t *buffer, unsigned size)
 {
     int readablebytes = buffer->write_index - buffer->read_index;
-    if (NULL == buffer)
-    {
-        log_error("buffer_retrieve: bad buffer");
-        return;
-    }
 
-    if (size < readablebytes)
+    if ((int)size < readablebytes)
     {
         buffer->read_index += size;
     }
@@ -190,5 +185,6 @@ void buffer_retrieveall(buffer_t *buffer)
         buffer->read_index = 0;
         buffer->write_index = 0;
     }
+	
+	return;
 }
-

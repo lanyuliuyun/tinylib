@@ -22,7 +22,7 @@ void timer_queue_cancel(timer_queue_t *timer_queue, loop_timer_t *timer);
 /* 仅对interval值非0的timer有效 */
 void timer_queue_refresh(timer_queue_t *timer_queue, loop_timer_t *timer);
 
-/* 获取从此刻举例往后最近的一个timer的时差 */
+/* 获取从此刻距离往后最近的一个timer的时差 */
 long timer_queue_gettimeout(timer_queue_t *timer_queue);
 
 void timer_queue_process(timer_queue_t *timer_queue);

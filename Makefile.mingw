@@ -92,6 +92,7 @@ TEST_URL_OBJS = test/test_url.o
 all: tinylib
 
 tinylib: $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
+	@mkdir ./output
 	$(AR) $(TINYLIB) $^
 
 test: tinylib $(TEST_ATOMIC_OBJS) \
