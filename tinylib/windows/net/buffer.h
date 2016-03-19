@@ -1,5 +1,5 @@
 
-/** buffer¶ÔÏó½Ó¿Ú */
+/** bufferå¯¹è±¡æ¥å£ */
 
 #ifndef NET_BUFFER_H
 #define NET_BUFFER_H
@@ -13,25 +13,25 @@ typedef struct buffer buffer_t;
 extern "C" {
 #endif
 
-/** °´Ö¸¶¨³ß´ç´´½¨µÄbuffer */
+/** æŒ‰æŒ‡å®šå°ºå¯¸åˆ›å»ºçš„buffer */
 buffer_t* buffer_new(unsigned size);
 
-/** ÊÍ·Å¸ø¶¨µÄ¶ÔÏó */
+/** é‡Šæ”¾ç»™å®šçš„å¯¹è±¡ */
 void buffer_destory(buffer_t* buffer);
 
-/** »ñÈ¡¸ø¶¨bufferÖĞÓĞĞ§Êı¾İµÄÆğÊ¼µØÖ·  */
+/** è·å–ç»™å®šbufferä¸­æœ‰æ•ˆæ•°æ®çš„èµ·å§‹åœ°å€  */
 void* buffer_peek(buffer_t* buffer);
 
-/** »ñÈ¡¸ø¶¨bufferÖĞÓĞĞ§Êı¾İµÄ³ß´ç */
+/** è·å–ç»™å®šbufferä¸­æœ‰æ•ˆæ•°æ®çš„å°ºå¯¸ */
 unsigned buffer_readablebytes(buffer_t* buffer);
 
-/** Ïò¸ø¶¨µÄbufferÖĞ×·¼ÓÊı¾İ£¬½á¹û·µ»Ø±¾´ÎĞ´ÈëµÄÊı¾İ³ß´ç*/
+/** å‘ç»™å®šçš„bufferä¸­è¿½åŠ æ•°æ®ï¼Œç»“æœè¿”å›æœ¬æ¬¡å†™å…¥çš„æ•°æ®å°ºå¯¸*/
 unsigned buffer_append(buffer_t* buffer, const void* data, unsigned size);
 
-/** ´Ó¸ø¶¨µÄfdÖĞ¶ÁÈ¡Êı¾İµ½bufferÖĞ£¬½á¹û·µ»Ø±¾´Î¶ÁÈ¡µ½µÄÊı¾İ³ß´ç*/
+/** ä»ç»™å®šçš„fdä¸­è¯»å–æ•°æ®åˆ°bufferä¸­ï¼Œç»“æœè¿”å›æœ¬æ¬¡è¯»å–åˆ°çš„æ•°æ®å°ºå¯¸*/
 unsigned buffer_readFd(buffer_t* buffer, SOCKET fd);
 
-/**  ±ê¼ÇÔÚ¸ø¶¨µÄbufferÖĞÒÑ¾­»ñÈ¡µ½ËùÖ¸³ß´çµÄÊı¾İ£¬ÊÍ·Å¶ÔÓ¦µÄ¿Õ¼ä */
+/**  æ ‡è®°åœ¨ç»™å®šçš„bufferä¸­å·²ç»è·å–åˆ°æ‰€æŒ‡å°ºå¯¸çš„æ•°æ®ï¼Œé‡Šæ”¾å¯¹åº”çš„ç©ºé—´ */
 void buffer_retrieve(buffer_t *buffer, unsigned size);
 
 void buffer_retrieveall(buffer_t *buffer);

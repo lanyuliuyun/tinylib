@@ -47,7 +47,8 @@ void delete_client(tcp_client_t* client)
     return;
 }
 
-static void client_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
+static 
+void client_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     tcp_client_t *client = (tcp_client_t *)userdata;
 
@@ -63,7 +64,8 @@ static void client_ondata(tcp_connection_t* connection, buffer_t* buffer, void* 
     return;
 }
 
-static void client_onclose(tcp_connection_t* connection, void* userdata)
+static 
+void client_onclose(tcp_connection_t* connection, void* userdata)
 {
     tcp_client_t *client = (tcp_client_t *)userdata;
 
@@ -79,7 +81,8 @@ static void client_onclose(tcp_connection_t* connection, void* userdata)
     return;
 }
 
-static void client_onevent(int fd, int event, void* userdata)
+static 
+void client_onevent(int fd, int event, void* userdata)
 {
     tcp_client_t* client;
     tcp_connection_t *connection;
@@ -284,4 +287,3 @@ void tcp_client_destroy(tcp_client_t* client)
 
     return;
 }
-

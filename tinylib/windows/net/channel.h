@@ -1,4 +1,6 @@
 
+/** 协助 loop 实现IO事件检测功能，每个待检测的fd，请对应分配一个channel */
+
 #ifndef NET_CHANNEL_H
 #define NET_CHANNEL_H
 
@@ -15,7 +17,7 @@ extern "C" {
 
 typedef void (*on_event_f)(SOCKET fd, short event, void* userdata);
 
-channel_t* channel_new(SOCKET fd, loop_t* loop, on_event_f func, void* userdata);
+channel_t* channel_new(SOCKET fd, loop_t* loop, on_event_f callback, void* userdata);
 
 void channel_destroy(channel_t* channel);
 
@@ -35,6 +37,8 @@ void channel_onevent(channel_t* channel);
 
 SOCKET channel_getfd(channel_t* channel);
 
+loop_t* channel_getloop(channel_t* channel);
+
 int channel_getindex(channel_t* channel);
 
 void channel_setindex(channel_t* channel, int idx); 
@@ -44,3 +48,4 @@ void channel_setindex(channel_t* channel, int idx);
 #endif
 
 #endif /* !NET_CHANNEL_H */
+

@@ -1,4 +1,6 @@
 
+/** 协助 loop 实现异步任务功能，非对外操作接口 */
+
 #ifndef ASYNC_TASK_QUEUE_H
 #define ASYNC_TASK_QUEUE_H
 
@@ -15,7 +17,7 @@ async_task_queue_t* async_task_queue_create(loop_t *loop);
 
 void async_task_queue_destroy(async_task_queue_t *task_queue);
 
-void async_task_queue_submit(async_task_queue_t *task_queue, void(*func)(void *userdata), void* userdata);
+void async_task_queue_submit(async_task_queue_t *task_queue, void(*callback)(void *userdata), void* userdata);
 
 #ifdef __cplusplus
 }

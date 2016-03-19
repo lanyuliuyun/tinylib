@@ -238,7 +238,8 @@ void loop_loop(loop_t *loop)
     return;
 }
 
-static void do_loop_quit(void *userdata)
+static 
+void do_loop_quit(void *userdata)
 {
     ((loop_t*)userdata)->run = 0;
 
@@ -247,19 +248,12 @@ static void do_loop_quit(void *userdata)
 
 void loop_quit(loop_t* loop)
 {
-    pthread_t threadId;
-    if (NULL != loop)
+    if (NULL == loop)
     {
-        threadId = pthread_self();
-        if (pthread_equal(loop->threadId, threadId))
-        {
-            loop->run = 0;
-        }
-        else
-        {
-            async_task_queue_submit(loop->task_queue, do_loop_quit, loop);
-        }
+		return;
     }
+	
+	loop_run_inloop(loop, do_loop_quit, loop);
 
     return;
 }

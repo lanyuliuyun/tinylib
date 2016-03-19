@@ -42,6 +42,10 @@ RTP_OBJS = \
 
 # unit test
 
+# async_task
+TEST_ASYNC_TASK_BIN = output/test_async_task
+TEST_ASYNC_TASK_OBJS = test/test_async_task.o
+
 ## atomic
 TEST_ATOMIC_BIN = output/test_atomic
 TEST_ATOMIC_OBJS = test/test_atomic.o
@@ -91,21 +95,22 @@ TEST_URL_OBJS = test/test_url.o
 all: tinylib
 
 tinylib: $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
-	@mkdir ./output
 	$(AR) $(TINYLIB) $^
 
-test: tinylib $(TEST_ATOMIC_OBJS) \
-			  $(TEST_LOG_OBJS) \
-			  $(TEST_LOOP_TIMER_OBJS) \
-			  $(TEST_MD5_OBJS) \
-			  $(TEST_MSG_CODEC_OBJS) \
-			  $(TEST_RTSP_REQUEST_OBJS)  \
-			  $(TEST_RTSP_SERVER_OBJS) \
-			  $(TEST_SDP_OBJS) \
-			  $(TEST_TCP_CLIENT_OBJS) \
-			  $(TEST_TCP_SERVER_OBJS) \
-			  $(TEST_TIME_WHEEL_OBJS) \
-			  $(TEST_URL_OBJS)
+test: tinylib $(TEST_ASYNC_TASK_OBJS) \
+              $(TEST_ATOMIC_OBJS) \
+	      $(TEST_LOG_OBJS) \
+	      $(TEST_LOOP_TIMER_OBJS) \
+	      $(TEST_MD5_OBJS) \
+	      $(TEST_MSG_CODEC_OBJS) \
+	      $(TEST_RTSP_REQUEST_OBJS)  \
+	      $(TEST_RTSP_SERVER_OBJS) \
+	      $(TEST_SDP_OBJS) \
+	      $(TEST_TCP_CLIENT_OBJS) \
+	      $(TEST_TCP_SERVER_OBJS) \
+	      $(TEST_TIME_WHEEL_OBJS) \
+	      $(TEST_URL_OBJS)
+	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) -ltinylib $(LDFLAGS)
 	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) -ltinylib $(LDFLAGS)
 	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) -ltinylib $(LDFLAGS)
 	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) -ltinylib $(LDFLAGS)
@@ -124,12 +129,13 @@ test: tinylib $(TEST_ATOMIC_OBJS) \
 
 clean:
 	rm -f $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
+	rm -f $(TEST_ASYNC_TASK_OBJS) $(TEST_ASYNC_TASK_BIN)
 	rm -f $(TEST_ATOMIC_OBJS) $(TEST_ATOMIC_BIN)
 	rm -f $(TEST_LOG_OBJS) $(TEST_LOG_BIN)
 	rm -f $(TEST_LOOP_TIMER_OBJS) $(TEST_LOOP_TIMER_BIN)
 	rm -f $(TEST_MD5_OBJS) $(TEST_MD5_BIN)
 	rm -f $(TEST_MSG_CODEC_OBJS) $(TEST_MSG_CODEC_BIN)
-	rm -f $(TEST_RTSP_REQUEST_OBJS)  $(TEST_RTSP_REQUEST_BIN)
+	rm -f $(TEST_RTSP_REQUEST_OBJS) $(TEST_RTSP_REQUEST_BIN)
 	rm -f $(TEST_RTSP_SERVER_OBJS) $(TEST_RTSP_SERVER_BIN)
 	rm -f $(TEST_SDP_OBJS) $(TEST_SDP_BIN)
 	rm -f $(TEST_TCP_CLIENT_OBJS) $(TEST_TCP_CLIENT_BIN)

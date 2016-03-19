@@ -129,110 +129,110 @@ SOCKET create_udp_socket(unsigned short port, const char *ip)
 
 int socketpair(SOCKET fds[2])
 {
-	SOCKET fd_s;
-	struct sockaddr_in addr;
-	struct sockaddr_in c_addr;
-	int addr_len;
-	
-	BOOL flag;
-	unsigned long value;
-	
-	unsigned short port_begin = 65535;
+    SOCKET fd_s;
+    struct sockaddr_in addr;
+    struct sockaddr_in c_addr;
+    int addr_len;
+    
+    BOOL flag;
+    unsigned long value;
+    
+    unsigned short port_begin = 65535;
 
-	SOCKET fd_client;
-	SOCKET fd_accept;
+    SOCKET fd_client;
+    SOCKET fd_accept;
 
-	do
-	{
-		fd_s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		
-		flag = TRUE;
-		setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
+    do
+    {
+        fd_s = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        
+        flag = TRUE;
+        setsockopt(fd_s, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
 
-		memset(&addr, 0, sizeof(addr));
-		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = 0x100007f;
-		addr.sin_port = htons(port_begin);
-		if (bind(fd_s, (struct sockaddr*)&addr, sizeof(addr)))
-		{
-			closesocket(fd_s);
+        memset(&addr, 0, sizeof(addr));
+        addr.sin_family = AF_INET;
+        addr.sin_addr.s_addr = 0x100007f;
+        addr.sin_port = htons(port_begin);
+        if (bind(fd_s, (struct sockaddr*)&addr, sizeof(addr)))
+        {
+            closesocket(fd_s);
 
-			port_begin--;
-			if (port_begin < 2)
-			{
-				return -1;
-			}
+            port_begin--;
+            if (port_begin < 2)
+            {
+                return -1;
+            }
 
-			continue;
-		}
+            continue;
+        }
 
-		listen(fd_s, 1);
+        listen(fd_s, 1);
 
-		fd_client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		flag = TRUE;
-		setsockopt(fd_client, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
+        fd_client = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        flag = TRUE;
+        setsockopt(fd_client, SOL_SOCKET, SO_REUSEADDR, (char*)&flag, sizeof(flag));
 
-		memset(&c_addr, 0, sizeof(c_addr));
-		c_addr.sin_family = AF_INET;
-		c_addr.sin_addr.s_addr = 0x100007f;
-		c_addr.sin_port = htons(port_begin-1);
-		if (bind(fd_client, (struct sockaddr*)&c_addr, sizeof(c_addr)))
-		{
-			closesocket(fd_s);
-			closesocket(fd_client);
+        memset(&c_addr, 0, sizeof(c_addr));
+        c_addr.sin_family = AF_INET;
+        c_addr.sin_addr.s_addr = 0x100007f;
+        c_addr.sin_port = htons(port_begin-1);
+        if (bind(fd_client, (struct sockaddr*)&c_addr, sizeof(c_addr)))
+        {
+            closesocket(fd_s);
+            closesocket(fd_client);
 
-			port_begin -= 2;
-			if (port_begin < 2)
-			{
-				return -1;
-			}
+            port_begin -= 2;
+            if (port_begin < 2)
+            {
+                return -1;
+            }
 
-			continue;
-		}
+            continue;
+        }
 
-		addr_len = (int)sizeof(addr);
-		getsockname(fd_s, (struct sockaddr*)&addr, &addr_len);
-		if (connect(fd_client, (struct sockaddr*)&addr, addr_len) != 0)
-		{
-			closesocket(fd_s);
-			closesocket(fd_client);
+        addr_len = (int)sizeof(addr);
+        getsockname(fd_s, (struct sockaddr*)&addr, &addr_len);
+        if (connect(fd_client, (struct sockaddr*)&addr, addr_len) != 0)
+        {
+            closesocket(fd_s);
+            closesocket(fd_client);
 
-			port_begin -= 2;
-			if (port_begin < 2)
-			{
-				return -1;
-			}
+            port_begin -= 2;
+            if (port_begin < 2)
+            {
+                return -1;
+            }
 
-			continue;
-		}
+            continue;
+        }
 
-		fd_accept = accept(fd_s, (struct sockaddr*)&addr, &addr_len);
-		if (fd_accept == INVALID_SOCKET)
-		{
-			closesocket(fd_s);
-			closesocket(fd_client);
+        fd_accept = accept(fd_s, (struct sockaddr*)&addr, &addr_len);
+        if (fd_accept == INVALID_SOCKET)
+        {
+            closesocket(fd_s);
+            closesocket(fd_client);
 
-			port_begin -= 2;
-			if (port_begin < 2)
-			{
-				return -1;
-			}
+            port_begin -= 2;
+            if (port_begin < 2)
+            {
+                return -1;
+            }
 
-			continue;
-		}
+            continue;
+        }
 
-		closesocket(fd_s);
+        closesocket(fd_s);
 
-		break;
-	} while(1);
-	
-	value = 1;
-	ioctlsocket(fd_client, FIONBIO, &value);
-	value = 1;
-	ioctlsocket(fd_accept, FIONBIO, &value);
+        break;
+    } while(1);
+    
+    value = 1;
+    ioctlsocket(fd_client, FIONBIO, &value);
+    value = 1;
+    ioctlsocket(fd_accept, FIONBIO, &value);
 
-	fds[0] = fd_client;
-	fds[1] = fd_accept;
+    fds[0] = fd_client;
+    fds[1] = fd_accept;
 
-	return 0;
+    return 0;
 }

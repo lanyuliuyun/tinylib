@@ -43,46 +43,36 @@ struct tcp_connection_msg
     unsigned size;
 };
 
-static void delete_connection(tcp_connection_t *connection)
+static 
+void delete_connection(tcp_connection_t *connection)
 {
-    if (NULL != connection)
-    {
-        log_debug("connection to %s:%u will be destroyed", connection->peer_addr.ip, connection->peer_addr.port);
+	log_debug("connection to %s:%u will be destroyed", connection->peer_addr.ip, connection->peer_addr.port);
 
-        channel_detach(connection->channel);
-        channel_destroy(connection->channel);
-        shutdown(connection->fd, SHUT_RDWR);
-        close(connection->fd);
-        buffer_destory(connection->in_buffer);
-        buffer_destory(connection->out_buffer);
-        free(connection);
-    }
+	channel_detach(connection->channel);
+	channel_destroy(connection->channel);
+	shutdown(connection->fd, SHUT_RDWR);
+	close(connection->fd);
+	buffer_destory(connection->in_buffer);
+	buffer_destory(connection->out_buffer);
+	free(connection);
 
     return;
 }
 
-static void connection_onevent(int fd, int event, void* userdata)
+static 
+void connection_onevent(int fd, int event, void* userdata)
 {
-    tcp_connection_t *connection;
+    tcp_connection_t *connection = (tcp_connection_t*)userdata;
+	inetaddr_t *peer_addr = &connection->peer_addr;
+	
     buffer_t* in_buffer;
     buffer_t* out_buffer;
     void* data;
     unsigned size;
     unsigned written;
     int error;
-    
-    inetaddr_t *peer_addr;
 
-    log_debug("connection_onevent: fd(%d), event(%d)", fd, event);
-
-    if (NULL == userdata)
-    {
-        log_error("connection_onevent: bad userdata");
-        return;
-    }
-
-    connection = (tcp_connection_t*)userdata;
-    peer_addr = &connection->peer_addr;
+    log_debug("connection_onevent: fd(%d), event(%d), peer addr: %s:%u", fd, event, peer_addr->ip, peer_addr->port);
 
     if (event & EPOLLHUP)
     {
@@ -169,7 +159,8 @@ tcp_connection_t* tcp_connection_new
         return NULL;
     }
 
-    connection = (tcp_connection_t*)malloc(sizeof(tcp_connection_t));
+    connection = (tcp_connection_t*)malloc(sizeof(*connection));
+	memset(connection, 0, sizeof(*connection));
 
     flag = 1;
     setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &flag, sizeof(flag));
@@ -227,6 +218,8 @@ void tcp_connection_destroy(tcp_connection_t* connection)
 static 
 int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, unsigned size)
 {
+	inetaddr_t *peer_addr = &connection->peer_addr;
+	
     int fd;
     void* buffer_data;
     channel_t *channel;
@@ -234,28 +227,12 @@ int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, un
     int written;
     unsigned buffer_left_data_size;
     struct iovec vecs[2];
-    
-    inetaddr_t *peer_addr;
-    
+
     int error;
-
-    if (NULL == connection || NULL == data || 0 == size)
-    {
-        log_error("bad connection(%p) or bad data(%p) or bad size(%u)", connection, data, size);
-        return -1;
-    }
-    
-    peer_addr = &connection->peer_addr;
-
-    if (0 == connection->is_connected)
-    {
-        log_warn("connection to %s:%u has NOT beed made yet", peer_addr->ip, peer_addr->port);
-        return 0;
-    }
 
     out_buffer = connection->out_buffer;
     channel = connection->channel;
-    fd = channel_getfd(channel);
+    fd = connection->fd;
 
     buffer_left_data_size = buffer_readablebytes(out_buffer);
 
@@ -274,7 +251,7 @@ int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, un
             
             if (error != EAGAIN)
             {
-                log_error("tcp_connection_send: writev() failed, fd: %d, errno: %d, peer addr: %s:%u", fd, errno, peer_addr->ip, peer_addr->port);
+                log_error("tcp_connection_sendInLoop: writev() failed, errno: %d, peer addr: %s:%u", errno, peer_addr->ip, peer_addr->port);
                 return -1;
             }
         }
@@ -302,7 +279,7 @@ int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, un
         written = write(fd, data, size);
         if (written < 0)
         {
-            log_error("writedata: write() failed, errno: %d, peer addr: %s:%u", errno, peer_addr->ip, peer_addr->port);
+            log_error("tcp_connection_sendInLoop: write() failed, errno: %d, peer addr: %s:%u", errno, peer_addr->ip, peer_addr->port);
             return -1;
         }
         else if (written < size)
@@ -314,7 +291,6 @@ int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, un
 
     return 0;
 }
-
 
 static
 void do_tcp_connection_send(void *userdata)
@@ -340,10 +316,10 @@ int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned
 
     if (0 == connection->is_connected)
     {
-        log_warn("connection to %s:%u has NOT beed made yet", connection->peer_addr.ip, connection->peer_addr.port);
+        log_warn("not a opened connection");
         return -1;
     }
-    
+
     if (loop_inloopthread(connection->loop))
     {
         tcp_connection_sendInLoop(connection, data, size);
@@ -399,17 +375,12 @@ void tcp_connection_detach(tcp_connection_t *connection)
     return;
 }
 
-static void do_connection_attach(void *userdata)
+static 
+void do_connection_attach(void *userdata)
 {
     tcp_connection_t *connection = (tcp_connection_t*)userdata;
-    if (NULL != connection)
-    {
-        channel_attach(connection->channel, connection->loop);
-    }
-    else
-    {
-        log_error("do_connection_attach: bad connection");
-    }
+
+    channel_attach(connection->channel, connection->loop);
 
     return;
 }
@@ -445,7 +416,7 @@ void tcp_connection_expand_send_buffer(tcp_connection_t *connection, unsigned si
     int result;
     int send_buffer_size;
     socklen_t len;
-    
+
     if (NULL == connection)
     {
         return;
@@ -461,7 +432,7 @@ void tcp_connection_expand_send_buffer(tcp_connection_t *connection, unsigned si
 
     send_buffer_size += ((size+1023)>>10)<<10;
     setsockopt(connection->fd, SOL_SOCKET, SO_SNDBUF, &send_buffer_size, sizeof(send_buffer_size));
-    
+
     return;
 }
 

@@ -1,7 +1,5 @@
 
-/** ±íÊ¾Ò»¸öÒ»¸ö»î¶¯µÄtcpÁ¬½Ó£¬
-  * ²»ĞèÒªuser½øĞĞconnectionµÄÏú»Ù²Ù×÷£¬¿â±¾Éí»áÔÚºÏÊÊµÄÊµ¼ÊÖ´ĞĞÏú»Ù
-  */
+/* è¡¨ç¤ºä¸€ä¸ªä¸€ä¸ªæ´»åŠ¨çš„tcpè¿æ¥ */
 
 #ifndef NET_TCP_CONNECTION_H
 #define NET_TCP_CONNECTION_H
@@ -13,7 +11,7 @@ typedef struct tcp_connection tcp_connection_t;
 #include "tinylib/windows/net/loop.h"
 #include "tinylib/windows/net/inetaddr.h"
 
-#include <winsock2.h>		/* fo SOCKET */
+#include <winsock2.h>        /* fo SOCKET */
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,13 +32,13 @@ void tcp_connection_setcalback(tcp_connection_t* connection, on_data_f datacb, o
 
 void tcp_connection_destroy(tcp_connection_t* connection);
 
-/* ½«Ëù¸øµÄconnection¶ÔÏó´ÓÆäËùÊôµÄloopÖĞÒÆ³ö£¬´Ó´Ë¸Ãconnection¶ÔÏóµÄIOÊÂ¼ş½«²»ÔÙ±»¼à²â 
- * ¸Ã·½·¨²»ÊÇÏß³Ì°²È«µÄ¡£
+/* å°†æ‰€ç»™çš„connectionå¯¹è±¡ä»å…¶æ‰€å±çš„loopä¸­ç§»å‡ºï¼Œä»æ­¤è¯¥connectionå¯¹è±¡çš„IOäº‹ä»¶å°†ä¸å†è¢«ç›‘æµ‹ 
+ * è¯¥æ–¹æ³•ä¸æ˜¯çº¿ç¨‹å®‰å…¨çš„ï¼Œåªèƒ½åœ¨å…¶æ‰€åœ¨çš„IOçº¿ç¨‹ä¸­æ‰§è¡Œï¼
  */
 void tcp_connection_detach(tcp_connection_t *connection);
 
-/* ½«Ëù¸øµÄconnection¶ÔÏóÌí¼Óµ½Ö¸¶¨µÄloopÖĞ½øĞĞIOÊÂ¼ş¼à²â£¬
- * ¸Ã·½·¨ÊÇÏß³Ì°²È«µÄ 
+/* å°†æ‰€ç»™çš„connectionå¯¹è±¡æ·»åŠ åˆ°æŒ‡å®šçš„loopä¸­è¿›è¡ŒIOäº‹ä»¶ç›‘æµ‹ï¼Œ
+ * è¯¥æ–¹æ³•æ˜¯çº¿ç¨‹å®‰å…¨çš„ ï¼
  */
 void tcp_connection_attach(tcp_connection_t *connection, loop_t *loop);
 

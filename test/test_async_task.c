@@ -1,9 +1,9 @@
 
 #ifdef WINNT
-	#include "tinylib/net/loop.h"
+	#include "tinylib/windows/net/loop.h"
 	#include <winsock2.h>
 #elif defined(__linux__)
-	#include "tinylib/linux/loop.h"
+	#include "tinylib/linux/net/loop.h"
 #endif
 
 #include "tinylib/util/log.h"
@@ -28,13 +28,13 @@ void on_timer(void* userdata)
 	static int counter = 3;
 	
 	log_info("timer");
-	
+
 	if (counter == 0)
 	{
 		loop_async(loop, quit, NULL);
 	}
 	counter--;
-	
+
 	return;
 }
 

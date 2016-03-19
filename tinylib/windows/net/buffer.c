@@ -22,7 +22,7 @@ static void ensure_space(buffer_t* buffer, unsigned size)
     
     assert(NULL != buffer);
 
-    /* bufferÎ²²¿µÄ¿ÕÏÐ¿Õ¼äÒÑ¾­×ã¹» */
+    /* bufferå°¾éƒ¨çš„ç©ºé—²ç©ºé—´å·²ç»è¶³å¤Ÿ */
     if ((buffer->len - buffer->write_index) >= size)
     {
         return;
@@ -30,8 +30,8 @@ static void ensure_space(buffer_t* buffer, unsigned size)
 
     if ((buffer->len - (buffer->write_index - buffer->read_index)) > size)
     {
-        /* bufferÖÐÕûÌåµÄ¿Õ¼ä×ã¹»£¬µ«ÐèÒª×öÒ»ÏÂÕûÀí £¬
-         * ½«Êý¾ÝÈ«²¿ÒÆµ½Ê×²¿£¬¿ÕÏÐ¿Õ¼äºÏ²¢
+        /* bufferä¸­æ•´ä½“çš„ç©ºé—´è¶³å¤Ÿï¼Œä½†éœ€è¦åšä¸€ä¸‹æ•´ç† ï¼Œ
+         * å°†æ•°æ®å…¨éƒ¨ç§»åˆ°é¦–éƒ¨ï¼Œç©ºé—²ç©ºé—´åˆå¹¶
          */
         memmove(buffer->data, (buffer->data+buffer->read_index), (buffer->write_index - buffer->read_index));
         buffer->write_index -= buffer->read_index;
@@ -39,10 +39,10 @@ static void ensure_space(buffer_t* buffer, unsigned size)
     }
     else
     {
-        /* buffeÖÐÕûÌåµÄ¿ÕÏÐ¿Õ¼äÒ²²»¹»£¬ÐèÒªÀ©ÈÝ */
+        /* buffeä¸­æ•´ä½“çš„ç©ºé—²ç©ºé—´ä¹Ÿä¸å¤Ÿï¼Œéœ€è¦æ‰©å®¹ */
         expand = ((size+1023)>>10)<<10;
         data = (unsigned char*)realloc(buffer->data, (buffer->len + expand));
-        /* Èô´Ë´¦¿Õ¼ä·ÖÅäÈôÊ§°Ü£¬ÔòÎÞÁ¦»ØÌìÁË! */
+        /* è‹¥æ­¤å¤„ç©ºé—´åˆ†é…è‹¥å¤±è´¥ï¼Œåˆ™æ— åŠ›å›žå¤©äº†! */
         assert(NULL != data);
         buffer->data = data;
         buffer->len += size;
@@ -62,8 +62,8 @@ buffer_t* buffer_new(unsigned size)
     }
 
     buffer = (buffer_t*)malloc(sizeof(buffer_t));
-   
     memset(buffer, 0, sizeof(buffer_t));
+
     buffer->data = (unsigned char*)malloc(size);
     memset(buffer->data, 0, size);
     buffer->len = size;
@@ -124,7 +124,7 @@ unsigned buffer_append(buffer_t* buffer, const void* data, unsigned size)
 unsigned buffer_readFd(buffer_t* buffer, SOCKET fd)
 {
     char extra[4096];
-	unsigned extra_bytes;
+    unsigned extra_bytes;
     WSABUF buffers[2];
     DWORD n;
     DWORD flag;
@@ -156,8 +156,8 @@ unsigned buffer_readFd(buffer_t* buffer, SOCKET fd)
     }
     else
     {
-		extra_bytes = n - (buffer->len - buffer->write_index);
-		buffer->write_index = buffer->len;		
+        extra_bytes = n - (buffer->len - buffer->write_index);
+        buffer->write_index = buffer->len;
         buffer_append(buffer, extra, extra_bytes);
     }
 
@@ -167,11 +167,6 @@ unsigned buffer_readFd(buffer_t* buffer, SOCKET fd)
 void buffer_retrieve(buffer_t *buffer, unsigned size)
 {
     unsigned readablebytes = buffer->write_index - buffer->read_index;
-    if (NULL == buffer)
-    {
-        log_error("buffer_retrieve: bad buffer");
-        return;
-    }
 
     if (size < readablebytes)
     {
@@ -193,5 +188,7 @@ void buffer_retrieveall(buffer_t *buffer)
         buffer->read_index = 0;
         buffer->write_index = 0;
     }
+    
+    return;
 }
 

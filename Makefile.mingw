@@ -6,7 +6,7 @@ LD = gcc
 AR = ar -r
 
 CFLAGS = -Wall -Werror -g -I. -D_WIN32_WINNT=0x0601 -DWIN32_LEAN_AND_MEAN
-LDFLAGS = -L./output
+LDFLAGS = -L./output -ltinylib -lpthread -lws2_32
 
 TINYLIB = output/libtinylib.a
 
@@ -42,6 +42,10 @@ RTP_OBJS = \
 	tinylib/rtp/rtp_peer.o
 
 # unit test
+
+# async_task
+TEST_ASYNC_TASK_BIN = output/test_async_task.exe
+TEST_ASYNC_TASK_OBJS = test/test_async_task.o
 
 ## atomic
 TEST_ATOMIC_BIN = output/test_atomic.exe
@@ -92,45 +96,47 @@ TEST_URL_OBJS = test/test_url.o
 all: tinylib
 
 tinylib: $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
-	@mkdir ./output
 	$(AR) $(TINYLIB) $^
 
-test: tinylib $(TEST_ATOMIC_OBJS) \
-			  $(TEST_LOG_OBJS) \
-			  $(TEST_LOOP_TIMER_OBJS) \
-			  $(TEST_MD5_OBJS) \
-			  $(TEST_MSG_CODEC_OBJS) \
-			  $(TEST_RTSP_REQUEST_OBJS)  \
-			  $(TEST_RTSP_SERVER_OBJS) \
-			  $(TEST_SDP_OBJS) \
-			  $(TEST_TCP_CLIENT_OBJS) \
-			  $(TEST_TCP_SERVER_OBJS) \
-			  $(TEST_TIME_WHEEL_OBJS) \
-			  $(TEST_URL_OBJS)
-	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) -ltinylib -lpthread $(LDFLAGS)
-	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) -ltinylib $(LDFLAGS) -lws2_32
-	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) -ltinylib $(LDFLAGS) -lws2_32
-	$(LD) $(TEST_RTSP_SERVER_OBJS) -o $(TEST_RTSP_SERVER_BIN) -ltinylib $(LDFLAGS) -lws2_32
-	$(LD) $(TEST_SDP_OBJS) -o $(TEST_SDP_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) -ltinylib $(LDFLAGS) -lws2_32
-	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) -ltinylib $(LDFLAGS) -lws2_32
-	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) -ltinylib $(LDFLAGS)
+test: tinylib $(TEST_ASYNC_TASK_OBJS) \
+          $(TEST_ATOMIC_OBJS) \
+	      $(TEST_LOG_OBJS) \
+	      $(TEST_LOOP_TIMER_OBJS) \
+	      $(TEST_MD5_OBJS) \
+	      $(TEST_MSG_CODEC_OBJS) \
+	      $(TEST_RTSP_REQUEST_OBJS)  \
+	      $(TEST_RTSP_SERVER_OBJS) \
+	      $(TEST_SDP_OBJS) \
+	      $(TEST_TCP_CLIENT_OBJS) \
+	      $(TEST_TCP_SERVER_OBJS) \
+	      $(TEST_TIME_WHEEL_OBJS) \
+	      $(TEST_URL_OBJS)
+	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) $(LDFLAGS)
+	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) $(LDFLAGS)
+	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) $(LDFLAGS)
+	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) $(LDFLAGS)
+	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) $(LDFLAGS)
+	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) $(LDFLAGS)
+	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) $(LDFLAGS)
+	$(LD) $(TEST_RTSP_SERVER_OBJS) -o $(TEST_RTSP_SERVER_BIN) $(LDFLAGS)
+	$(LD) $(TEST_SDP_OBJS) -o $(TEST_SDP_BIN) $(LDFLAGS)
+	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) $(LDFLAGS)
+	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) $(LDFLAGS)
+	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) $(LDFLAGS)
+	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) $(LDFLAGS)
 
 %.o: %.c
 	$(CC) -c $^ -o $@ $(CFLAGS)
 
 clean:
 	rm -f $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
+	rm -f $(TEST_ASYNC_TASK_OBJS) $(TEST_ASYNC_TASK_BIN)
 	rm -f $(TEST_ATOMIC_OBJS) $(TEST_ATOMIC_BIN)
 	rm -f $(TEST_LOG_OBJS) $(TEST_LOG_BIN)
 	rm -f $(TEST_LOOP_TIMER_OBJS) $(TEST_LOOP_TIMER_BIN)
 	rm -f $(TEST_MD5_OBJS) $(TEST_MD5_BIN)
 	rm -f $(TEST_MSG_CODEC_OBJS) $(TEST_MSG_CODEC_BIN)
-	rm -f $(TEST_RTSP_REQUEST_OBJS)  $(TEST_RTSP_REQUEST_BIN)
+	rm -f $(TEST_RTSP_REQUEST_OBJS) $(TEST_RTSP_REQUEST_BIN)
 	rm -f $(TEST_RTSP_SERVER_OBJS) $(TEST_RTSP_SERVER_BIN)
 	rm -f $(TEST_SDP_OBJS) $(TEST_SDP_BIN)
 	rm -f $(TEST_TCP_CLIENT_OBJS) $(TEST_TCP_CLIENT_BIN)

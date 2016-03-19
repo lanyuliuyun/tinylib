@@ -151,7 +151,6 @@ udp_peer_t* udp_peer_new(loop_t *loop, const char *ip, unsigned short port, on_m
 {
     int fd;
     udp_peer_t* peer;
-    
 
     if (NULL == loop || NULL == ip || 0 == port || NULL == messagecb)
     {
@@ -162,12 +161,13 @@ udp_peer_t* udp_peer_new(loop_t *loop, const char *ip, unsigned short port, on_m
     fd = create_udp_socket(port, ip);
     if (fd < 0)
     {
-        log_error("udp_peer_new: create_udp_socket() failed, local addr: %s:%u", ip, port);
+        log_error("udp_peer_new: create_udp_socket() failed, local addr: %s:%u, errno: %d", ip, port, errno);
         return NULL;
     }
 
     peer = (udp_peer_t*)malloc(sizeof(udp_peer_t));
     memset(peer, 0, sizeof(*peer));
+
     peer->ref_count = 1;
     peer->loop = loop;
     strncpy(peer->ip, ip, 16);
@@ -178,7 +178,6 @@ udp_peer_t* udp_peer_new(loop_t *loop, const char *ip, unsigned short port, on_m
     peer->write_userdata = userdata;
 
     peer->fd = fd;
-
     peer->channel = channel_new(fd, peer->loop, udp_peer_onevent, peer);
 
     loop_run_inloop(peer->loop, init_udp_peer_event, peer);
@@ -403,6 +402,7 @@ int udp_peer_send2(udp_peer_t* peer, const void *message, unsigned len, const st
     result = sendto(peer->fd, message, len, 0, (const struct sockaddr*)&peer_addr, sizeof(*peer_addr));
     if (len != result)
     {
+		log_warn("udp_peer_send2: sendto() failed, errno: %d", errno);
         ret = -1;
     }
 
@@ -428,7 +428,7 @@ void udp_peer_expand_send_buffer(udp_peer_t* peer, unsigned size)
         return;
     }
     
-    send_buffer_size += ((size+1023)>>10)<<10;;
+    send_buffer_size += ((size+1023)>>10)<<10;
     setsockopt(peer->fd, SOL_SOCKET, SO_SNDBUF, (char*)&send_buffer_size, sizeof(send_buffer_size));
     
     return;
@@ -458,4 +458,3 @@ void udp_peer_expand_recv_buffer(udp_peer_t* peer, unsigned size)
     
     return;
 }
-

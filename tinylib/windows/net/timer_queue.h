@@ -1,4 +1,6 @@
 
+/** ååŠ© loop å®ç°timerï¼Œéå¯¹å¤–æ“ä½œæ¥å£ */
+
 #ifndef NET_TIMER_QUEUE_H
 #define NET_TIMER_QUEUE_H
 
@@ -6,26 +8,27 @@ struct timer_queue;
 typedef struct timer_queue timer_queue_t;
 
 #include "tinylib/windows/net/timer.h"
+#include "tinylib/windows/net/loop.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-timer_queue_t* timer_queue_create(void);
+timer_queue_t* timer_queue_create(loop_t *loop);
 
 void timer_queue_destroy(timer_queue_t* timer_queue);
 
-/* ĞÂÔöÒ»¸ötimer£¬ÔÚÖ¸¶¨Ê±¿ÌÖ´ĞĞÓÃ»§º¯Êı, Èôinterval·Ç0£¬Ôò±íÊ¾ÊÇÒ»¸öÖÜÆÚĞÔtimer */
+/* æ–°å¢ä¸€ä¸ªtimerï¼Œåœ¨æŒ‡å®šæ—¶åˆ»æ‰§è¡Œç”¨æˆ·å‡½æ•°, è‹¥intervalé0ï¼Œåˆ™è¡¨ç¤ºæ˜¯ä¸€ä¸ªå‘¨æœŸæ€§timer */
 loop_timer_t *timer_queue_add(timer_queue_t *timer_queue, unsigned long long timestamp, unsigned interval, onexpire_f expirecb, void *userdata);
 
 void timer_queue_cancel(timer_queue_t *timer_queue, loop_timer_t *timer);
-/* ½ö¶ÔintervalÖµ·Ç0µÄtimerÓĞĞ§ */
+/* ä»…å¯¹intervalå€¼é0çš„timeræœ‰æ•ˆ */
 void timer_queue_refresh(timer_queue_t *timer_queue, loop_timer_t *timer);
 
-/* »ñÈ¡´Ó´Ë¿Ì¾ÙÀıÍùºó×î½üµÄÒ»¸ötimerµÄÊ±²î */
+/* è·å–ä»æ­¤åˆ»è·ç¦»å¾€åæœ€è¿‘çš„ä¸€ä¸ªtimerçš„æ—¶å·® */
 long timer_queue_gettimeout(timer_queue_t *timer_queue);
 
-void timer_queue_process(timer_queue_t *timer_queue);
+void timer_queue_process_inloop(timer_queue_t *timer_queue);
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,5 @@
 
-/* 表示一个一个活动的tcp连接，
- */
+/* 表示一个一个活动的tcp连接 */
 
 #ifndef NET_TCP_CONNECTION_H
 #define NET_TCP_CONNECTION_H
@@ -32,7 +31,7 @@ void tcp_connection_setcalback(tcp_connection_t* connection, on_data_f datacb, o
 void tcp_connection_destroy(tcp_connection_t* connection);
 
 /* 将所给的connection对象从其所属的loop中移出，从此该connection对象的IO事件将不再被监测 
- * 该方法不是线程安全的！
+ * 该方法不是线程安全的，只能在其所在的IO线程中执行！
  */
 void tcp_connection_detach(tcp_connection_t *connection);
 
