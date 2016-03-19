@@ -2,9 +2,9 @@
 #include "tinylib/rtsp/rtsp_server.h"
 
 #ifdef WINNT
-	#include "tinylib/windows/net/tcp_server.h"
+    #include "tinylib/windows/net/tcp_server.h"
 #elif defined(__linux__)
-	#include "tinylib/linux/net/tcp_server.h"
+    #include "tinylib/linux/net/tcp_server.h"
 #endif
 
 #include "tinylib/util/log.h"
@@ -16,23 +16,23 @@ struct rtsp_server
 {
     tcp_server_t *server;
     rtsp_session_handler_f session_handler;
-	rtsp_session_interleaved_packet_f interleaved_sink;
+    rtsp_session_interleaved_packet_f interleaved_sink;
     void* userdata;
-	
-	char ip[16];
-	unsigned short port;
+    
+    char ip[16];
+    unsigned short port;
 
-	int started;
-	int is_in_callback;
-	int is_alive;
+    int started;
+    int is_in_callback;
+    int is_alive;
 };
 
 static inline void delete_server(rtsp_server_t *server)
 {
     tcp_server_destroy(server->server);
-	free(server);
-	
-	return;
+    free(server);
+    
+    return;
 }
 
 static void server_onconnection(tcp_connection_t* connection, void* userdata, const inetaddr_t* peer_addr)
@@ -45,14 +45,14 @@ static void server_onconnection(tcp_connection_t* connection, void* userdata, co
         return;
     }
 
-	(void)peer_addr;
-	
+    (void)peer_addr;
+    
     server = (rtsp_server_t *)userdata;
     session = rtsp_session_start(connection, server->session_handler, server->interleaved_sink, server->userdata);
-	
-	(void)session;
+    
+    (void)session;
 
-    /* FIXME: rtsp_server ÄÚ²¿¶Ô session ½øĞĞµÇ¼Ç¹ÜÀí?  */
+    /* FIXME: rtsp_server å†…éƒ¨å¯¹ session è¿›è¡Œç™»è®°ç®¡ç†?  */
 
     return;
 }
@@ -60,11 +60,11 @@ static void server_onconnection(tcp_connection_t* connection, void* userdata, co
 rtsp_server_t* rtsp_server_new
 (
     loop_t *loop, 
-	rtsp_session_handler_f session_handler, 
-	rtsp_session_interleaved_packet_f interleaved_sink, 
-	void *userdata,
+    rtsp_session_handler_f session_handler, 
+    rtsp_session_interleaved_packet_f interleaved_sink, 
+    void *userdata,
     unsigned short port, 
-	const char* ip
+    const char* ip
 )
 {
     rtsp_server_t *server;
@@ -72,7 +72,7 @@ rtsp_server_t* rtsp_server_new
     if (NULL == loop || NULL == session_handler || NULL == interleaved_sink ||  0 == port || NULL == ip)
     {
         log_error("rtsp_server_new: bad loop(%p) or bad session_handler(%p) or interleaved_sink(%p) bad  or bad port(%u) or bad ip(%p)", 
-			loop, session_handler, interleaved_sink, port, ip);
+            loop, session_handler, interleaved_sink, port, ip);
         return NULL;
     }
 
@@ -80,10 +80,10 @@ rtsp_server_t* rtsp_server_new
     memset(server, 0, sizeof(*server));
 
     server->session_handler = session_handler;
-	server->interleaved_sink = interleaved_sink;
+    server->interleaved_sink = interleaved_sink;
     server->userdata = userdata;
-	strncpy(server->ip, ip, sizeof(server->ip)-1);
-	server->port = port;
+    strncpy(server->ip, ip, sizeof(server->ip)-1);
+    server->port = port;
 
     server->server = tcp_server_new(loop, server_onconnection, server, port, ip);
     if (NULL == server->server)
@@ -92,10 +92,10 @@ rtsp_server_t* rtsp_server_new
         log_error("rtsp_server_new: tcp_server_new() failed");
         return NULL;
     }
-	
-	server->started = 0;
-	server->is_in_callback = 0;
-	server->is_alive = 1;
+    
+    server->started = 0;
+    server->is_in_callback = 0;
+    server->is_alive = 1;
 
     return server;
 }
@@ -115,13 +115,13 @@ int rtsp_server_start(rtsp_server_t *server)
     }
 
     if (tcp_server_start(server->server) != 0)
-	{
-		log_error("rtsp_server_start: failed to start tcp server at %s:%u", 
-			server->ip, server->port);
-		return -1;
-	}
+    {
+        log_error("rtsp_server_start: failed to start tcp server at %s:%u", 
+            server->ip, server->port);
+        return -1;
+    }
 
-	server->started = 1;
+    server->started = 1;
 
     return 0;
 }
@@ -151,14 +151,14 @@ void rtsp_server_destroy(rtsp_server_t *server)
         rtsp_server_stop(server);
     }
 
-	if (server->is_in_callback)
-	{
-		server->is_alive = 0;
-	}
-	else
-	{
-		delete_server(server);
-	}
+    if (server->is_in_callback)
+    {
+        server->is_alive = 0;
+    }
+    else
+    {
+        delete_server(server);
+    }
 
     return;
 }

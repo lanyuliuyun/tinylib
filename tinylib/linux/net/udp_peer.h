@@ -22,19 +22,19 @@ udp_peer_t* udp_peer_new(loop_t *loop, const char *ip, unsigned short port, on_m
 
 unsigned short udp_peer_getport(udp_peer_t* peer);
 
-/* ¹Ò½ÓreadÊÂ¼ş£¬on_message_fÎªNULLÊ±£¬±íÊ¾Çå³ıreadÊÂ¼ş¡£·µ»ØÔ­À´µÄon_message_f */
+/* æŒ‚æ¥readäº‹ä»¶ï¼Œon_message_fä¸ºNULLæ—¶ï¼Œè¡¨ç¤ºæ¸…é™¤readäº‹ä»¶ã€‚è¿”å›åŸæ¥çš„on_message_f */
 on_message_f udp_peer_onmessage(udp_peer_t* peer, on_message_f messagecb, void *userdata);
 
-/* ¹Ò½ÓwriteÊÂ¼ş£¬writecbÎªNULLÊ±£¬±íÊ¾Çå³ıwriteÊÂ¼ş¡£·µ»ØÔ­À´µÄwirtecb */
+/* æŒ‚æ¥writeäº‹ä»¶ï¼Œwritecbä¸ºNULLæ—¶ï¼Œè¡¨ç¤ºæ¸…é™¤writeäº‹ä»¶ã€‚è¿”å›åŸæ¥çš„wirtecb */
 on_writable_f udp_peer_onwrite(udp_peer_t* peer, on_writable_f writecb, void *userdata);
 
 void udp_peer_destroy(udp_peer_t* peer);
 
-/* ÓÉÓÚudpµÄ¼òµ¥ĞÔ£¬Ö»×ö¼òµ¥·¢ËÍ£¬ÇëÊ¹ÓÃÕß×ÔĞĞÍê³É±¨ÎÄ·ÖÆ¬£¬±£Ö¤Ã¿´ÎÏûÏ¢³ß´ç²»³¬¹ı65535 */
+/* ç”±äºudpçš„ç®€å•æ€§ï¼Œåªåšç®€å•å‘é€ï¼Œè¯·ä½¿ç”¨è€…è‡ªè¡Œå®ŒæˆæŠ¥æ–‡åˆ†ç‰‡ï¼Œä¿è¯æ¯æ¬¡æ¶ˆæ¯å°ºå¯¸ä¸è¶…è¿‡65535 */
 int udp_peer_send(udp_peer_t* peer, const void *message, unsigned len, const inetaddr_t *peer_addr);
 int udp_peer_send2(udp_peer_t* peer, const void *message, unsigned len, const struct sockaddr_in *peer_addr);
 
-/* À©Ôö·¢ËÍbuffer³ß´ç£¬Ã¿´ÎÒÔ1KÎªµ¥Î»ÏòÉÏÔ²Õû */
+/* æ‰©å¢å‘é€bufferå°ºå¯¸ï¼Œæ¯æ¬¡ä»¥1Kä¸ºå•ä½å‘ä¸Šåœ†æ•´ */
 void udp_peer_expand_send_buffer(udp_peer_t* peer, unsigned size);
 void udp_peer_expand_recv_buffer(udp_peer_t* peer, unsigned size);
 

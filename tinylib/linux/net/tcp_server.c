@@ -25,26 +25,28 @@ struct tcp_server
     
     int fd;
     channel_t *channel;
-	
+    
     inetaddr_t addr;
-	
-	int is_started;
-	int is_in_callback;
-	int is_alive;
+    
+    int is_started;
+    int is_in_callback;
+    int is_alive;
 };
 
-static inline void delete_server(tcp_server_t *server)
+static inline 
+void delete_server(tcp_server_t *server)
 {
-	if (server->is_started)
-	{
-		tcp_server_stop(server);
-	}
+    if (server->is_started)
+    {
+        tcp_server_stop(server);
+    }
     free(server);
 
-	return;
+    return;
 }
 
-static void server_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
+static 
+void server_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     /* 默认读取数据之后不处理，直接丢弃 
      * 所以需要使用者在on_connection中自行将数据接受callback改为自己的处理函数
@@ -57,7 +59,8 @@ static void server_ondata(tcp_connection_t* connection, buffer_t* buffer, void* 
     return;
 }
 
-static void server_onclose(tcp_connection_t* connection, void* userdata)
+static 
+void server_onclose(tcp_connection_t* connection, void* userdata)
 {
     /* 需要使用者在on_connection()中自行将close callback修改为自己的处理函数 */
     tcp_connection_destroy(connection);
@@ -65,7 +68,8 @@ static void server_onclose(tcp_connection_t* connection, void* userdata)
     return;
 }
 
-static void server_onevent(int fd, int event, void* userdata)
+static 
+void server_onevent(int fd, int event, void* userdata)
 {
     tcp_server_t *server;
     tcp_connection_t* connection;
@@ -76,7 +80,7 @@ static void server_onevent(int fd, int event, void* userdata)
 
     server = (tcp_server_t *)userdata;
     
-	log_debug("server_onevent: fd(%d), event(%d), local addr(%s:%u)", fd, event, server->addr.ip, server->addr.port);
+    log_debug("server_onevent: fd(%d), event(%d), local addr(%s:%u)", fd, event, server->addr.ip, server->addr.port);
     
     len = sizeof(addr);
     memset(&addr, 0, len);
@@ -87,29 +91,29 @@ static void server_onevent(int fd, int event, void* userdata)
         return;
     }
 
-	inetaddr_init(&peer_addr, &addr);
+    inetaddr_init(&peer_addr, &addr);
 
     log_debug("new connection arrived from %s:%d, local addr: %s:%u", 
-		peer_addr.ip, peer_addr.port, server->addr.ip, server->addr.port);
+        peer_addr.ip, peer_addr.port, server->addr.ip, server->addr.port);
 
     set_socket_onblock(client_fd, 1);
     connection = tcp_connection_new(server->loop, client_fd, server_ondata, server_onclose, server, &peer_addr);
     if (NULL == connection)
     {
         log_error("tcp server_onevent: tcp_connection_new() failed, connection from %s:%u abandoned, local addr: %s:%u", 
-			peer_addr.ip, peer_addr.port, server->addr.ip, server->addr.port);
-		close(client_fd);
+            peer_addr.ip, peer_addr.port, server->addr.ip, server->addr.port);
+        close(client_fd);
         return;
     }
 
-	server->is_in_callback = 1;
+    server->is_in_callback = 1;
     server->on_connection(connection, server->userdata, &peer_addr);
-	server->is_in_callback = 0;
+    server->is_in_callback = 0;
 
-	if (0 == server->is_alive)
-	{
-		delete_server(server);
-	}
+    if (0 == server->is_alive)
+    {
+        delete_server(server);
+    }
 
     return;
 }
@@ -136,28 +140,80 @@ tcp_server_t* tcp_server_new
     server->userdata = userdata;
     inetaddr_initbyipport(&server->addr, ip, port);
 
-	server->is_started = 0;
-	server->is_in_callback = 0;
-	server->is_alive = 1;
-	
+    server->is_started = 0;
+    server->is_in_callback = 0;
+    server->is_alive = 1;
+    
     return server;
+}
+
+static
+void do_tcp_server_destroy(void* userdata)
+{
+    tcp_server_t *server = (tcp_server_t*)userdata;
+    
+    if (server->is_in_callback)
+    {
+        server->is_alive = 0;
+    }
+    else
+    {
+        delete_server(server);
+    }
+
+    return;
 }
 
 void tcp_server_destroy(tcp_server_t *server)
 {
-	if (NULL == server)
-	{
-		return;
-	}
-	
-	if (server->is_in_callback)
-	{
-		server->is_alive = 0;
-	}
-	else
-	{
-		delete_server(server);
-	}
+    if (NULL == server)
+    {
+        return;
+    }
+    
+    loop_run_inloop(server->loop, do_tcp_server_destroy, server);
+    
+    return;
+}
+
+static
+void do_tcp_server_start(void* userdata)
+{
+    tcp_server_t *server = (tcp_server_t*)userdata;
+
+    do
+    {
+        server->fd = create_server_socket(server->addr.port, server->addr.ip);
+        if (server->fd < 0)
+        {
+            log_error("do_tcp_server_start: create_server_socket() failed, local addr: %s:%u", server->addr.ip, server->addr.port);
+            break;
+        }
+
+        server->channel = channel_new(server->fd, server->loop, server_onevent, server);
+
+        if(listen(server->fd, 128) < 0)
+        {
+            log_error("do_tcp_server_start: listen() failed, errno: %d, local addr: %s:%u", errno, server->addr.ip, server->addr.port);
+            break;
+        }
+        if (channel_setevent(server->channel, EPOLLIN))
+        {
+            log_error("do_tcp_server_start: channel_setevent() failed, local addr: %s:%u", server->addr.ip, server->addr.port);
+            break;
+        }
+
+        return;
+    } while(0);
+
+    if (server->fd >= 0)
+    {
+        close(server->fd);
+        server->fd = -1;
+    }
+    channel_destroy(server->channel);
+    server->channel = NULL;
+    server->is_started = 0;
 
     return;
 }
@@ -170,52 +226,30 @@ int tcp_server_start(tcp_server_t *server)
         return -1;
     }
 
-	if (server->is_started)
-	{
-		log_warn("server on %s:%u has already been started", server->addr.ip, server->addr.port);
-		return 0;
-	}
+    if (server->is_started)
+    {
+        return 0;
+    }
 
-	do
-	{
-		server->fd = create_server_socket(server->addr.port, server->addr.ip);
-		if (server->fd < 0)
-		{
-			log_error("tcp_server_start: create_server_socket() failed, local addr: %s:%u", server->addr.ip, server->addr.port);
-			break;
-		}
+    server->is_started = 1;
+    loop_run_inloop(server->loop, do_tcp_server_start, server);
 
-		server->channel = channel_new(server->fd, server->loop, server_onevent, server);
-		if (NULL == server->channel)
-		{
-			log_error("tcp_server_start: channel_new() failed, local addr: %s:%u", server->addr.ip, server->addr.port);
-			break;
-		}
+    return 0;
+}
 
-		if(listen(server->fd, 64) < 0)
-		{
-			log_error("tcp_server_start: listen() failed, errno: %d, local addr: %s:%u", errno, server->addr.ip, server->addr.port);
-			break;
-		}
-		if (channel_setevent(server->channel, EPOLLIN))
-		{
-			log_error("tcp_server_start: channel_setevent() failed, local addr: %s:%u", server->addr.ip, server->addr.port);
-			break;
-		}
-		server->is_started = 1;
-		
-		return 0;
-	} while(0);
+static
+void do_tcp_server_stop(void* userdata)
+{
+    tcp_server_t *server = (tcp_server_t*)userdata;
 
-	if (server->fd >= 0)
-	{
-		close(server->fd);
-		server->fd = -1;
-	}
-	channel_destroy(server->channel);
-	server->channel = NULL;
+    channel_detach(server->channel);
+    channel_destroy(server->channel);
+    server->channel = NULL;
+    close(server->fd);
+    server->fd = -1;
+    server->is_started = 0;
 
-    return -1;
+    return;
 }
 
 void tcp_server_stop(tcp_server_t *server)
@@ -224,15 +258,8 @@ void tcp_server_stop(tcp_server_t *server)
     {
         return;
     }
-
-    channel_detach(server->channel);
-    channel_destroy(server->channel);
-    server->channel = NULL;
-    close(server->fd);
-    server->fd = -1;
-	server->is_started = 0;
-
+    
+    loop_run_inloop(server->loop, do_tcp_server_stop, server);
+    
     return;
 }
-
-

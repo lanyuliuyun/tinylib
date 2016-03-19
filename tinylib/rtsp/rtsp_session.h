@@ -6,9 +6,9 @@ struct rtsp_session;
 typedef struct rtsp_session rtsp_session_t;
 
 #ifdef WINNT
-	#include "tinylib/windows/net/tcp_connection.h"
+    #include "tinylib/windows/net/tcp_connection.h"
 #elif defined(__linux__)
-	#include "tinylib/linux/net/tcp_connection.h"
+    #include "tinylib/linux/net/tcp_connection.h"
 #endif
 
 #include "tinylib/rtsp/rtsp_message_codec.h"
@@ -17,31 +17,31 @@ typedef struct rtsp_session rtsp_session_t;
 extern "C" {
 #endif
 
-/* »á»°ĞÂ½¨Á¢»òÁ¬½Ó¶Ï¿ªÊ±£¬ request_msg ÎªNULL, Ê¹ÓÃ tcp_connection_connected() Çø·ÖÊÇÄÇÖÖÇé¿ö
- * request_msg¼´¶ÔÓ¦µÄÇëÇóÏûÏ¢¶ÔÏó
+/* ä¼šè¯æ–°å»ºç«‹æˆ–è¿æ¥æ–­å¼€æ—¶ï¼Œ request_msg ä¸ºNULL, ä½¿ç”¨ tcp_connection_connected() åŒºåˆ†æ˜¯é‚£ç§æƒ…å†µ
+ * request_msgå³å¯¹åº”çš„è¯·æ±‚æ¶ˆæ¯å¯¹è±¡
  */
 typedef void (*rtsp_session_handler_f)
 (
-	rtsp_session_t* session, 
-	tcp_connection_t* connection, 
-	rtsp_request_msg_t *request_msg, 
-	void *userdata
+    rtsp_session_t* session, 
+    tcp_connection_t* connection, 
+    rtsp_request_msg_t *request_msg, 
+    void *userdata
 );
 
 typedef void (*rtsp_session_interleaved_packet_f)
 (
-	rtsp_session_t* session, 
-	unsigned char channel,
-	void* packet, unsigned short size,
-	void *userdata
+    rtsp_session_t* session, 
+    unsigned char channel,
+    void* packet, unsigned short size,
+    void *userdata
 );
 
 rtsp_session_t* rtsp_session_start
 (
-	tcp_connection_t *connection, 
-	rtsp_session_handler_f session_handler, 
-	rtsp_session_interleaved_packet_f interleaved_sink, 
-	void* userdata
+    tcp_connection_t *connection, 
+    rtsp_session_handler_f session_handler, 
+    rtsp_session_interleaved_packet_f interleaved_sink, 
+    void* userdata
 );
 
 void rtsp_session_set_extra_userdata(rtsp_session_t* session, void *userdata);

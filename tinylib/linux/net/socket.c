@@ -7,8 +7,8 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netitinylib/linux/net/in.h>
-#include <netitinylib/linux/net/tcp.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <errno.h>
@@ -103,8 +103,8 @@ void set_socket_onblock(int fd, int on)
     flags = fcntl(fd, F_GETFD, 0);
     flags |= FD_CLOEXEC;
     result = fcntl(fd, F_SETFD, flags);
-	
-	(void)result;
+    
+    (void)result;
 
     return;
 }
@@ -121,8 +121,8 @@ void set_socket_nodelay(int fd, int on)
     }
 
     result = setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &value, sizeof(value));
-	
-	(void)result;
+    
+    (void)result;
 
     return;
 }

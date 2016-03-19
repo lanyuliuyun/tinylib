@@ -1,7 +1,6 @@
 
-/** 表示一个一个活动的tcp连接，
-  * 不需要user进行connection的销毁操作，库本身会在合适的实际执行销毁
-  */
+/* 表示一个一个活动的tcp连接，
+ */
 
 #ifndef NET_TCP_CONNECTION_H
 #define NET_TCP_CONNECTION_H

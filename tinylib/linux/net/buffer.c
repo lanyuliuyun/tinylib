@@ -65,6 +65,7 @@ buffer_t* buffer_new(unsigned size)
 
     buffer = (buffer_t*)malloc(sizeof(buffer_t));
     memset(buffer, 0, sizeof(buffer_t));
+
     buffer->data = (unsigned char*)malloc(size);
     memset(buffer->data, 0, size);
     buffer->len = size;
@@ -125,7 +126,7 @@ unsigned buffer_append(buffer_t* buffer, const void* data, unsigned size)
 unsigned buffer_readFd(buffer_t* buffer, int fd)
 {
     char extra[4096];
-	unsigned extra_bytes;
+    unsigned extra_bytes;
     struct iovec vecs[2];
     int n;
 
@@ -145,7 +146,7 @@ unsigned buffer_readFd(buffer_t* buffer, int fd)
     if (n < 0)
     {
         log_error("buffer_readFd: readv() failed, fd(%d), errno(%d)", fd, errno);
-        return -1;
+        return 0;
     }
     else if (n <= (buffer->len - buffer->write_index))
     {
@@ -153,8 +154,8 @@ unsigned buffer_readFd(buffer_t* buffer, int fd)
     }
     else
     {
-		extra_bytes = n - (buffer->len - buffer->write_index);
-		buffer->write_index = buffer->len;	
+        extra_bytes = n - (buffer->len - buffer->write_index);
+        buffer->write_index = buffer->len;
         buffer_append(buffer, extra, extra_bytes);
     }
 
@@ -163,9 +164,9 @@ unsigned buffer_readFd(buffer_t* buffer, int fd)
 
 void buffer_retrieve(buffer_t *buffer, unsigned size)
 {
-    int readablebytes = buffer->write_index - buffer->read_index;
+    unsigned readablebytes = buffer->write_index - buffer->read_index;
 
-    if ((int)size < readablebytes)
+    if (size < readablebytes)
     {
         buffer->read_index += size;
     }
@@ -185,6 +186,7 @@ void buffer_retrieveall(buffer_t *buffer)
         buffer->read_index = 0;
         buffer->write_index = 0;
     }
-	
-	return;
+    
+    return;
 }
+

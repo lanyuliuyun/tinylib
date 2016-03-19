@@ -1,6 +1,6 @@
 
-/** Ò»¸öSDPµÄÒ»¸ö»ù±¾½âÎöÆ÷£¬Ö»×ö¼òµ¥µÄÎÄ±¾½âÎö£¬
- * ¾ßÌåµÄÖµº¬Òå£¬ÇëÊ¹ÓÃÕß¸ù¾İĞèÒª×ÔĞĞ×ö½øÒ»²½½âÎö
+/* ä¸€ä¸ªSDPçš„ä¸€ä¸ªåŸºæœ¬è§£æå™¨ï¼Œåªåšç®€å•çš„æ–‡æœ¬è§£æï¼Œ
+ * å…·ä½“çš„å€¼å«ä¹‰ï¼Œè¯·ä½¿ç”¨è€…æ ¹æ®éœ€è¦è‡ªè¡Œåšè¿›ä¸€æ­¥è§£æ
  */
 
 #ifndef RTSP_SDP_H
@@ -13,7 +13,7 @@ typedef struct sdp_attrib
     const struct sdp_attrib *next;
 }sdp_attrib_t;
 
-/* sdpĞÅÏ¢ÖĞsession²¿·ÖµÄ¼ÇÂ¼ */
+/* sdpä¿¡æ¯ä¸­sessionéƒ¨åˆ†çš„è®°å½• */
 typedef struct sdp_session
 {
     const char* version;
@@ -30,23 +30,23 @@ typedef struct sdp_session
     const char* control;
     
     const sdp_attrib_t *attrib;
-	const sdp_attrib_t *attrib_end;
+    const sdp_attrib_t *attrib_end;
 }sdp_session_t;
 
 typedef struct sdp_media
 {
     const char* type;                /* video/audio */
-    const char* param;               /*m=vedio/audioÖ®ºóµÄÄÚÈİ */
+    const char* param;               /*m=vedio/audioä¹‹åçš„å†…å®¹ */
     const char* bandwidth;
     const char* control; 
-    const sdp_attrib_t* attrib;      /* ³ıcontrolÊôĞÔÖ®ÍâÆäËûµÄattribute */
-	const sdp_attrib_t *attrib_end;
+    const sdp_attrib_t* attrib;      /* é™¤controlå±æ€§ä¹‹å¤–å…¶ä»–çš„attribute */
+    const sdp_attrib_t *attrib_end;
 }sdp_media_t;
 
 typedef struct sdp
 {
     sdp_session_t *session;
-    sdp_media_t *media[3];      /* Ä¿Ç°×î¶à½âÎöÈı¸ö×ÓÃ½ÌåÁ÷·Ö±ğÊ¹ÓÃtackID½øĞĞ±êÊ¾ */
+    sdp_media_t *media[3];      /* ç›®å‰æœ€å¤šè§£æä¸‰ä¸ªå­åª’ä½“æµåˆ†åˆ«ä½¿ç”¨tackIDè¿›è¡Œæ ‡ç¤º */
 }sdp_t;
 
 #ifdef __cplusplus

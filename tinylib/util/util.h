@@ -1,6 +1,6 @@
 
-/** 基本的工具相关
-  */
+/* 基本的工具相关 
+ */
 
 #ifndef TINYLIB_UTIL_H
 #define TINYLIB_UTIL_H

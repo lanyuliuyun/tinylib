@@ -19,7 +19,7 @@ static inline void sdp_session_online(sdp_session_t* session, char *line, unsign
     pos = strchr(line, '=');
     if (NULL == pos)
     {
-        /* ¸ø¶¨ĞĞÖĞÃ»ÓĞ=£¬²»ÊÇÒ»¸öºÏ·¨µÄsessionĞĞ£¬Ìø¹ı²»´¦Àí */
+        /* ç»™å®šè¡Œä¸­æ²¡æœ‰=ï¼Œä¸æ˜¯ä¸€ä¸ªåˆæ³•çš„sessionè¡Œï¼Œè·³è¿‡ä¸å¤„ç† */
         return;
     }
 
@@ -119,7 +119,7 @@ static inline void sdp_session_online(sdp_session_t* session, char *line, unsign
             pos = strchr(part, ':');
             if (NULL == pos)
             {
-                /* ÊôĞÔĞĞÖĞ£¬Ã»ÓĞÃ°ºÅ²»ÊÇÒ»¸öºÏ·¨µÄÊôĞÔĞĞ£¬Ìø¹ı */
+                /* å±æ€§è¡Œä¸­ï¼Œæ²¡æœ‰å†’å·ä¸æ˜¯ä¸€ä¸ªåˆæ³•çš„å±æ€§è¡Œï¼Œè·³è¿‡ */
                 break;
             }
 
@@ -133,21 +133,21 @@ static inline void sdp_session_online(sdp_session_t* session, char *line, unsign
             }
 
             attrib = (sdp_attrib_t*)malloc(sizeof(sdp_attrib_t));
-			memset(attrib, 0, sizeof(*attrib));
-			attrib->key = part;
-			attrib->value = pos;
-			attrib->next = NULL;
+            memset(attrib, 0, sizeof(*attrib));
+            attrib->key = part;
+            attrib->value = pos;
+            attrib->next = NULL;
 
-			if (NULL == session->attrib)
-			{
-				session->attrib = attrib;
-				session->attrib_end = attrib;
-			}
-			else
-			{
-				((sdp_attrib_t*)session->attrib_end)->next = attrib;
-				session->attrib_end = attrib;
-			}
+            if (NULL == session->attrib)
+            {
+                session->attrib = attrib;
+                session->attrib_end = attrib;
+            }
+            else
+            {
+                ((sdp_attrib_t*)session->attrib_end)->next = attrib;
+                session->attrib_end = attrib;
+            }
 
             break;
         }
@@ -173,7 +173,7 @@ static inline void sdp_media_online(sdp_media_t* media, char *line, unsigned len
     pos = strchr(line, '=');
     if (NULL == pos)
     {
-        /* Ëù¸øµÄĞĞÖĞ²»°üº¬=£¬²»ÊÇÒ»¸öºÏ·¨µÄÊôĞÔĞĞ */
+        /* æ‰€ç»™çš„è¡Œä¸­ä¸åŒ…å«=ï¼Œä¸æ˜¯ä¸€ä¸ªåˆæ³•çš„å±æ€§è¡Œ */
         return;
     }
 
@@ -192,7 +192,7 @@ static inline void sdp_media_online(sdp_media_t* media, char *line, unsigned len
             pos = strchr(part, ':');
             if (NULL == pos)
             {
-                /* Ëù¸øµÄÊôĞÔĞĞÖĞ²»°üº¬Ã°ºÅ£¬²»ÊÇÒ»¸öºÏ·¨µÄÊôĞÔĞĞ£¬Ìø¹ı */
+                /* æ‰€ç»™çš„å±æ€§è¡Œä¸­ä¸åŒ…å«å†’å·ï¼Œä¸æ˜¯ä¸€ä¸ªåˆæ³•çš„å±æ€§è¡Œï¼Œè·³è¿‡ */
                 break;
             }
 
@@ -206,20 +206,20 @@ static inline void sdp_media_online(sdp_media_t* media, char *line, unsigned len
             }
 
             attrib = (sdp_attrib_t*)malloc(sizeof(sdp_attrib_t));
-			memset(attrib, 0, sizeof(*attrib));
-			attrib->key = part;
-			attrib->value = pos;
+            memset(attrib, 0, sizeof(*attrib));
+            attrib->key = part;
+            attrib->value = pos;
 
-			if (NULL == media->attrib)
-			{
-				media->attrib = attrib;
-				media->attrib_end = attrib;
-			}
-			else
-			{
-				((sdp_attrib_t*)media->attrib_end)->next = attrib;
-				media->attrib_end = attrib;
-			}
+            if (NULL == media->attrib)
+            {
+                media->attrib = attrib;
+                media->attrib_end = attrib;
+            }
+            else
+            {
+                ((sdp_attrib_t*)media->attrib_end)->next = attrib;
+                media->attrib_end = attrib;
+            }
 
             break;
         }
@@ -254,7 +254,7 @@ sdp_t* sdp_parse(const char *data, unsigned len)
     rawdata = (char*)sdp + sizeof(*sdp);
     memcpy(rawdata, data, len);    
 
-    /* È·ÈÏµÚÒ»¸ö¶ÎÊÇsession»¹ÊÇmedia */
+    /* ç¡®è®¤ç¬¬ä¸€ä¸ªæ®µæ˜¯sessionè¿˜æ˜¯media */
     line = rawdata;    
     while(*line == ' ' || *line == '\t') line++;
     pos = strchr(line, '=');    
@@ -272,7 +272,7 @@ sdp_t* sdp_parse(const char *data, unsigned len)
     sdp->media[1] = NULL;
     sdp->media[2] = NULL;
 
-    /* µÚÒ»¸ökey=value²»ÊÇm=£¬±íÃ÷sdpĞÅÏ¢ÊÇÒÔsession¶Î¿ªÊ¼µÄ */
+    /* ç¬¬ä¸€ä¸ªkey=valueä¸æ˜¯m=ï¼Œè¡¨æ˜sdpä¿¡æ¯æ˜¯ä»¥sessionæ®µå¼€å§‹çš„ */
     if (key != 'm')
     {
         sdp->session = (sdp_session_t*)malloc(sizeof(sdp_session_t));
@@ -283,7 +283,7 @@ sdp_t* sdp_parse(const char *data, unsigned len)
             crlf = strstr(line, "\r\n");
             if (NULL == crlf)
             {
-                /* µ±×ö×îºóÒ»ĞĞµÄÄÚÈİ */
+                /* å½“åšæœ€åä¸€è¡Œçš„å†…å®¹ */
                 sdp_session_online(sdp->session, line, (len - (line - rawdata)));
 
                 return sdp;
@@ -298,7 +298,7 @@ sdp_t* sdp_parse(const char *data, unsigned len)
         } while(key != 'm');
     }
 
-    /* ÖÁ´Ë¿ªÊ¼ÁËmediaµÄ¶Î */
+    /* è‡³æ­¤å¼€å§‹äº†mediaçš„æ®µ */
     do
     {
         while (*line == ' ' || *line == '\t') line++;
@@ -316,11 +316,11 @@ sdp_t* sdp_parse(const char *data, unsigned len)
             pos = strchr(line, '=');
             if (NULL == pos)
             {
-                /* Ê£ÏÂ²¿·ÖÊı¾İÖĞÃ»ÓĞ=£¬²»ÊÇºÏ·¨µÄsdpÄÚÈİ£¬ºöÂÔÖ®£¬½âÎö½áÊø */
+                /* å‰©ä¸‹éƒ¨åˆ†æ•°æ®ä¸­æ²¡æœ‰=ï¼Œä¸æ˜¯åˆæ³•çš„sdpå†…å®¹ï¼Œå¿½ç•¥ä¹‹ï¼Œè§£æç»“æŸ */
                 return sdp;
             }
 
-            /* Ìø¹ım= */
+            /* è·³è¿‡m= */
             pos++;
             line = pos;
             pos = strchr(line, ' ');
@@ -331,7 +331,7 @@ sdp_t* sdp_parse(const char *data, unsigned len)
 
             if (NULL == pos)
             {
-                /* media¿ªÊ¼ĞĞ¸ñÊ½·Ç·¨£¬Ê£ÏÂµÄÊı¾İÎª·Ç·¨£¬ºöÂÔÖ®£¬½âÎö½áÊø */
+                /* mediaå¼€å§‹è¡Œæ ¼å¼éæ³•ï¼Œå‰©ä¸‹çš„æ•°æ®ä¸ºéæ³•ï¼Œå¿½ç•¥ä¹‹ï¼Œè§£æç»“æŸ */
                 log_error("sdp_parse(): bad media start line");
                 return sdp;
             }
@@ -340,7 +340,7 @@ sdp_t* sdp_parse(const char *data, unsigned len)
             pos++;
             while(*pos == ' ' || *pos == '\t') pos++;
 
-            /* ×î¶à½âÎöÈı¸ömedia¶Î */
+            /* æœ€å¤šè§£æä¸‰ä¸ªmediaæ®µ */
             if (media_count >= 3)
             {
                 break;
@@ -357,7 +357,7 @@ sdp_t* sdp_parse(const char *data, unsigned len)
 
         if (NULL == crlf)
         {
-            /* Ã»ÓĞ¸ü¶àµÄĞĞ£¬ÈÏÎªÊÇ×îºóÒ»ĞĞ */
+            /* æ²¡æœ‰æ›´å¤šçš„è¡Œï¼Œè®¤ä¸ºæ˜¯æœ€åä¸€è¡Œ */
             sdp_media_online(media, line, (len - (line - rawdata)));
             break;
         }
@@ -415,8 +415,8 @@ void sdp_destroy(sdp_t* sdp)
 
         free(media);
     }
-	
-	free(sdp);
+    
+    free(sdp);
 
     return;
 }

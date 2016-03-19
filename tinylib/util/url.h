@@ -1,5 +1,5 @@
 
-/** 实现一个基本的URL解析的工具*/
+/** 一个基本的URL解析的工具 */
 
 #ifndef UTIL_URL_H
 #define UTIL_URL_H
@@ -11,10 +11,10 @@ typedef struct url
     const char *user;                 /* user */
     const char *pass;                 /* pass */
     const char *host;                 /* 10.0.0.1 */
-    unsigned short port;        	  /* 554 */
+    unsigned short port;              /* 554 */
     const char *path;                 /* /demo.mp4/track1 */
-	const char *query;				  /* key1=value1&key2=value2 */
-	const char *hash;				  /* hash */
+    const char *query;                  /* key1=value1&key2=value2 */
+    const char *hash;                  /* hash */
 }url_t;
 
 #ifdef __cplusplus

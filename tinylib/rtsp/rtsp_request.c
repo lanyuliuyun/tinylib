@@ -6,15 +6,15 @@
 #include "tinylib/util/log.h"
 
 #ifdef WINNT
-	#include "tinylib/windows/net/tcp_client.h"
-	#include "tinylib/windows/net/tcp_connection.h"
-	
-	#include <winsock2.h>
+    #include "tinylib/windows/net/tcp_client.h"
+    #include "tinylib/windows/net/tcp_connection.h"
+    
+    #include <winsock2.h>
 #elif defined(__linux__)
-	#include "tinylib/linux/net/tcp_client.h"
-	#include "tinylib/linux/net/tcp_connection.h"
-	
-	#include <arpa/inet.h>
+    #include "tinylib/linux/net/tcp_client.h"
+    #include "tinylib/linux/net/tcp_connection.h"
+    
+    #include <arpa/inet.h>
 #endif
 
 #include <string.h>
@@ -25,45 +25,45 @@
 
 struct rtsp_request
 {
-    tcp_client_t *client;           /* ±¾ÇëÇó¶ÔÏóÊ¹ÓÃµÄtcp client */
-	loop_t* loop;
+    tcp_client_t *client;           /* æœ¬è¯·æ±‚å¯¹è±¡ä½¿ç”¨çš„tcp client */
+    loop_t* loop;
 
     char *url;    
     url_t *u;
-    char pure_url[1024];           /* ²»º¬user/passwordµÄurl */
+    char pure_url[1024];           /* ä¸å«user/passwordçš„url */
 
-    rtsp_request_handler_f request_handler; /* userÌá¹©µÄÇëÇóÏìÓ¦´¦Àíº¯Êý */
-	rtsp_request_interleaved_packet_f interleaved_sink;
+    rtsp_request_handler_f request_handler; /* useræä¾›çš„è¯·æ±‚å“åº”å¤„ç†å‡½æ•° */
+    rtsp_request_interleaved_packet_f interleaved_sink;
     void* userdata;
-	
-	rtsp_response_msg_t *response_msg;
-	
-	int is_new_response;				/* ±ê¼ÇÒ»ÔòÐÂµÄrtsp¿Í»§¶ËÏûÏ¢µÄ¿ªÊ¼£¬¿ÉÄÜÊÇÐÂµÄrtspÇëÇóÏûÏ¢£¬»òinterleavedÏûÏ¢
-									 * ÔÚ×î¿ªÊ¼ºÍÃ¿´¦ÀíÍêÒ»ÔòÏûÏ¢£¬ÐèÒª½«ÆäÖÃÎª1
-									 */
+    
+    rtsp_response_msg_t *response_msg;
+    
+    int is_new_response;                /* æ ‡è®°ä¸€åˆ™æ–°çš„rtspå®¢æˆ·ç«¯æ¶ˆæ¯çš„å¼€å§‹ï¼Œå¯èƒ½æ˜¯æ–°çš„rtspè¯·æ±‚æ¶ˆæ¯ï¼Œæˆ–interleavedæ¶ˆæ¯
+                                     * åœ¨æœ€å¼€å§‹å’Œæ¯å¤„ç†å®Œä¸€åˆ™æ¶ˆæ¯ï¼Œéœ€è¦å°†å…¶ç½®ä¸º1
+                                     */
 
-	int is_interleaved_message;		/* ±ê¼ÇÊÇ·ñÊÇÒ»ÔòinterleavedÏûÏ¢ */
+    int is_interleaved_message;        /* æ ‡è®°æ˜¯å¦æ˜¯ä¸€åˆ™interleavedæ¶ˆæ¯ */
 
-    int cseq;                       /* µ±Ç°ÕýÔÚÖ´ÐÐµÄÇëÇóµÄcseq */
-    rtsp_method_e current_request;            /* µ±Ç°ÕýÔÚÖ´ÐÐµÄÇëÇó */
+    int cseq;                       /* å½“å‰æ­£åœ¨æ‰§è¡Œçš„è¯·æ±‚çš„cseq */
+    rtsp_method_e current_request;            /* å½“å‰æ­£åœ¨æ‰§è¡Œçš„è¯·æ±‚ */
 
-    int server_methods;             /* Ô¶¶Ërtsp·þÎñÆ÷ËùÖ§³ÖµÄ·½·¨ */
+    int server_methods;             /* è¿œç«¯rtspæœåŠ¡å™¨æ‰€æ”¯æŒçš„æ–¹æ³• */
 
-	int got_sessionid;
-    char *sessionid;           		/* ÔÚsetupÇëÇóÖ®ºó·þÎñÆ÷·µ»ØµÄSession ID */
+    int got_sessionid;
+    char *sessionid;                   /* åœ¨setupè¯·æ±‚ä¹‹åŽæœåŠ¡å™¨è¿”å›žçš„Session ID */
     int timeout;                    /* request timeout seconds */
 
-    int need_auth;                  /* ·þÎñÆ÷¸æÖªÊÇ·ñÐèÒªÈÏÖ¤ */
+    int need_auth;                  /* æœåŠ¡å™¨å‘ŠçŸ¥æ˜¯å¦éœ€è¦è®¤è¯ */
     
-    int is_in_handler;              /* ±ê¼Çµ±Ç°ÇëÇó¶ÔÏóÊÇ·ñÔÚÏàÓ¦»Øµ÷º¯ÊýµÄÖ´ÐÐÐòÁÐÖÐ */
-    int is_alive;                   /* ±ê¼Çµ±Ç°ÇëÇó¶ÔÏóÊÇ·ñÊÇ»î¶¯µÄ£¬Èô²»ÊÇ»î¶¯µÄ£¬ÔòÔÚ»Øµ÷Ö´ÐÐÍê±ÏÖ®ºó»á½«ÆäÉ¾³ý */
+    int is_in_handler;              /* æ ‡è®°å½“å‰è¯·æ±‚å¯¹è±¡æ˜¯å¦åœ¨ç›¸åº”å›žè°ƒå‡½æ•°çš„æ‰§è¡Œåºåˆ—ä¸­ */
+    int is_alive;                   /* æ ‡è®°å½“å‰è¯·æ±‚å¯¹è±¡æ˜¯å¦æ˜¯æ´»åŠ¨çš„ï¼Œè‹¥ä¸æ˜¯æ´»åŠ¨çš„ï¼Œåˆ™åœ¨å›žè°ƒæ‰§è¡Œå®Œæ¯•ä¹‹åŽä¼šå°†å…¶åˆ é™¤ */
 };
 
 static inline
 void request_delete(rtsp_request_t *request)
 {
     tcp_client_destroy(request->client);
-	free(request->sessionid);
+    free(request->sessionid);
     url_release(request->u);
     free(request->url);
     free(request);
@@ -73,96 +73,96 @@ void request_delete(rtsp_request_t *request)
 
 static void request_filt_response
 (
-	rtsp_request_t *request, 
-	tcp_connection_t* connection, 
-	rtsp_method_e method, 
-	rtsp_response_msg_t *response_msg
+    rtsp_request_t *request, 
+    tcp_connection_t* connection, 
+    rtsp_method_e method, 
+    rtsp_response_msg_t *response_msg
 )
 {
-	char* pos;
-	rtsp_head_t *head = NULL;
-	
-	if (RTSP_METHOD_OPTIONS == method)
-	{
-		head = response_msg->head;
-		while (NULL != head)
-		{
-			if (RTSP_HEAD_PUBLIC == head->key)
-			{
-				break;
-			}
-			
-			head = head->next;
-		}
+    char* pos;
+    rtsp_head_t *head = NULL;
+    
+    if (RTSP_METHOD_OPTIONS == method)
+    {
+        head = response_msg->head;
+        while (NULL != head)
+        {
+            if (RTSP_HEAD_PUBLIC == head->key)
+            {
+                break;
+            }
+            
+            head = head->next;
+        }
 
-		if (NULL != head)
-		{
-			if (strstr(head->value, "OPTIONS"))
-			{
-				request->server_methods |= RTSP_METHOD_OPTIONS;
-			}
-			if (strstr(head->value, "DESCRIBE"))
-			{
-				request->server_methods |= RTSP_METHOD_DESCRIBE;
-			}
-			if (strstr(head->value, "ANNOUNCE"))
-			{
-				request->server_methods |= RTSP_METHOD_ANNOUNCE;
-			}				
-			if (strstr(head->value, "SETUP"))
-			{
-				request->server_methods |= RTSP_METHOD_SETUP;
-			}
-			if (strstr(head->value, "PLAY"))
-			{
-				request->server_methods |= RTSP_METHOD_PLAY;
-			}
-			if (strstr(head->value, "PAUSE"))
-			{
-				request->server_methods |= RTSP_METHOD_PAUSE;
-			}
-			if (strstr(head->value, "TEARDOWN"))
-			{
-				request->server_methods |= RTSP_METHOD_TEARDOWN;
-			}
-			if (strstr(head->value, "GET_PARAMETER"))
-			{
-				request->server_methods |= RTSP_METHOD_GET_PARAMETER;
-			}
-			if (strstr(head->value, "SET_PARAMETER"))
-			{
-				request->server_methods |= RTSP_METHOD_SET_PARAMETER;
-			}
-			if (strstr(head->value, "REDIRECT"))
-			{
-				request->server_methods |= RTSP_METHOD_REDIRECT;
-			}
-			if (strstr(head->value, "RECORD"))
-			{
-				request->server_methods |= RTSP_METHOD_RECORD;
-			}
-		}
-	}
-	else if (RTSP_METHOD_SETUP == method)
-	{
+        if (NULL != head)
+        {
+            if (strstr(head->value, "OPTIONS"))
+            {
+                request->server_methods |= RTSP_METHOD_OPTIONS;
+            }
+            if (strstr(head->value, "DESCRIBE"))
+            {
+                request->server_methods |= RTSP_METHOD_DESCRIBE;
+            }
+            if (strstr(head->value, "ANNOUNCE"))
+            {
+                request->server_methods |= RTSP_METHOD_ANNOUNCE;
+            }                
+            if (strstr(head->value, "SETUP"))
+            {
+                request->server_methods |= RTSP_METHOD_SETUP;
+            }
+            if (strstr(head->value, "PLAY"))
+            {
+                request->server_methods |= RTSP_METHOD_PLAY;
+            }
+            if (strstr(head->value, "PAUSE"))
+            {
+                request->server_methods |= RTSP_METHOD_PAUSE;
+            }
+            if (strstr(head->value, "TEARDOWN"))
+            {
+                request->server_methods |= RTSP_METHOD_TEARDOWN;
+            }
+            if (strstr(head->value, "GET_PARAMETER"))
+            {
+                request->server_methods |= RTSP_METHOD_GET_PARAMETER;
+            }
+            if (strstr(head->value, "SET_PARAMETER"))
+            {
+                request->server_methods |= RTSP_METHOD_SET_PARAMETER;
+            }
+            if (strstr(head->value, "REDIRECT"))
+            {
+                request->server_methods |= RTSP_METHOD_REDIRECT;
+            }
+            if (strstr(head->value, "RECORD"))
+            {
+                request->server_methods |= RTSP_METHOD_RECORD;
+            }
+        }
+    }
+    else if (RTSP_METHOD_SETUP == method)
+    {
         head = response_msg->head;
         while(NULL != head)
         {
             if (head->key == RTSP_HEAD_SESSION)
             {
                 request->timeout = 0;
-				free(request->sessionid);
-				request->sessionid = NULL;
-				
+                free(request->sessionid);
+                request->sessionid = NULL;
+                
                 pos = strchr(head->value, ';');
                 if (NULL == pos)
                 {
-					request->sessionid = strdup(head->value);
+                    request->sessionid = strdup(head->value);
                 }
                 else
                 {
                     *pos = '\0';
-					request->sessionid = strdup(head->value);
+                    request->sessionid = strdup(head->value);
                     
                     pos++;
                     while(*pos == ' ' || *pos == '\t')++pos;
@@ -174,196 +174,196 @@ static void request_filt_response
                     }
                 }
 
-				request->got_sessionid = 1;
+                request->got_sessionid = 1;
 
                 break;
             }
 
             head = head->next;
         }
-	}
+    }
 
-	return;
+    return;
 }
 
 static void request_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     rtsp_request_t *request;
 
-	unsigned parsed_bytes;
+    unsigned parsed_bytes;
     char* data;
     unsigned size;
-	char ch;
+    char ch;
 
-	uint16_t interleaved_len;
-	int ret;
+    uint16_t interleaved_len;
+    int ret;
 
     request = (rtsp_request_t *)userdata;
 
     data = (char*)buffer_peek(buffer);
-	size = buffer_readablebytes(buffer);
-	if (request->is_new_response)
-	{
-		while (1)
-		{
-			data = (char*)buffer_peek(buffer);
-			size = buffer_readablebytes(buffer);
+    size = buffer_readablebytes(buffer);
+    if (request->is_new_response)
+    {
+        while (1)
+        {
+            data = (char*)buffer_peek(buffer);
+            size = buffer_readablebytes(buffer);
 
-			ch = data[0];
-			if (ch == 0x24)
-			{
-				request->is_new_response = 0;
-				request->is_interleaved_message = 1;
+            ch = data[0];
+            if (ch == 0x24)
+            {
+                request->is_new_response = 0;
+                request->is_interleaved_message = 1;
 
-				ch = data[1];
-				interleaved_len = ntohs(*(uint16_t*)&data[2]);
-				if (size < (unsigned)(interleaved_len+4))
-				{
-					return;
-				}
+                ch = data[1];
+                interleaved_len = ntohs(*(uint16_t*)&data[2]);
+                if (size < (unsigned)(interleaved_len+4))
+                {
+                    return;
+                }
 
-				request->interleaved_sink(request, (unsigned char)ch, &data[4], interleaved_len, request->userdata);
-				buffer_retrieve(buffer, (interleaved_len+4));
+                request->interleaved_sink(request, (unsigned char)ch, &data[4], interleaved_len, request->userdata);
+                buffer_retrieve(buffer, (interleaved_len+4));
 
-				request->is_new_response = 1;
-				request->is_interleaved_message = 0;
-				continue;
-			}
-			else
-			{
-				request->is_new_response = 0;
-				request->is_interleaved_message = 0;
+                request->is_new_response = 1;
+                request->is_interleaved_message = 0;
+                continue;
+            }
+            else
+            {
+                request->is_new_response = 0;
+                request->is_interleaved_message = 0;
 
-				/* ÈÏÎªÊÇ³£¹æµÄrtspÎÄ±¾ÏûÏ¢¿ªÊ¼£¬³¢ÊÔ½âÎöÖ® */
-				ret = rtsp_response_msg_decode(request->response_msg, data, size, &parsed_bytes);
-				if (ret == 0)
-				{
-					request_filt_response(request, connection, request->current_request, request->response_msg);
-					
-					request->is_in_handler = 1;
-					request->request_handler(request, connection, request->current_request, request->response_msg, request->userdata);
-					request->is_in_handler = 0;
+                /* è®¤ä¸ºæ˜¯å¸¸è§„çš„rtspæ–‡æœ¬æ¶ˆæ¯å¼€å§‹ï¼Œå°è¯•è§£æžä¹‹ */
+                ret = rtsp_response_msg_decode(request->response_msg, data, size, &parsed_bytes);
+                if (ret == 0)
+                {
+                    request_filt_response(request, connection, request->current_request, request->response_msg);
+                    
+                    request->is_in_handler = 1;
+                    request->request_handler(request, connection, request->current_request, request->response_msg, request->userdata);
+                    request->is_in_handler = 0;
 
-					rtsp_response_msg_unref(request->response_msg);
-					request->response_msg = NULL;
-					buffer_retrieve(buffer, parsed_bytes);
+                    rtsp_response_msg_unref(request->response_msg);
+                    request->response_msg = NULL;
+                    buffer_retrieve(buffer, parsed_bytes);
 
-					if (0 == request->is_alive)
-					{
-						request_delete(request);
+                    if (0 == request->is_alive)
+                    {
+                        request_delete(request);
 
-						break;
-					}
+                        break;
+                    }
 
-					request->response_msg = rtsp_response_msg_new();
-					request->is_new_response = 1;
-					continue;
-				}
-				else if (ret > 0)
-				{
-					/* ÇëÇóÐÐ½âÎöÃ»ÓÐ³ö´í£¬µ«Êý¾Ý²»ÍêÕû£¬ÎÞ·¨¼ÌÐø£¬·µ»Ø¼ÌÐøÊÕÊý¾Ý */
-					return;
-				}
-				else
-				{
-					/* ½âÎö³ö´í£¬Îª·Ç·¨ÏûÏ¢ */
-					request->is_in_handler = 1;
-					request->request_handler(request, NULL, RTSP_METHOD_NONE, NULL, request->userdata);
-					request->is_in_handler = 0;
+                    request->response_msg = rtsp_response_msg_new();
+                    request->is_new_response = 1;
+                    continue;
+                }
+                else if (ret > 0)
+                {
+                    /* è¯·æ±‚è¡Œè§£æžæ²¡æœ‰å‡ºé”™ï¼Œä½†æ•°æ®ä¸å®Œæ•´ï¼Œæ— æ³•ç»§ç»­ï¼Œè¿”å›žç»§ç»­æ”¶æ•°æ® */
+                    return;
+                }
+                else
+                {
+                    /* è§£æžå‡ºé”™ï¼Œä¸ºéžæ³•æ¶ˆæ¯ */
+                    request->is_in_handler = 1;
+                    request->request_handler(request, NULL, RTSP_METHOD_NONE, NULL, request->userdata);
+                    request->is_in_handler = 0;
 
-					if (0 == request->is_alive)
-					{
-						request_delete(request);
-					}
-					
-					return;
-				}
-			}
-		}
-	}
-	else
-	{
-		while (1)
-		{
-			data = (char*)buffer_peek(buffer);
-			size = buffer_readablebytes(buffer);
+                    if (0 == request->is_alive)
+                    {
+                        request_delete(request);
+                    }
+                    
+                    return;
+                }
+            }
+        }
+    }
+    else
+    {
+        while (1)
+        {
+            data = (char*)buffer_peek(buffer);
+            size = buffer_readablebytes(buffer);
 
-			/* Êµ¼ÊÉÏÈôÊÇÇ°Ò»´Î²»ÍêÕûµÄinterleavedÏûÏ¢£¬ÔòÆðÊ¼×Ö½ÚÒ»¶¨ÊÇ 0x24 */
+            /* å®žé™…ä¸Šè‹¥æ˜¯å‰ä¸€æ¬¡ä¸å®Œæ•´çš„interleavedæ¶ˆæ¯ï¼Œåˆ™èµ·å§‹å­—èŠ‚ä¸€å®šæ˜¯ 0x24 */
 
-			ch = data[0];
-			if (ch == 0x24)
-			{
-				request->is_new_response = 0;
-				request->is_interleaved_message = 1;
-				
-				ch = data[1];
-				interleaved_len = ntohs(*(uint16_t*)&data[2]);
-				if (size < (unsigned)(interleaved_len+4))
-				{
-					return;
-				}
+            ch = data[0];
+            if (ch == 0x24)
+            {
+                request->is_new_response = 0;
+                request->is_interleaved_message = 1;
+                
+                ch = data[1];
+                interleaved_len = ntohs(*(uint16_t*)&data[2]);
+                if (size < (unsigned)(interleaved_len+4))
+                {
+                    return;
+                }
 
-				request->interleaved_sink(request, (unsigned char)ch, &data[4], interleaved_len, request->userdata);
-				buffer_retrieve(buffer, (interleaved_len+4));
+                request->interleaved_sink(request, (unsigned char)ch, &data[4], interleaved_len, request->userdata);
+                buffer_retrieve(buffer, (interleaved_len+4));
 
-				request->is_new_response = 1;
+                request->is_new_response = 1;
 
-				continue;
-			}
-			else
-			{
-				request->is_new_response = 0;
-				request->is_interleaved_message = 0;
+                continue;
+            }
+            else
+            {
+                request->is_new_response = 0;
+                request->is_interleaved_message = 0;
 
-				request->response_msg = rtsp_response_msg_new();
+                request->response_msg = rtsp_response_msg_new();
 
-				/* ÈÏÎªÊÇ³£¹æµÄrtspÎÄ±¾ÏûÏ¢¿ªÊ¼£¬³¢ÊÔ½âÎöÖ® */
-				ret = rtsp_response_msg_decode(request->response_msg, data, size, &parsed_bytes);
-				if (ret == 0)
-				{
-					request_filt_response(request, connection, request->current_request, request->response_msg);
-					
-					request->is_in_handler = 1;
-					request->request_handler(request, connection, request->current_request, request->response_msg, request->userdata);
-					request->is_in_handler = 0;
+                /* è®¤ä¸ºæ˜¯å¸¸è§„çš„rtspæ–‡æœ¬æ¶ˆæ¯å¼€å§‹ï¼Œå°è¯•è§£æžä¹‹ */
+                ret = rtsp_response_msg_decode(request->response_msg, data, size, &parsed_bytes);
+                if (ret == 0)
+                {
+                    request_filt_response(request, connection, request->current_request, request->response_msg);
+                    
+                    request->is_in_handler = 1;
+                    request->request_handler(request, connection, request->current_request, request->response_msg, request->userdata);
+                    request->is_in_handler = 0;
 
-					rtsp_response_msg_unref(request->response_msg);
-					request->response_msg = NULL;
-					buffer_retrieve(buffer, parsed_bytes);
+                    rtsp_response_msg_unref(request->response_msg);
+                    request->response_msg = NULL;
+                    buffer_retrieve(buffer, parsed_bytes);
 
-					if (0 == request->is_alive)
-					{
-						request_delete(request);
+                    if (0 == request->is_alive)
+                    {
+                        request_delete(request);
 
-						break;
-					}
+                        break;
+                    }
 
-					request->response_msg = rtsp_response_msg_new();
-					request->is_new_response = 1;
-					continue;
-				}
-				else if (ret > 0)
-				{
-					/* ÇëÇóÐÐ½âÎöÃ»ÓÐ³ö´í£¬µ«Êý¾Ý²»ÍêÕû£¬ÎÞ·¨¼ÌÐø£¬·µ»Ø¼ÌÐøÊÕÊý¾Ý */
-					return;
-				}
-				else
-				{
-					/* ½âÎö³ö´í£¬Îª·Ç·¨ÏûÏ¢ */
-					request->is_in_handler = 1;
-					request->request_handler(request, NULL, RTSP_METHOD_NONE, NULL, request->userdata);
-					request->is_in_handler = 0;
-					
-					if (0 == request->is_alive)
-					{
-						request_delete(request);
-					}
-					
-					return;
-				}
-			}
-		}
-	}
+                    request->response_msg = rtsp_response_msg_new();
+                    request->is_new_response = 1;
+                    continue;
+                }
+                else if (ret > 0)
+                {
+                    /* è¯·æ±‚è¡Œè§£æžæ²¡æœ‰å‡ºé”™ï¼Œä½†æ•°æ®ä¸å®Œæ•´ï¼Œæ— æ³•ç»§ç»­ï¼Œè¿”å›žç»§ç»­æ”¶æ•°æ® */
+                    return;
+                }
+                else
+                {
+                    /* è§£æžå‡ºé”™ï¼Œä¸ºéžæ³•æ¶ˆæ¯ */
+                    request->is_in_handler = 1;
+                    request->request_handler(request, NULL, RTSP_METHOD_NONE, NULL, request->userdata);
+                    request->is_in_handler = 0;
+                    
+                    if (0 == request->is_alive)
+                    {
+                        request_delete(request);
+                    }
+                    
+                    return;
+                }
+            }
+        }
+    }
 
     return;
 }
@@ -371,15 +371,15 @@ static void request_ondata(tcp_connection_t* connection, buffer_t* buffer, void*
 static void request_onclose(tcp_connection_t* connection, void* userdata)
 {
     rtsp_request_t *request = (rtsp_request_t*)userdata;
-	
+    
     request->is_in_handler = 1;
     request->request_handler(request, connection, RTSP_METHOD_NONE, NULL, request->userdata);
     request->is_in_handler = 0;
 
-	if (0 == request->is_alive)
-	{
-		request_delete(request);
-	}
+    if (0 == request->is_alive)
+    {
+        request_delete(request);
+    }
 
     return;
 }
@@ -392,21 +392,21 @@ static void request_onconnected(tcp_connection_t* connection, void *userdata)
     request->request_handler(request, connection, RTSP_METHOD_NONE, NULL, request->userdata);
     request->is_in_handler = 0;
 
-	if (0 == request->is_alive)
-	{
-		request_delete(request);
-	}
+    if (0 == request->is_alive)
+    {
+        request_delete(request);
+    }
 
     return;
 }
 
 rtsp_request_t* rtsp_request_new
 (
-	loop_t* loop, 
-	const char* url, 
-	rtsp_request_handler_f request_handler, 
-	rtsp_request_interleaved_packet_f interleaved_sink, 
-	void* userdata
+    loop_t* loop, 
+    const char* url, 
+    rtsp_request_handler_f request_handler, 
+    rtsp_request_interleaved_packet_f interleaved_sink, 
+    void* userdata
 )
 {
     rtsp_request_t *request;
@@ -417,7 +417,7 @@ rtsp_request_t* rtsp_request_new
     if (NULL == url || NULL == loop || NULL == request_handler || NULL == interleaved_sink)
     {
         log_error("rtsp_request_new: bad url(%p) or bad loop(%p) or bad request_handler(%p) or bad interleaved_sink(%p)", 
-			url, loop, request_handler, interleaved_sink);
+            url, loop, request_handler, interleaved_sink);
         return NULL;
     }
 
@@ -434,8 +434,8 @@ rtsp_request_t* rtsp_request_new
 
     request = (rtsp_request_t*)malloc(sizeof(rtsp_request_t));
     memset(request, 0, sizeof(*request));
-	request->client = NULL;
-	request->loop = loop;
+    request->client = NULL;
+    request->loop = loop;
     request->url = strdup(url);
     request->u = u;
     len = snprintf(request->pure_url, sizeof(request->pure_url)-1, "%s//%s:%u", u->schema, u->host, u->port);
@@ -445,15 +445,15 @@ rtsp_request_t* rtsp_request_new
     }
 
     request->request_handler = request_handler;
-	request->interleaved_sink = interleaved_sink;
+    request->interleaved_sink = interleaved_sink;
     request->userdata = userdata;
-	
-	request->response_msg = rtsp_response_msg_new();
+    
+    request->response_msg = rtsp_response_msg_new();
 
     request->cseq = 0;
     request->current_request = RTSP_METHOD_NONE;
-	request->got_sessionid = 0;
-	request->sessionid = NULL;
+    request->got_sessionid = 0;
+    request->sessionid = NULL;
     request->timeout = 0;
     request->need_auth = 0;
     request->is_in_handler = 0;
@@ -511,12 +511,12 @@ int rtsp_request_launch(rtsp_request_t* request)
 
 unsigned rtsp_request_server_method(rtsp_request_t* request)
 {
-	return NULL == request ? 0 : request->server_methods;
+    return NULL == request ? 0 : request->server_methods;
 }
 
 int rtsp_request_timeout(rtsp_request_t* request)
 {
-	return NULL == request ? 0 : request->timeout;
+    return NULL == request ? 0 : request->timeout;
 }
 
 int rtsp_request_options(rtsp_request_t* request)
@@ -541,7 +541,7 @@ int rtsp_request_options(rtsp_request_t* request)
     request->current_request = RTSP_METHOD_OPTIONS;
 
     memset(buffer, 0, sizeof(buffer));
-    /* Îª±£Ö¤ÓÃ»§ÃûºÍÃÜÂë²»ÔÚurlÖÐÐ¹Â¶£¬ÑÏ¸ñµÄµÄÓ¦¸ÃÊ¹ÓÃpure_url×÷ÎªÇëÇóurl */
+    /* ä¸ºä¿è¯ç”¨æˆ·åå’Œå¯†ç ä¸åœ¨urlä¸­æ³„éœ²ï¼Œä¸¥æ ¼çš„çš„åº”è¯¥ä½¿ç”¨pure_urlä½œä¸ºè¯·æ±‚url */
     /* len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, "OPTIONS", request->pure_url, NULL, NULL, 0); */
     len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, RTSP_METHOD_OPTIONS, request->url, NULL, NULL, 0);
     tcp_connection_send(connection, buffer, len);
@@ -571,7 +571,7 @@ int rtsp_request_describe(rtsp_request_t* request, rtsp_head_t* head)
     request->current_request = RTSP_METHOD_DESCRIBE;
 
     memset(buffer, 0, sizeof(buffer));
-    /* Îª±£Ö¤ÓÃ»§ÃûºÍÃÜÂë²»ÔÚurlÖÐÐ¹Â¶£¬ÑÏ¸ñµÄÓ¦¸ÃÊ¹ÓÃpure_url×÷ÎªÇëÇóurl */
+    /* ä¸ºä¿è¯ç”¨æˆ·åå’Œå¯†ç ä¸åœ¨urlä¸­æ³„éœ²ï¼Œä¸¥æ ¼çš„åº”è¯¥ä½¿ç”¨pure_urlä½œä¸ºè¯·æ±‚url */
     /* len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, "DESCRIBE", request->pure_url, head, NULL, 0); */
     len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, RTSP_METHOD_DESCRIBE, request->url, head, NULL, 0);
     tcp_connection_send(connection, buffer, len);
@@ -585,8 +585,8 @@ int rtsp_request_setup(rtsp_request_t* request, rtsp_head_t* head, const char *u
     int len;
     tcp_connection_t* connection;
     const char *u;
-	rtsp_head_t session_head;
-	rtsp_head_t* headptr;    
+    rtsp_head_t session_head;
+    rtsp_head_t* headptr;    
 
     if (NULL == request)
     {
@@ -602,7 +602,7 @@ int rtsp_request_setup(rtsp_request_t* request, rtsp_head_t* head, const char *u
 
     request->cseq++;
     request->current_request = RTSP_METHOD_SETUP;
-	
+    
     if (request->got_sessionid)
     {
         session_head.key = RTSP_HEAD_SESSION;
@@ -620,7 +620,7 @@ int rtsp_request_setup(rtsp_request_t* request, rtsp_head_t* head, const char *u
     if (NULL == u)
     {
         u = request->pure_url;
-		/* u = request->url; */
+        /* u = request->url; */
     }
 
     memset(buffer, 0, sizeof(buffer));
@@ -686,7 +686,7 @@ int rtsp_request_teardown(rtsp_request_t* request, rtsp_head_t* head)
     {
         return -1;
     }
-	
+    
     connection = tcp_client_getconnection(request->client);
     if (NULL == connection)
     {
@@ -740,7 +740,7 @@ int rtsp_request_get_parameter(rtsp_request_t* request, rtsp_head_t* head, const
 
     request->cseq++;
     request->current_request = RTSP_METHOD_GET_PARAMETER;
-	
+    
     if (request->got_sessionid)
     {
         session_head.key = RTSP_HEAD_SESSION;
@@ -755,7 +755,7 @@ int rtsp_request_get_parameter(rtsp_request_t* request, rtsp_head_t* head, const
     }
 
     memset(buffer, 0, sizeof(buffer));
-    /* Îª±£Ö¤ÓÃ»§ÃûºÍÃÜÂë²»ÔÚurlÖÐÐ¹Â¶£¬ÑÏ¸ñµÄµÄÓ¦¸ÃÊ¹ÓÃpure_url×÷ÎªÇëÇóurl */
+    /* ä¸ºä¿è¯ç”¨æˆ·åå’Œå¯†ç ä¸åœ¨urlä¸­æ³„éœ²ï¼Œä¸¥æ ¼çš„çš„åº”è¯¥ä½¿ç”¨pure_urlä½œä¸ºè¯·æ±‚url */
     /* len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, "OPTIONS", request->pure_url, NULL, NULL, 0); */
     len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, RTSP_METHOD_GET_PARAMETER, request->pure_url, headptr, body, body_len);
     tcp_connection_send(connection, buffer, len);
@@ -785,7 +785,7 @@ int rtsp_request_set_parameter(rtsp_request_t* request, rtsp_head_t* head, const
 
     request->cseq++;
     request->current_request = RTSP_METHOD_SET_PARAMETER;
-	
+    
     if (request->got_sessionid)
     {
         session_head.key = RTSP_HEAD_SESSION;
@@ -800,8 +800,8 @@ int rtsp_request_set_parameter(rtsp_request_t* request, rtsp_head_t* head, const
     }
 
     memset(buffer, 0, sizeof(buffer));
-    /* Îª±£Ö¤ÓÃ»§ÃûºÍÃÜÂë²»ÔÚurlÖÐÐ¹Â¶£¬ÑÏ¸ñµÄµÄÓ¦¸ÃÊ¹ÓÃpure_url×÷ÎªÇëÇóurl */
-	len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, RTSP_METHOD_SET_PARAMETER, request->pure_url, headptr, body, body_len);
+    /* ä¸ºä¿è¯ç”¨æˆ·åå’Œå¯†ç ä¸åœ¨urlä¸­æ³„éœ²ï¼Œä¸¥æ ¼çš„çš„åº”è¯¥ä½¿ç”¨pure_urlä½œä¸ºè¯·æ±‚url */
+    len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, RTSP_METHOD_SET_PARAMETER, request->pure_url, headptr, body, body_len);
     /* len = rtsp_msg_buid_request(buffer, sizeof(buffer), request->cseq, RTSP_METHOD_SET_PARAMETER, request->url, headptr, body, body_len); */
     tcp_connection_send(connection, buffer, len);
 

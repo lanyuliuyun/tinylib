@@ -10,8 +10,8 @@ typedef enum log_level{
     LOG_LEVEL_LOG,      /** 一般运行日志 */
     LOG_LEVEL_ERROR,    /** 错误信息 */
     LOG_LEVEL_WARN,     /** 告警性的消息，背后可能存在错误 */
-	LOG_LEVEL_INFO,		/** 提示性的信息输出 */
-	LOG_LEVEL_DEBUG,	/** 调试信息输出，用于功能流程诊断 */
+    LOG_LEVEL_INFO,        /** 提示性的信息输出 */
+    LOG_LEVEL_DEBUG,    /** 调试信息输出，用于功能流程诊断 */
 }log_level_e;
 
 #ifdef __cplusplus

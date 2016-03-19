@@ -1,5 +1,5 @@
 
-/** ÊµÏÖÒ»¸ö¼ò´ğµÄrtsp¿Í»§¶Ë£¬²»Ö§³Öpipeline·½Ê½µÄÇëÇó·¢ËÍºÍÓ¦´ğ´¦Àí */
+/** å®ç°ä¸€ä¸ªç®€ç­”çš„rtspå®¢æˆ·ç«¯ï¼Œä¸æ”¯æŒpipelineæ–¹å¼çš„è¯·æ±‚å‘é€å’Œåº”ç­”å¤„ç† */
 
 #ifndef RTSP_REQUEST_H
 #define RTSP_REQUEST_H
@@ -8,9 +8,9 @@ struct rtsp_request;
 typedef struct rtsp_request rtsp_request_t;
 
 #if WINNT
-	#include "tinylib/windows/net/tcp_connection.h"
+    #include "tinylib/windows/net/tcp_connection.h"
 #elif defined(__linux__)
-	#include "tinylib/linux/net/tcp_connection.h"
+    #include "tinylib/linux/net/tcp_connection.h"
 #endif
 
 #include "tinylib/rtsp/rtsp_message_codec.h"
@@ -19,55 +19,55 @@ typedef struct rtsp_request rtsp_request_t;
 extern "C" {
 #endif
 
-/** rtspÇëÇóÏìÓ¦ÏûÏ¢µÄ´¦Àí»Øµ÷
+/** rtspè¯·æ±‚å“åº”æ¶ˆæ¯çš„å¤„ç†å›è°ƒ
   *
-  * @connnection: ¶ÔÓ¦±¾´Î»á»°µÄtcpÁ¬½Ó
-  * @method: ÊÕµ½´ËÏìÓ¦ÏûÏ¢Ö®Ç°£¬client¶Ë·¢ËÍÇëÇóÏûÏ¢ÖĞµÄÇëÇó·½·¨£¬
-  *          Èç¹ûÊÇRTSP_METHOD_NONE±íÊ¾ÓëÔ¶¶ËRTSP·şÎñÆ÷µÄÁ¬½Ó½¨Á¢OK£¬´ËÊ±responseÎªNULL
-  * @respons: ÏìÓ¦ÏûÏ¢£¬²»°üº¬body²¿·Ö
+  * @connnection: å¯¹åº”æœ¬æ¬¡ä¼šè¯çš„tcpè¿æ¥
+  * @method: æ”¶åˆ°æ­¤å“åº”æ¶ˆæ¯ä¹‹å‰ï¼Œclientç«¯å‘é€è¯·æ±‚æ¶ˆæ¯ä¸­çš„è¯·æ±‚æ–¹æ³•ï¼Œ
+  *          å¦‚æœæ˜¯RTSP_METHOD_NONEè¡¨ç¤ºä¸è¿œç«¯RTSPæœåŠ¡å™¨çš„è¿æ¥å»ºç«‹OKï¼Œæ­¤æ—¶responseä¸ºNULL
+  * @respons: å“åº”æ¶ˆæ¯ï¼Œä¸åŒ…å«bodyéƒ¨åˆ†
   */
 typedef void (*rtsp_request_handler_f)
 (
-	rtsp_request_t *request, 
-	tcp_connection_t* connection, 
-	rtsp_method_e method, 
-	const rtsp_response_msg_t* response, 
-	void *userdata
+    rtsp_request_t *request, 
+    tcp_connection_t* connection, 
+    rtsp_method_e method, 
+    const rtsp_response_msg_t* response, 
+    void *userdata
 );
 
 typedef void (*rtsp_request_interleaved_packet_f)
 (
-	rtsp_request_t *request, 
-	unsigned char channel,
-	void* packet, unsigned short size,
-	void *userdata
+    rtsp_request_t *request, 
+    unsigned char channel,
+    void* packet, unsigned short size,
+    void *userdata
 );
 
 rtsp_request_t* rtsp_request_new
 (
-	loop_t* loop, 
-	const char* url, 
-	rtsp_request_handler_f handler, 
-	rtsp_request_interleaved_packet_f interleaved_sink, 
-	void* userdata
+    loop_t* loop, 
+    const char* url, 
+    rtsp_request_handler_f handler, 
+    rtsp_request_interleaved_packet_f interleaved_sink, 
+    void* userdata
 );
 
 void rtsp_request_destroy(rtsp_request_t* request);
 
 int rtsp_request_launch(rtsp_request_t* request);
 
-/* ·µ»ØÔ¶¶Ë·şÎñÆ÷Ö§³ÖµÄ·½·¨£¬½öµ±OPTIONSÇëÇóÕıÈ·ÏìÓ¦Ö®ºó²ÅÓĞĞ§£¬ÆäËû·µ»Ø0 */
+/* è¿”å›è¿œç«¯æœåŠ¡å™¨æ”¯æŒçš„æ–¹æ³•ï¼Œä»…å½“OPTIONSè¯·æ±‚æ­£ç¡®å“åº”ä¹‹åæ‰æœ‰æ•ˆï¼Œå…¶ä»–è¿”å›0 */
 unsigned rtsp_request_server_method(rtsp_request_t* request);
 
-/* »ñÈ¡·şÎñÆ÷·µ»ØµÄ»Ø»°³¬Ê±Öµ */
+/* è·å–æœåŠ¡å™¨è¿”å›çš„å›è¯è¶…æ—¶å€¼ */
 int rtsp_request_timeout(rtsp_request_t* request);
 
 int rtsp_request_options(rtsp_request_t* request);
 
 int rtsp_request_describe(rtsp_request_t* request, rtsp_head_t* head);
 
-/* ¶îÍâµÄurl²ÎÊıÖ¸¶¨¾ßÌåÎªÄÄ¸öSDPÖĞµÄ×ÓÃ½ÌåÁ÷½øĞĞSETUP£¬
-  * ÈôÎªNULL£¬Ôò½«Ä¬ÈÏÊ¹ÓÃÇëÇó´´½¨Ê±Ö¸¶¨µÄURL
+/* é¢å¤–çš„urlå‚æ•°æŒ‡å®šå…·ä½“ä¸ºå“ªä¸ªSDPä¸­çš„å­åª’ä½“æµè¿›è¡ŒSETUPï¼Œ
+  * è‹¥ä¸ºNULLï¼Œåˆ™å°†é»˜è®¤ä½¿ç”¨è¯·æ±‚åˆ›å»ºæ—¶æŒ‡å®šçš„URL
   */
 int rtsp_request_setup(rtsp_request_t* request, rtsp_head_t* head, const char *url);
 

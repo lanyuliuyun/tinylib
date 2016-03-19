@@ -4,7 +4,7 @@
 
 #include <string.h>
 #include <sys/socket.h>
-#include <netitinylib/linux/net/in.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 
 void inetaddr_init(inetaddr_t *addr, struct sockaddr_in *addr_in)

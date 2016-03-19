@@ -1,14 +1,14 @@
 
 #ifdef WINNT
-	#include "tinylib/windows/net/tcp_connection.h"
-	#include "tinylib/windows/net/buffer.h"
-	
-	#include <winsock2.h>
+    #include "tinylib/windows/net/tcp_connection.h"
+    #include "tinylib/windows/net/buffer.h"
+    
+    #include <winsock2.h>
 #elif defined(__linux__)
-	#include "tinylib/linux/net/tcp_connection.h"
-	#include "tinylib/linux/net/buffer.h"
-	
-	#include <arpa/inet.h>
+    #include "tinylib/linux/net/tcp_connection.h"
+    #include "tinylib/linux/net/buffer.h"
+    
+    #include <arpa/inet.h>
 #endif
 
 #include "tinylib/rtsp/rtsp_message_codec.h"
@@ -25,19 +25,19 @@ struct rtsp_session
     tcp_connection_t* connection;
 
     rtsp_session_handler_f session_handler;
-	rtsp_session_interleaved_packet_f interleaved_sink;
+    rtsp_session_interleaved_packet_f interleaved_sink;
     void* userdata;
 
-	rtsp_request_msg_t *request_msg;
+    rtsp_request_msg_t *request_msg;
 
-	int is_new_request;				/* ±ê¼ÇÒ»ÔòÐÂµÄrtsp¿Í»§¶ËÏûÏ¢µÄ¿ªÊ¼£¬¿ÉÄÜÊÇÐÂµÄrtspÇëÇóÏûÏ¢£¬»òinterleavedÏûÏ¢
-									 * ÔÚ×î¿ªÊ¼ºÍÃ¿´¦ÀíÍêÒ»ÔòÏûÏ¢£¬ÐèÒª½«ÆäÖÃÎª1
-									 */
+    int is_new_request;                /* æ ‡è®°ä¸€åˆ™æ–°çš„rtspå®¢æˆ·ç«¯æ¶ˆæ¯çš„å¼€å§‹ï¼Œå¯èƒ½æ˜¯æ–°çš„rtspè¯·æ±‚æ¶ˆæ¯ï¼Œæˆ–interleavedæ¶ˆæ¯
+                                     * åœ¨æœ€å¼€å§‹å’Œæ¯å¤„ç†å®Œä¸€åˆ™æ¶ˆæ¯ï¼Œéœ€è¦å°†å…¶ç½®ä¸º1
+                                     */
 
-	int is_interleaved_message;		/* ±ê¼ÇÊÇ·ñÊÇÒ»ÔòinterleavedÏûÏ¢ */
+    int is_interleaved_message;        /* æ ‡è®°æ˜¯å¦æ˜¯ä¸€åˆ™interleavedæ¶ˆæ¯ */
 
     unsigned long context_data[4];
-	void *extra_userdata;
+    void *extra_userdata;
 
     int is_in_handler;
     int is_alive;    
@@ -46,183 +46,183 @@ struct rtsp_session
 static inline
 void session_delete(rtsp_session_t* session)
 {
-	tcp_connection_destroy(session->connection);
-	rtsp_request_msg_unref(session->request_msg);
-	free(session);
+    tcp_connection_destroy(session->connection);
+    rtsp_request_msg_unref(session->request_msg);
+    free(session);
 
-	return;
+    return;
 }
 
 static void session_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     rtsp_session_t* session;
 
-	unsigned parsed_bytes;
+    unsigned parsed_bytes;
     char* data;
     unsigned size;
-	uint8_t ch;
+    uint8_t ch;
 
-	uint16_t interleaved_len;
-	int ret;
+    uint16_t interleaved_len;
+    int ret;
 
     session = (rtsp_session_t*)userdata;
 
-	if (session->is_new_request)
-	{
-		while (1)
-		{
-			data = (char*)buffer_peek(buffer);
-			size = buffer_readablebytes(buffer);
+    if (session->is_new_request)
+    {
+        while (1)
+        {
+            data = (char*)buffer_peek(buffer);
+            size = buffer_readablebytes(buffer);
 
-			ch = data[0];
-			if (ch == 0x24)
-			{
-				session->is_new_request = 0;
-				session->is_interleaved_message = 1;
+            ch = data[0];
+            if (ch == 0x24)
+            {
+                session->is_new_request = 0;
+                session->is_interleaved_message = 1;
 
-				ch = data[1];
-				interleaved_len = ntohs(*(uint16_t*)&data[2]);
-				if (size < (unsigned)(interleaved_len+4))
-				{
-					return;
-				}
+                ch = data[1];
+                interleaved_len = ntohs(*(uint16_t*)&data[2]);
+                if (size < (unsigned)(interleaved_len+4))
+                {
+                    return;
+                }
 
-				session->interleaved_sink(session, (unsigned char)ch, &data[4], interleaved_len, session->userdata);
+                session->interleaved_sink(session, (unsigned char)ch, &data[4], interleaved_len, session->userdata);
 
-				buffer_retrieve(buffer, (interleaved_len+4));
-				session->is_new_request = 1;
-				session->is_interleaved_message = 0;
-				continue;
-			}
-			else
-			{
-				session->is_new_request = 0;
-				session->is_interleaved_message = 0;
+                buffer_retrieve(buffer, (interleaved_len+4));
+                session->is_new_request = 1;
+                session->is_interleaved_message = 0;
+                continue;
+            }
+            else
+            {
+                session->is_new_request = 0;
+                session->is_interleaved_message = 0;
 
-				/* ÈÏÎªÊÇ³£¹æµÄrtspÎÄ±¾ÏûÏ¢¿ªÊ¼£¬³¢ÊÔ½âÎöÖ® */
-				ret = rtsp_request_msg_decode(session->request_msg, data, size, &parsed_bytes);
-				if (ret == 0)
-				{
-					session->is_in_handler = 1;
-					session->session_handler(session, connection, session->request_msg, session->userdata);
-					session->is_in_handler = 0;
+                /* è®¤ä¸ºæ˜¯å¸¸è§„çš„rtspæ–‡æœ¬æ¶ˆæ¯å¼€å§‹ï¼Œå°è¯•è§£æžä¹‹ */
+                ret = rtsp_request_msg_decode(session->request_msg, data, size, &parsed_bytes);
+                if (ret == 0)
+                {
+                    session->is_in_handler = 1;
+                    session->session_handler(session, connection, session->request_msg, session->userdata);
+                    session->is_in_handler = 0;
 
-					rtsp_request_msg_unref(session->request_msg);
-					session->request_msg = NULL;
-					buffer_retrieve(buffer, parsed_bytes);
+                    rtsp_request_msg_unref(session->request_msg);
+                    session->request_msg = NULL;
+                    buffer_retrieve(buffer, parsed_bytes);
 
-					if (0 == session->is_alive)
-					{
-						session_delete(session);
+                    if (0 == session->is_alive)
+                    {
+                        session_delete(session);
 
-						break;
-					}
+                        break;
+                    }
 
-					session->request_msg = rtsp_request_msg_new();
-					session->is_new_request = 1;
-					continue;
-				}
-				else if (ret > 0)
-				{
-					/* ÇëÇóÐÐ½âÎöÃ»ÓÐ³ö´í£¬µ«Êý¾Ý²»ÍêÕû£¬ÎÞ·¨¼ÌÐø£¬·µ»Ø¼ÌÐøÊÕÊý¾Ý */
-					return;
-				}
-				else
-				{
-					/* ½âÎö³ö´í£¬Îª·Ç·¨ÏûÏ¢ */
-					session->is_in_handler = 1;
-					session->session_handler(session, NULL, NULL, session->userdata);
-					session->is_in_handler = 0;
-					
-					if (0 == session->is_alive)
-					{
-						session_delete(session);
-					}
-					
-					return;
-				}
-			}
-		}
-	}
-	else
-	{
-		while (1)
-		{
-			data = (char*)buffer_peek(buffer);
-			size = buffer_readablebytes(buffer);
+                    session->request_msg = rtsp_request_msg_new();
+                    session->is_new_request = 1;
+                    continue;
+                }
+                else if (ret > 0)
+                {
+                    /* è¯·æ±‚è¡Œè§£æžæ²¡æœ‰å‡ºé”™ï¼Œä½†æ•°æ®ä¸å®Œæ•´ï¼Œæ— æ³•ç»§ç»­ï¼Œè¿”å›žç»§ç»­æ”¶æ•°æ® */
+                    return;
+                }
+                else
+                {
+                    /* è§£æžå‡ºé”™ï¼Œä¸ºéžæ³•æ¶ˆæ¯ */
+                    session->is_in_handler = 1;
+                    session->session_handler(session, NULL, NULL, session->userdata);
+                    session->is_in_handler = 0;
+                    
+                    if (0 == session->is_alive)
+                    {
+                        session_delete(session);
+                    }
+                    
+                    return;
+                }
+            }
+        }
+    }
+    else
+    {
+        while (1)
+        {
+            data = (char*)buffer_peek(buffer);
+            size = buffer_readablebytes(buffer);
 
-			/* Êµ¼ÊÉÏÈôÊÇÇ°Ò»´Î²»ÍêÕûµÄinterleavedÏûÏ¢£¬ÔòÆðÊ¼×Ö½ÚÒ»¶¨ÊÇ 0x24 */
+            /* å®žé™…ä¸Šè‹¥æ˜¯å‰ä¸€æ¬¡ä¸å®Œæ•´çš„interleavedæ¶ˆæ¯ï¼Œåˆ™èµ·å§‹å­—èŠ‚ä¸€å®šæ˜¯ 0x24 */
 
-			ch = data[0];
-			if (ch == 0x24)
-			{
-				session->is_new_request = 0;
-				session->is_interleaved_message = 1;
+            ch = data[0];
+            if (ch == 0x24)
+            {
+                session->is_new_request = 0;
+                session->is_interleaved_message = 1;
 
-				ch = data[1];
-				interleaved_len = ntohs(*(uint16_t*)&data[2]);
-				if (size < (unsigned)(interleaved_len+4))
-				{
-					return;
-				}
+                ch = data[1];
+                interleaved_len = ntohs(*(uint16_t*)&data[2]);
+                if (size < (unsigned)(interleaved_len+4))
+                {
+                    return;
+                }
 
-				session->interleaved_sink(session, (unsigned char)ch, &data[4], interleaved_len, session->userdata);
+                session->interleaved_sink(session, (unsigned char)ch, &data[4], interleaved_len, session->userdata);
 
-				buffer_retrieve(buffer, (interleaved_len+4));
-				session->is_new_request = 1;
-				session->is_interleaved_message = 0;
-				continue;
-			}
-			else
-			{
-				session->is_new_request = 0;
-				session->is_interleaved_message = 0;
+                buffer_retrieve(buffer, (interleaved_len+4));
+                session->is_new_request = 1;
+                session->is_interleaved_message = 0;
+                continue;
+            }
+            else
+            {
+                session->is_new_request = 0;
+                session->is_interleaved_message = 0;
 
-				/* ÈÏÎªÊÇ³£¹æµÄrtspÎÄ±¾ÏûÏ¢¿ªÊ¼£¬³¢ÊÔ½âÎöÖ® */
-				ret = rtsp_request_msg_decode(session->request_msg, data, size, &parsed_bytes);
-				if (ret == 0)
-				{
-					session->is_in_handler = 1;
-					session->session_handler(session, connection, session->request_msg, session->userdata);
-					session->is_in_handler = 0;
+                /* è®¤ä¸ºæ˜¯å¸¸è§„çš„rtspæ–‡æœ¬æ¶ˆæ¯å¼€å§‹ï¼Œå°è¯•è§£æžä¹‹ */
+                ret = rtsp_request_msg_decode(session->request_msg, data, size, &parsed_bytes);
+                if (ret == 0)
+                {
+                    session->is_in_handler = 1;
+                    session->session_handler(session, connection, session->request_msg, session->userdata);
+                    session->is_in_handler = 0;
 
-					rtsp_request_msg_unref(session->request_msg);
-					session->request_msg = NULL;
-					buffer_retrieve(buffer, parsed_bytes);
+                    rtsp_request_msg_unref(session->request_msg);
+                    session->request_msg = NULL;
+                    buffer_retrieve(buffer, parsed_bytes);
 
-					if (0 == session->is_alive)
-					{
-						session_delete(session);
+                    if (0 == session->is_alive)
+                    {
+                        session_delete(session);
 
-						break;
-					}
+                        break;
+                    }
 
-					session->request_msg = rtsp_request_msg_new();
-					session->is_new_request = 1;
-					continue;
-				}
-				else if (ret > 0)
-				{
-					/* ÇëÇóÐÐ½âÎöÃ»ÓÐ³ö´í£¬µ«Êý¾Ý²»¹»£¬ÎÞ·¨¼ÌÐø£¬·µ»Ø¼ÌÐøÊÕÊý¾Ý */
-					return;
-				}
-				else
-				{
-					/* ½âÎö³ö´í£¬Îª·Ç·¨ÏûÏ¢ */
-					session->is_in_handler = 1;
-					session->session_handler(session, NULL, NULL, session->userdata);
-					session->is_in_handler = 0;
+                    session->request_msg = rtsp_request_msg_new();
+                    session->is_new_request = 1;
+                    continue;
+                }
+                else if (ret > 0)
+                {
+                    /* è¯·æ±‚è¡Œè§£æžæ²¡æœ‰å‡ºé”™ï¼Œä½†æ•°æ®ä¸å¤Ÿï¼Œæ— æ³•ç»§ç»­ï¼Œè¿”å›žç»§ç»­æ”¶æ•°æ® */
+                    return;
+                }
+                else
+                {
+                    /* è§£æžå‡ºé”™ï¼Œä¸ºéžæ³•æ¶ˆæ¯ */
+                    session->is_in_handler = 1;
+                    session->session_handler(session, NULL, NULL, session->userdata);
+                    session->is_in_handler = 0;
 
-					if (0 == session->is_alive)
-					{
-						session_delete(session);
-					}
-					
-					return;
-				}
-			}
-		}
-	}
+                    if (0 == session->is_alive)
+                    {
+                        session_delete(session);
+                    }
+                    
+                    return;
+                }
+            }
+        }
+    }
 
     return;
 }
@@ -245,10 +245,10 @@ static void session_onclose(tcp_connection_t* connection, void* userdata)
 
 rtsp_session_t* rtsp_session_start
 (
-	tcp_connection_t *connection, 
-	rtsp_session_handler_f session_handler, 
-	rtsp_session_interleaved_packet_f interleaved_sink, 
-	void* userdata
+    tcp_connection_t *connection, 
+    rtsp_session_handler_f session_handler, 
+    rtsp_session_interleaved_packet_f interleaved_sink, 
+    void* userdata
 )
 {
     rtsp_session_t* session;
@@ -256,7 +256,7 @@ rtsp_session_t* rtsp_session_start
     if (NULL == connection || NULL == session_handler || NULL == interleaved_sink)
     {
         log_error("rtsp_session_start: bad connection(%p) or bad session_handler(%p) or bad interleaved_sink(%p)", 
-			connection, session_handler, interleaved_sink);
+            connection, session_handler, interleaved_sink);
         return NULL;
     }
 
@@ -265,24 +265,24 @@ rtsp_session_t* rtsp_session_start
     memset(session, 0, sizeof(*session));
     tcp_connection_setcalback(connection, session_ondata, session_onclose, session);
     session->connection = connection;
-	
+    
     session->session_handler = session_handler;
-	session->interleaved_sink = interleaved_sink;
+    session->interleaved_sink = interleaved_sink;
     session->userdata = userdata;
 
-	session->request_msg = rtsp_request_msg_new();
+    session->request_msg = rtsp_request_msg_new();
 
-	session->is_new_request = 1;
-	session->is_interleaved_message = 0;
+    session->is_new_request = 1;
+    session->is_interleaved_message = 0;
 
     memset(session->context_data, 0, sizeof(session->context_data));
-	session->extra_userdata = NULL;
-	
+    session->extra_userdata = NULL;
+    
     session->is_alive = 1;
     session->is_in_handler = 0;
 
-	/* session´´½¨Íê±ÏÖ®ºó£¬ÏòÓÃ»§¸øÒ»¸öÍ¨Öª£¬ÒÔ·½±ãÆä½øÐÐ±ØÒªµÄ³õÊ¼»¯¹¤×÷ */
-	session_handler(session, connection, NULL, session->userdata);
+    /* sessionåˆ›å»ºå®Œæ¯•ä¹‹åŽï¼Œå‘ç”¨æˆ·ç»™ä¸€ä¸ªé€šçŸ¥ï¼Œä»¥æ–¹ä¾¿å…¶è¿›è¡Œå¿…è¦çš„åˆå§‹åŒ–å·¥ä½œ */
+    session_handler(session, connection, NULL, session->userdata);
 
     return session;
 }
@@ -300,7 +300,7 @@ void rtsp_session_end(rtsp_session_t* session)
     }
     else
     {
-		session_delete(session);
+        session_delete(session);
     }
 
     return;
@@ -308,20 +308,20 @@ void rtsp_session_end(rtsp_session_t* session)
 
 void rtsp_session_set_extra_userdata(rtsp_session_t* session, void *userdata)
 {
-	if (NULL != session)
-	{
-		session->extra_userdata = userdata;
-	}
-	
-	return;
+    if (NULL != session)
+    {
+        session->extra_userdata = userdata;
+    }
+    
+    return;
 }
 
 void* rtsp_session_get_extra_userdata(rtsp_session_t* session)
 {
-	if (NULL == session)
-	{
-		return NULL;
-	}
+    if (NULL == session)
+    {
+        return NULL;
+    }
 
-	return session->extra_userdata;
+    return session->extra_userdata;
 }

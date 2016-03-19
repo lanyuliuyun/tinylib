@@ -62,7 +62,7 @@ void time_wheel_destroy(time_wheel_t* wheel)
 
     free(bucket);
 
-	return;
+    return;
 }
 
 void* time_wheel_submit(time_wheel_t* wheel, onexpire_f callback, void* userdata, unsigned steps)
@@ -190,16 +190,16 @@ void time_wheel_refresh(time_wheel_t* wheel, void *handle)
     }
 
     /* 新的位置 */
-	index = wheel->index - bucket->steps;
-	if (index < 0)
-	{
-		index += wheel->max_steps;
-	}
+    index = wheel->index - bucket->steps;
+    if (index < 0)
+    {
+        index += wheel->max_steps;
+    }
 
     tail = wheel->buckets[index];
     bucket->prev = NULL;
     bucket->next = tail;
-	bucket->index = index;
+    bucket->index = index;
     if (NULL != tail)
     {
         tail->prev = bucket;
@@ -225,13 +225,13 @@ void time_wheel_step(time_wheel_t* wheel)
     bucket = wheel->buckets[wheel->index];
 
     wheel->buckets[wheel->index] = NULL;
-	index = wheel->index;
-	index--;
+    index = wheel->index;
+    index--;
     if (index < 0)
     {
         index = wheel->max_steps - 1;
     }
-	wheel->index = index;
+    wheel->index = index;
     
     while (NULL != bucket)
     {
@@ -244,11 +244,11 @@ void time_wheel_step(time_wheel_t* wheel)
         else /* if (TIME_WHEEL_EXPIRE_LOOP == bucket->callback(bucket->userdata))  */
         {
             /* 进入下一个周期的计时 */
-        	index = wheel->index - bucket->steps + 1;
-        	if (index < 0)
-    		{
-    			index += wheel->max_steps;
-    		}
+            index = wheel->index - bucket->steps + 1;
+            if (index < 0)
+            {
+                index += wheel->max_steps;
+            }
 
             head = wheel->buckets[index];
             bucket->next = head;

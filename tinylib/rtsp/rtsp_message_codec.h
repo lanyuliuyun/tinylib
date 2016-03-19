@@ -1,7 +1,7 @@
 
-/** ¶ÔrtspÏûÏ¢½øÐÐ½âÎö£¬Éú³É¶ÔÓ¦µÄrequest/response¶ÔÏó 
-  * ½ö×ö¼òµ¥½âÎö£¬¶ÔÓÚheadÖÐvalue×Ö¶Î£¬ÇëÔÚ¸÷×ÔÊ¹ÓÃÊ±ÔÙ×ö½øÒ»²½½âÎö
-  */
+/* å¯¹rtspæ¶ˆæ¯è¿›è¡Œè§£æžï¼Œç”Ÿæˆå¯¹åº”çš„request/responseå¯¹è±¡ 
+ * ä»…åšç®€å•è§£æžï¼Œå¯¹äºŽheadä¸­valueå­—æ®µï¼Œè¯·åœ¨å„è‡ªä½¿ç”¨æ—¶å†åšè¿›ä¸€æ­¥è§£æž
+ */
 
 #ifndef RTSP_MESSAGE_CODEC_H
 #define RTSP_MESSAGE_CODEC_H
@@ -10,62 +10,62 @@ typedef enum rtsp_method{
     RTSP_METHOD_NONE = 0,
     RTSP_METHOD_OPTIONS = 1,
     RTSP_METHOD_DESCRIBE = 1<<1,
-	RTSP_METHOD_ANNOUNCE = 1<<2,
+    RTSP_METHOD_ANNOUNCE = 1<<2,
     RTSP_METHOD_SETUP = 1<<3,
     RTSP_METHOD_PLAY = 1<<4,
-	RTSP_METHOD_PAUSE = 1<<5,
+    RTSP_METHOD_PAUSE = 1<<5,
     RTSP_METHOD_TEARDOWN = 1<<6,
-	RTSP_METHOD_GET_PARAMETER = 1<<7,
-	RTSP_METHOD_SET_PARAMETER = 1<<8,
-	RTSP_METHOD_REDIRECT = 1<<9,
-	RTSP_METHOD_RECORD = 1<<10,
+    RTSP_METHOD_GET_PARAMETER = 1<<7,
+    RTSP_METHOD_SET_PARAMETER = 1<<8,
+    RTSP_METHOD_REDIRECT = 1<<9,
+    RTSP_METHOD_RECORD = 1<<10,
 }rtsp_method_e;
 
 typedef enum rtsp_head_key{
-	RTSP_HEAD_ACCEPT,
-	RTSP_HEAD_ACCEPT_ENCODING,
-	RTSP_HEAD_ACCEPT_LANGUAGE,
-	RTSP_HEAD_ALLOW,
-	RTSP_HEAD_AUTHORIZATION,
-	RTSP_HEAD_BANDWIDTH,
-	RTSP_HEAD_BLOCKSIZE,
-	RTSP_HEAD_CACHE_CONTROL,
-	RTSP_HEAD_CONFERENCE,
-	RTSP_HEAD_CONNECTION,
-	RTSP_HEAD_CONTENT_BASE,
-	RTSP_HEAD_CONTENT_ENCODING,
-	RTSP_HEAD_CONTENT_LANGUAGE,
-	RTSP_HEAD_CONTENT_LENGTH,
-	RTSP_HEAD_CONTENT_LOCATION,
-	RTSP_HEAD_CONTENT_TYPE,
-	RTSP_HEAD_CSEQ,
-	RTSP_HEAD_DATE,
-	RTSP_HEAD_EXPIRES,
-	RTSP_HEAD_FROM,
-	RTSP_HEAD_HOST,
-	RTSP_HEAD_IF_MATCH,
-	RTSP_HEAD_IF_MODIFIED_SINCE,
-	RTSP_HEAD_LAST_MODIFIED,
-	RTSP_HEAD_LOCATION,
-	RTSP_HEAD_PROXY_AUTHENTICATE,
-	RTSP_HEAD_PROXY_REQUIRE,
-	RTSP_HEAD_PUBLIC,
-	RTSP_HEAD_RANGE,
-	RTSP_HEAD_REFERER,
-	RTSP_HEAD_RETRY_AFTER,
-	RTSP_HEAD_REQUIRE,
-	RTSP_HEAD_RTP_INFO,
-	RTSP_HEAD_SCALE,
-	RTSP_HEAD_SPEED,
-	RTSP_HEAD_SERVER,
-	RTSP_HEAD_SESSION,
-	RTSP_HEAD_TIMESTAMP,
-	RTSP_HEAD_TRANSPORT,
-	RTSP_HEAD_UNSUPPORTED,
-	RTSP_HEAD_USER_AGENT,
-	RTSP_HEAD_VARY,
-	RTSP_HEAD_VIA,
-	RTSP_HEAD_WWW_AUTHENTICA
+    RTSP_HEAD_ACCEPT,
+    RTSP_HEAD_ACCEPT_ENCODING,
+    RTSP_HEAD_ACCEPT_LANGUAGE,
+    RTSP_HEAD_ALLOW,
+    RTSP_HEAD_AUTHORIZATION,
+    RTSP_HEAD_BANDWIDTH,
+    RTSP_HEAD_BLOCKSIZE,
+    RTSP_HEAD_CACHE_CONTROL,
+    RTSP_HEAD_CONFERENCE,
+    RTSP_HEAD_CONNECTION,
+    RTSP_HEAD_CONTENT_BASE,
+    RTSP_HEAD_CONTENT_ENCODING,
+    RTSP_HEAD_CONTENT_LANGUAGE,
+    RTSP_HEAD_CONTENT_LENGTH,
+    RTSP_HEAD_CONTENT_LOCATION,
+    RTSP_HEAD_CONTENT_TYPE,
+    RTSP_HEAD_CSEQ,
+    RTSP_HEAD_DATE,
+    RTSP_HEAD_EXPIRES,
+    RTSP_HEAD_FROM,
+    RTSP_HEAD_HOST,
+    RTSP_HEAD_IF_MATCH,
+    RTSP_HEAD_IF_MODIFIED_SINCE,
+    RTSP_HEAD_LAST_MODIFIED,
+    RTSP_HEAD_LOCATION,
+    RTSP_HEAD_PROXY_AUTHENTICATE,
+    RTSP_HEAD_PROXY_REQUIRE,
+    RTSP_HEAD_PUBLIC,
+    RTSP_HEAD_RANGE,
+    RTSP_HEAD_REFERER,
+    RTSP_HEAD_RETRY_AFTER,
+    RTSP_HEAD_REQUIRE,
+    RTSP_HEAD_RTP_INFO,
+    RTSP_HEAD_SCALE,
+    RTSP_HEAD_SPEED,
+    RTSP_HEAD_SERVER,
+    RTSP_HEAD_SESSION,
+    RTSP_HEAD_TIMESTAMP,
+    RTSP_HEAD_TRANSPORT,
+    RTSP_HEAD_UNSUPPORTED,
+    RTSP_HEAD_USER_AGENT,
+    RTSP_HEAD_VARY,
+    RTSP_HEAD_VIA,
+    RTSP_HEAD_WWW_AUTHENTICA
 }rtsp_head_key_e;
 
 typedef struct rtsp_head
@@ -79,27 +79,27 @@ typedef struct rtsp_request_msg
 {
     rtsp_method_e method;       /* rtsp_method_e */
     char* url;
-    int version;				/* 0x0100±íÊ¾RTSP/1.0 */
-    int cseq;               	/* µ¥¶À½«ÏûÏ¢µÄµÄcseqÍ·Áà³öÀ´£¬·½±ãÊ¹ÓÃ */
-    rtsp_head_t* head;    		/* ³ýCSeqÖ®ÍâµÄhead */
+    int version;                /* 0x0100è¡¨ç¤ºRTSP/1.0 */
+    int cseq;                   /* å•ç‹¬å°†æ¶ˆæ¯çš„çš„cseqå¤´æ‹Žå‡ºæ¥ï¼Œæ–¹ä¾¿ä½¿ç”¨ */
+    rtsp_head_t* head;            /* é™¤CSeqä¹‹å¤–çš„head */
     char *body;
     int body_len;
 }rtsp_request_msg_t;
 
 typedef struct rtsp_response_msg
 {
-	int version;				/* 0x0100±íÊ¾RTSP/1.0 */
-    int code;           		/* ÏìÓ¦½á¹ûÖÐµÄstatus code */
-    int cseq;           		/* ¶ÔÓ¦ÓÚrequestÏûÏ¢ÖÐµÄcseqÍ·£¬Îª·½±ã×öµ¥¶À±ê¼Ç */
-    rtsp_head_t* head;  		/* ³ýCSeqÖ®ÍâµÄhead */
-    char* body;         		/* ÏûÏ¢ÌåÄÚÈÝ £¬Ò»°ã¶ÔÓ¦ÓÚDESCRIBEÏìÓ¦ÖÐµÄSDPÐÅÏ¢ */
-    int body_len;    			/*ÏûÏ¢ÌåµÄ³¤¶È£¬body´æÔÚÊ±ÓÐÐ§*/
+    int version;                /* 0x0100è¡¨ç¤ºRTSP/1.0 */
+    int code;                   /* å“åº”ç»“æžœä¸­çš„status code */
+    int cseq;                   /* å¯¹åº”äºŽrequestæ¶ˆæ¯ä¸­çš„cseqå¤´ï¼Œä¸ºæ–¹ä¾¿åšå•ç‹¬æ ‡è®° */
+    rtsp_head_t* head;          /* é™¤CSeqä¹‹å¤–çš„head */
+    char* body;                 /* æ¶ˆæ¯ä½“å†…å®¹ ï¼Œä¸€èˆ¬å¯¹åº”äºŽDESCRIBEå“åº”ä¸­çš„SDPä¿¡æ¯ */
+    int body_len;                /*æ¶ˆæ¯ä½“çš„é•¿åº¦ï¼Œbodyå­˜åœ¨æ—¶æœ‰æ•ˆ*/
 }rtsp_response_msg_t;
 
 typedef struct rtsp_interleaved_head{
-	unsigned char magic;
-	unsigned char channel;
-	unsigned short len;
+    unsigned char magic;
+    unsigned char channel;
+    unsigned short len;
 }rtsp_interleaved_head_t;
 
 typedef struct rtsp_transport_head
@@ -113,9 +113,9 @@ typedef struct rtsp_transport_head
     unsigned short server_rtp_port;
     unsigned short server_rtcp_port;
     const char* ssrc;
-	unsigned interleaved;
-	unsigned char rtp_channel;
-	unsigned char rtcp_channel;
+    unsigned interleaved;
+    unsigned char rtp_channel;
+    unsigned char rtcp_channel;
 }rtsp_transport_head_t;
 
 typedef struct rtsp_authenticate_head
@@ -130,50 +130,50 @@ typedef struct rtsp_authenticate_head
 extern "C" {
 #endif
 
-/* ´´½¨Ò»¸ö¿ÕµÄrtspÇëÇóÏûÏ¢¶ÔÏó */
+/* åˆ›å»ºä¸€ä¸ªç©ºçš„rtspè¯·æ±‚æ¶ˆæ¯å¯¹è±¡ */
 rtsp_request_msg_t* rtsp_request_msg_new(void);
 
-/* Ïú»ÙÒ»¸ö¸ø¶¨µÄÇëÇóÏûÏ¢¶ÔÏó */
+/* é”€æ¯ä¸€ä¸ªç»™å®šçš„è¯·æ±‚æ¶ˆæ¯å¯¹è±¡ */
 void rtsp_request_msg_destroy(rtsp_request_msg_t* request_msg);
 
-/* ÀàËÆÓÚexpatÁ÷Ê½·½Ê½ÊäÈë½øÐÐ½âÎö
- * ·µ»Ø0 ±íÊ¾³É¹¦½âÎöµ½Ò»¸öÍêÕûµÄrtspÇëÇóÏûÏ¢
- * ·µ»Ø1 ±íÊ¾½âÎö¹ý³ÌÃ»ÓÐ´íÎó£¬µ«ÒòÊý¾Ý²»¹»ÍêÕûµÄrtspÇëÇóÏûÏ¢ÉÐÎ´½âÎöÍê³É
- * ·µ»Ø-1 ±íÊ¾½âÎö¹ý³Ì³ö´í£¬¶àÊÇÓöµ½·Ç·¨µÄÏûÏ¢
+/* ç±»ä¼¼äºŽexpatæµå¼æ–¹å¼è¾“å…¥è¿›è¡Œè§£æž
+ * è¿”å›ž0 è¡¨ç¤ºæˆåŠŸè§£æžåˆ°ä¸€ä¸ªå®Œæ•´çš„rtspè¯·æ±‚æ¶ˆæ¯
+ * è¿”å›ž1 è¡¨ç¤ºè§£æžè¿‡ç¨‹æ²¡æœ‰é”™è¯¯ï¼Œä½†å› æ•°æ®ä¸å¤Ÿå®Œæ•´çš„rtspè¯·æ±‚æ¶ˆæ¯å°šæœªè§£æžå®Œæˆ
+ * è¿”å›ž-1 è¡¨ç¤ºè§£æžè¿‡ç¨‹å‡ºé”™ï¼Œå¤šæ˜¯é‡åˆ°éžæ³•çš„æ¶ˆæ¯
  * 
- * parsed_bytes ±íÊ¾³É¹¦½âÎöµ½Ò»¸örtspÇëÇóÏûÏ¢Ê±£¨¼´·µ»ØÖµÎª0Ê±£©£¬ÏûºÄÁË¶àÉÙ×Ö½Ú£»ÆäËûÇé¿ö£¬¸ÃÊä³ö²ÎÊýÎÞÒâÒå
+ * parsed_bytes è¡¨ç¤ºæˆåŠŸè§£æžåˆ°ä¸€ä¸ªrtspè¯·æ±‚æ¶ˆæ¯æ—¶ï¼ˆå³è¿”å›žå€¼ä¸º0æ—¶ï¼‰ï¼Œæ¶ˆè€—äº†å¤šå°‘å­—èŠ‚ï¼›å…¶ä»–æƒ…å†µï¼Œè¯¥è¾“å‡ºå‚æ•°æ— æ„ä¹‰
  */
 int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, unsigned size, unsigned *parsed_bytes);
 
-/* ¶ÔÇëÇóÏûÏ¢½øÐÐÔ­×ÓÐÔµÄÒýÓÃ¼ÆÊý²Ù×÷£¬Ö÷ÒªÔÚ¿çÏß³ÌµÄ»·¾³ÀïÊ¹ÓÃ */
-/** Ôö¼ÓÒ»´ÎÒýÓÃ¼ÆÊý */
+/* å¯¹è¯·æ±‚æ¶ˆæ¯è¿›è¡ŒåŽŸå­æ€§çš„å¼•ç”¨è®¡æ•°æ“ä½œï¼Œä¸»è¦åœ¨è·¨çº¿ç¨‹çš„çŽ¯å¢ƒé‡Œä½¿ç”¨ */
+/** å¢žåŠ ä¸€æ¬¡å¼•ç”¨è®¡æ•° */
 void rtsp_request_msg_ref(rtsp_request_msg_t* request_msg);
-/** ¼õÉÙÒ»´ÎÒýÓÃ¼ÆÊý£¬²¢·µ»Ø²Ù×÷ºóµÄ¼ÆÊýÖµ£¬µ±¼ÆÊýÖµÎª0Ê±£¬¸Ã¶ÔÏó½«±»Ïú»Ù */
+/** å‡å°‘ä¸€æ¬¡å¼•ç”¨è®¡æ•°ï¼Œå¹¶è¿”å›žæ“ä½œåŽçš„è®¡æ•°å€¼ï¼Œå½“è®¡æ•°å€¼ä¸º0æ—¶ï¼Œè¯¥å¯¹è±¡å°†è¢«é”€æ¯ */
 int rtsp_request_msg_unref(rtsp_request_msg_t* request_msg);
 
 rtsp_response_msg_t* rtsp_response_msg_new(void);
 
-/* ÀàËÆÓÚexpatÁ÷Ê½·½Ê½ÊäÈë½øÐÐ½âÎö
- * ·µ»Ø0 ±íÊ¾³É¹¦½âÎöµ½Ò»¸öÍêÕûµÄrtspÇëÇóÏûÏ¢
- * ·µ»Ø1 ±íÊ¾½âÎö¹ý³ÌÃ»ÓÐ´íÎó£¬µ«ÒòÊý¾Ý²»¹»ÍêÕûµÄrtspÇëÇóÏûÏ¢ÉÐÎ´½âÎöÍê³É
- * ·µ»Ø-1 ±íÊ¾½âÎö¹ý³Ì³ö´í£¬¶àÊÇÓöµ½·Ç·¨µÄÏûÏ¢
+/* ç±»ä¼¼äºŽexpatæµå¼æ–¹å¼è¾“å…¥è¿›è¡Œè§£æž
+ * è¿”å›ž0 è¡¨ç¤ºæˆåŠŸè§£æžåˆ°ä¸€ä¸ªå®Œæ•´çš„rtspè¯·æ±‚æ¶ˆæ¯
+ * è¿”å›ž1 è¡¨ç¤ºè§£æžè¿‡ç¨‹æ²¡æœ‰é”™è¯¯ï¼Œä½†å› æ•°æ®ä¸å¤Ÿå®Œæ•´çš„rtspè¯·æ±‚æ¶ˆæ¯å°šæœªè§£æžå®Œæˆ
+ * è¿”å›ž-1 è¡¨ç¤ºè§£æžè¿‡ç¨‹å‡ºé”™ï¼Œå¤šæ˜¯é‡åˆ°éžæ³•çš„æ¶ˆæ¯
  * 
- * parsed_bytes ±íÊ¾³É¹¦½âÎöµ½Ò»¸örtspÇëÇóÏûÏ¢Ê±£¨¼´·µ»ØÖµÎª0Ê±£©£¬ÏûºÄÁË¶àÉÙ×Ö½Ú£»ÆäËûÇé¿ö£¬¸ÃÊä³ö²ÎÊýÎÞÒâÒå
+ * parsed_bytes è¡¨ç¤ºæˆåŠŸè§£æžåˆ°ä¸€ä¸ªrtspè¯·æ±‚æ¶ˆæ¯æ—¶ï¼ˆå³è¿”å›žå€¼ä¸º0æ—¶ï¼‰ï¼Œæ¶ˆè€—äº†å¤šå°‘å­—èŠ‚ï¼›å…¶ä»–æƒ…å†µï¼Œè¯¥è¾“å‡ºå‚æ•°æ— æ„ä¹‰
  */
 int rtsp_response_msg_decode(rtsp_response_msg_t* response_msg, const char *data, unsigned size, unsigned *parsed_bytes);
 
 void rtsp_response_msg_destroy(rtsp_response_msg_t* response_msg);
 
-/* ¶ÔÏìÓ¦ÏûÏ¢½øÐÐÔ­×ÓÐÔµÄÒýÓÃ¼ÆÊý²Ù×÷£¬Ö÷ÒªÔÚ¿çÏß³ÌµÄ»·¾³ÀïÊ¹ÓÃ */
-/** Ôö¼ÓÒ»´ÎÒýÓÃ¼ÆÊý */
+/* å¯¹å“åº”æ¶ˆæ¯è¿›è¡ŒåŽŸå­æ€§çš„å¼•ç”¨è®¡æ•°æ“ä½œï¼Œä¸»è¦åœ¨è·¨çº¿ç¨‹çš„çŽ¯å¢ƒé‡Œä½¿ç”¨ */
+/** å¢žåŠ ä¸€æ¬¡å¼•ç”¨è®¡æ•° */
 void rtsp_response_msg_ref(rtsp_response_msg_t* response_msg);
-/** ¼õÉÙÒ»´ÎÒýÓÃ¼ÆÊý£¬²¢·µ»Ø²Ù×÷ºóµÄ¼ÆÊýÖµ£¬µ±¼ÆÊýÖµÎª0Ê±£¬¸Ã¶ÔÏó½«±»Ïú»Ù */
+/** å‡å°‘ä¸€æ¬¡å¼•ç”¨è®¡æ•°ï¼Œå¹¶è¿”å›žæ“ä½œåŽçš„è®¡æ•°å€¼ï¼Œå½“è®¡æ•°å€¼ä¸º0æ—¶ï¼Œè¯¥å¯¹è±¡å°†è¢«é”€æ¯ */
 int rtsp_response_msg_unref(rtsp_response_msg_t* response_msg);
 
-/** ¹¹½¨ÏàÓ¦ÏûÏ¢£¬ÆäÖÐtime-headerºÍcseq-header ÄÚ²¿»á×ÔÐÐÌî³ä£¬ÆäÓàµÄheaderÓÉheadÖ¸¶¨ */
+/** æž„å»ºç›¸åº”æ¶ˆæ¯ï¼Œå…¶ä¸­time-headerå’Œcseq-header å†…éƒ¨ä¼šè‡ªè¡Œå¡«å……ï¼Œå…¶ä½™çš„headerç”±headæŒ‡å®š */
 int rtsp_msg_build_response
 (
-	char *response_msg, unsigned len, int cseq, int code,
+    char *response_msg, unsigned len, int cseq, int code,
     rtsp_head_t* head, const char* body, unsigned body_len
 );
 
@@ -189,10 +189,10 @@ void rtsp_transport_head_destroy(rtsp_transport_head_t* head);
 rtsp_authenticate_head_t* rtsp_authenticate_head_decode(const char *auth);
 void rtsp_authenticate_head_destroy(rtsp_authenticate_head_t* head);
 
-/* ¸ù¾Ý¸ø¶¨µÄuser, password, method, url, realm, nonce¼ÆËãresponse, ²¢×éÖ¯authorizationÐÅÏ¢ */
+/* æ ¹æ®ç»™å®šçš„user, password, method, url, realm, nonceè®¡ç®—response, å¹¶ç»„ç»‡authorizationä¿¡æ¯ */
 unsigned rtsp_authorization_head
 (
-	char *auth, unsigned len, const char *user, const char *password, 
+    char *auth, unsigned len, const char *user, const char *password, 
     const char *method, const char *url, const char *realm, const char *nonce
 );
 

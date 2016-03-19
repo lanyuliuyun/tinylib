@@ -1,5 +1,4 @@
 
-
 #include "tinylib/linux/net/channel.h"
 #include "tinylib/linux/net/tcp_connection.h"
 #include "tinylib/linux/net/inetaddr.h"
@@ -34,23 +33,30 @@ struct tcp_connection
 
     int is_in_callback;
     int is_alive;
-	int is_connected;
+    int is_connected;
+};
+
+struct tcp_connection_msg
+{
+    tcp_connection_t* connection;
+    void* data;
+    unsigned size;
 };
 
 static void delete_connection(tcp_connection_t *connection)
 {
-	if (NULL != connection)
-	{
-		log_debug("connection to %s:%u will be destroyed", connection->peer_addr.ip, connection->peer_addr.port);
+    if (NULL != connection)
+    {
+        log_debug("connection to %s:%u will be destroyed", connection->peer_addr.ip, connection->peer_addr.port);
 
-		channel_detach(connection->channel);
-		channel_destroy(connection->channel);
-		shutdown(connection->fd, SHUT_RDWR);
-		close(connection->fd);
-		buffer_destory(connection->in_buffer);
-		buffer_destory(connection->out_buffer);
-		free(connection);
-	}
+        channel_detach(connection->channel);
+        channel_destroy(connection->channel);
+        shutdown(connection->fd, SHUT_RDWR);
+        close(connection->fd);
+        buffer_destory(connection->in_buffer);
+        buffer_destory(connection->out_buffer);
+        free(connection);
+    }
 
     return;
 }
@@ -63,9 +69,9 @@ static void connection_onevent(int fd, int event, void* userdata)
     void* data;
     unsigned size;
     unsigned written;
-	int error;
-	
-	inetaddr_t *peer_addr;
+    int error;
+    
+    inetaddr_t *peer_addr;
 
     log_debug("connection_onevent: fd(%d), event(%d)", fd, event);
 
@@ -76,11 +82,11 @@ static void connection_onevent(int fd, int event, void* userdata)
     }
 
     connection = (tcp_connection_t*)userdata;
-	peer_addr = &connection->peer_addr;
+    peer_addr = &connection->peer_addr;
 
     if (event & EPOLLHUP)
     {
-		connection->is_connected = 0;
+        connection->is_connected = 0;
         connection->is_in_callback = 1;
         connection->closecb(connection, connection->userdata);
         connection->is_in_callback = 0;
@@ -94,7 +100,7 @@ static void connection_onevent(int fd, int event, void* userdata)
             if (0 == size)
             {
                 assert(NULL != connection->closecb);
-				connection->is_connected = 0;
+                connection->is_connected = 0;
                 connection->is_in_callback = 1;
                 connection->closecb(connection, connection->userdata);
                 connection->is_in_callback = 0;
@@ -116,19 +122,19 @@ static void connection_onevent(int fd, int event, void* userdata)
             written = write(connection->fd, data, size);
             if (written < 0)
             {
-				error = errno;
-				if (error != EAGAIN)
-				{
-					log_error("connection_onevent: write() failed, fd(%d), errno(%d), peer addr: %s:%u", fd, error, peer_addr->ip, peer_addr->port);
-					return;
-				}
-				else
-				{
-					written = 0;
-				}
+                error = errno;
+                if (error != EAGAIN)
+                {
+                    log_error("connection_onevent: write() failed, fd(%d), errno(%d), peer addr: %s:%u", fd, error, peer_addr->ip, peer_addr->port);
+                    return;
+                }
+                else
+                {
+                    written = 0;
+                }
             }
 
-			if(written == size)
+            if(written == size)
             {
                 channel_clearevent(connection->channel, EPOLLOUT);
             }
@@ -152,9 +158,9 @@ tcp_connection_t* tcp_connection_new
     tcp_connection_t *connection;
     struct sockaddr_in addr;
     socklen_t addr_len;
-	
-	struct linger linger_info;
-	int flag;
+    
+    struct linger linger_info;
+    int flag;
 
     if (NULL == loop || fd < 0 || NULL == datacb || NULL == closecb || NULL == peer_addr)
     {
@@ -165,13 +171,13 @@ tcp_connection_t* tcp_connection_new
 
     connection = (tcp_connection_t*)malloc(sizeof(tcp_connection_t));
 
-	flag = 1;
-	setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &flag, sizeof(flag));
-	
-	memset(&linger_info, 0, sizeof(linger_info));
-	linger_info.l_onoff = 1;
-	linger_info.l_linger = 3;
-	setsockopt(fd, SOL_SOCKET, SO_LINGER, &linger_info, sizeof(linger_info));
+    flag = 1;
+    setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &flag, sizeof(flag));
+    
+    memset(&linger_info, 0, sizeof(linger_info));
+    linger_info.l_onoff = 1;
+    linger_info.l_linger = 3;
+    setsockopt(fd, SOL_SOCKET, SO_LINGER, &linger_info, sizeof(linger_info));
 
     connection->loop = loop;
     connection->fd = fd;
@@ -180,35 +186,13 @@ tcp_connection_t* tcp_connection_new
     connection->userdata = userdata;
 
     connection->channel = channel_new(fd, loop, connection_onevent, connection);
-    if (NULL == connection->channel)
-    {
-        log_error("tcp_connection_new: channel_new() failed");
-        free(connection);
-        return NULL;
-    }
 
     connection->in_buffer = buffer_new(4096);
-    if (NULL == connection->in_buffer)
-    {
-        log_error("tcp_connection_new: buffer_new() failed");
-        channel_destroy(connection->channel);
-        free(connection);
-        return NULL;
-    }
-
     connection->out_buffer = buffer_new(4096);
-    if (NULL == connection->out_buffer)
-    {
-        log_error("tcp_connection_new: buffer_new() failed");
-        buffer_destory(connection->in_buffer);
-        channel_destroy(connection->channel);        
-        free(connection);
-        return NULL;
-    }
 
     connection->is_in_callback = 0;
     connection->is_alive = 1;
-	connection->is_connected = 1;
+    connection->is_connected = 1;
     connection->peer_addr = *peer_addr;
 
     memset(&addr, 0, sizeof(addr));
@@ -240,7 +224,8 @@ void tcp_connection_destroy(tcp_connection_t* connection)
     return;
 }
 
-int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned size)
+static 
+int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, unsigned size)
 {
     int fd;
     void* buffer_data;
@@ -249,24 +234,24 @@ int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned
     int written;
     unsigned buffer_left_data_size;
     struct iovec vecs[2];
-	
-	inetaddr_t *peer_addr;
-	
-	int error;
+    
+    inetaddr_t *peer_addr;
+    
+    int error;
 
     if (NULL == connection || NULL == data || 0 == size)
     {
         log_error("bad connection(%p) or bad data(%p) or bad size(%u)", connection, data, size);
         return -1;
     }
-	
-	peer_addr = &connection->peer_addr;
+    
+    peer_addr = &connection->peer_addr;
 
-	if (0 == connection->is_connected)
-	{
-		log_warn("connection to %s:%u has NOT beed made yet", peer_addr->ip, peer_addr->port);
-		return 0;
-	}
+    if (0 == connection->is_connected)
+    {
+        log_warn("connection to %s:%u has NOT beed made yet", peer_addr->ip, peer_addr->port);
+        return 0;
+    }
 
     out_buffer = connection->out_buffer;
     channel = connection->channel;
@@ -285,13 +270,13 @@ int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned
         written = writev(fd, vecs, 2);
         if (written < 0)
         {
-			error = errno;
-			
-			if (error != EAGAIN)
-			{
-				log_error("tcp_connection_send: writev() failed, fd: %d, errno: %d, peer addr: %s:%u", fd, errno, peer_addr->ip, peer_addr->port);
-				return -1;
-			}
+            error = errno;
+            
+            if (error != EAGAIN)
+            {
+                log_error("tcp_connection_send: writev() failed, fd: %d, errno: %d, peer addr: %s:%u", fd, errno, peer_addr->ip, peer_addr->port);
+                return -1;
+            }
         }
         else if (written == (buffer_left_data_size+size))
         {
@@ -330,6 +315,53 @@ int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned
     return 0;
 }
 
+
+static
+void do_tcp_connection_send(void *userdata)
+{
+    struct tcp_connection_msg *connection_msg = (struct tcp_connection_msg *)userdata;
+    
+    tcp_connection_sendInLoop(connection_msg->connection, connection_msg->data, connection_msg->size);
+    
+    free(connection_msg);
+    
+    return;
+}
+
+int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned size)
+{
+    struct tcp_connection_msg *connection_msg;
+    
+    if (NULL == connection || NULL == data || 0 == size)
+    {
+        log_error("tcp_connection_send: bad connection(%p) or bad data(%p) or bad size(%u)", connection, data, size);
+        return -1;
+    }
+
+    if (0 == connection->is_connected)
+    {
+        log_warn("connection to %s:%u has NOT beed made yet", connection->peer_addr.ip, connection->peer_addr.port);
+        return -1;
+    }
+    
+    if (loop_inloopthread(connection->loop))
+    {
+        tcp_connection_sendInLoop(connection, data, size);
+    }
+    else
+    {
+        connection_msg = (struct tcp_connection_msg *)malloc(sizeof(*connection_msg) + size);
+        connection_msg->connection = connection;
+        connection_msg->data = &connection_msg[1];
+        connection_msg->size = size;
+        memcpy(connection_msg->data, data, size);
+        
+        loop_async(connection->loop, do_tcp_connection_send, connection_msg);
+    }
+
+    return 0;
+}
+
 void tcp_connection_setcalback(tcp_connection_t* connection, on_data_f datacb, on_close_f closecb, void* userdata)
 {
     if (NULL != connection)
@@ -358,8 +390,8 @@ void tcp_connection_detach(tcp_connection_t *connection)
     {
         return;
     }
-	
-	log_debug("tcp_connection_detach: fd(%d)", connection->fd);
+    
+    log_debug("tcp_connection_detach: fd(%d)", connection->fd);
 
     channel_detach(connection->channel);
     connection->loop = NULL;
@@ -390,7 +422,7 @@ void tcp_connection_attach(tcp_connection_t *connection, loop_t *loop)
         return;
     }
 
-	log_debug("tcp_connection_attach: fd(%d)", connection->fd);
+    log_debug("tcp_connection_attach: fd(%d)", connection->fd);
 
     connection->loop = loop;
     loop_run_inloop(loop, do_connection_attach, connection);
@@ -400,60 +432,60 @@ void tcp_connection_attach(tcp_connection_t *connection, loop_t *loop)
 
 loop_t* tcp_connection_getloop(tcp_connection_t *connection)
 {
-	return NULL == connection ? NULL : connection->loop;
+    return NULL == connection ? NULL : connection->loop;
 }
 
 int tcp_connection_connected(tcp_connection_t *connection)
 {
-	return NULL == connection ? 0 : connection->is_connected;
+    return NULL == connection ? 0 : connection->is_connected;
 }
 
 void tcp_connection_expand_send_buffer(tcp_connection_t *connection, unsigned size)
 {
-	int result;
-	int send_buffer_size;
-	socklen_t len;
-	
-	if (NULL == connection)
-	{
-		return;
-	}
+    int result;
+    int send_buffer_size;
+    socklen_t len;
+    
+    if (NULL == connection)
+    {
+        return;
+    }
 
-	len = sizeof(send_buffer_size);
-	result = getsockopt(connection->fd, SOL_SOCKET, SO_SNDBUF, &send_buffer_size, &len);
-	if (0 != result)
-	{
-		log_error("tcp_connection_expand_send_buffer:　getsockopt() failed, errno: %d", errno);
-		return;
-	}
+    len = sizeof(send_buffer_size);
+    result = getsockopt(connection->fd, SOL_SOCKET, SO_SNDBUF, &send_buffer_size, &len);
+    if (0 != result)
+    {
+        log_error("tcp_connection_expand_send_buffer:　getsockopt() failed, errno: %d", errno);
+        return;
+    }
 
-	send_buffer_size += ((size+1023)>>10)<<10;
-	setsockopt(connection->fd, SOL_SOCKET, SO_SNDBUF, &send_buffer_size, sizeof(send_buffer_size));
-	
-	return;
+    send_buffer_size += ((size+1023)>>10)<<10;
+    setsockopt(connection->fd, SOL_SOCKET, SO_SNDBUF, &send_buffer_size, sizeof(send_buffer_size));
+    
+    return;
 }
 
 void tcp_connection_expand_recv_buffer(tcp_connection_t *connection, unsigned size)
 {
-	int result;
-	int recv_buffer_size;
-	socklen_t len;
+    int result;
+    int recv_buffer_size;
+    socklen_t len;
 
-	if (NULL == connection)
-	{
-		return;
-	}
+    if (NULL == connection)
+    {
+        return;
+    }
 
-	len = sizeof(recv_buffer_size);
-	result = getsockopt(connection->fd, SOL_SOCKET, SO_RCVBUF, &recv_buffer_size, &len);
-	if (0 != result)
-	{
-		log_error("tcp_connection_expand_recv_buffer:　getsockopt() failed, errno: %d", errno);
-		return;
-	}
+    len = sizeof(recv_buffer_size);
+    result = getsockopt(connection->fd, SOL_SOCKET, SO_RCVBUF, &recv_buffer_size, &len);
+    if (0 != result)
+    {
+        log_error("tcp_connection_expand_recv_buffer:　getsockopt() failed, errno: %d", errno);
+        return;
+    }
 
-	recv_buffer_size += ((size+1023)>>10)<<10;
-	setsockopt(connection->fd, SOL_SOCKET, SO_RCVBUF, &recv_buffer_size, sizeof(recv_buffer_size));
-	
-	return;
+    recv_buffer_size += ((size+1023)>>10)<<10;
+    setsockopt(connection->fd, SOL_SOCKET, SO_RCVBUF, &recv_buffer_size, sizeof(recv_buffer_size));
+    
+    return;
 }

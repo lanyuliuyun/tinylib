@@ -8,22 +8,22 @@
 
 void get_current_timestamp(unsigned long long *timestamp)
 {
-	FILETIME now;
-	ULARGE_INTEGER ularg;
+    FILETIME now;
+    ULARGE_INTEGER ularg;
 
-	if (NULL == timestamp)
-	{
-		log_error("get_current_timestamp: bad timestamp");
-		return;
-	}
+    if (NULL == timestamp)
+    {
+        log_error("get_current_timestamp: bad timestamp");
+        return;
+    }
 
-	GetSystemTimeAsFileTime(&now);
-	memcpy(&ularg, &now, sizeof(ularg));
+    GetSystemTimeAsFileTime(&now);
+    memcpy(&ularg, &now, sizeof(ularg));
 
-	/* ularg单位为100ns，除以10000转换成ms */
-	*timestamp = ularg.QuadPart / 10000;
+    /* ularg单位为100ns，除以10000转换成ms */
+    *timestamp = ularg.QuadPart / 10000;
 
-	return;
+    return;
 }
 
 #elif defined(__linux__)
@@ -32,18 +32,18 @@ void get_current_timestamp(unsigned long long *timestamp)
 
 void get_current_timestamp(unsigned long long *timestamp)
 {
-	struct timeval tv;
+    struct timeval tv;
 
-	if (NULL == timestamp)
-	{
-		log_error("get_current_timestamp: bad timestamp");
-		return;
-	}
+    if (NULL == timestamp)
+    {
+        log_error("get_current_timestamp: bad timestamp");
+        return;
+    }
 
-	gettimeofday(&tv, NULL);
-	*timestamp = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    gettimeofday(&tv, NULL);
+    *timestamp = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 
-	return;
+    return;
 }
 
 #endif

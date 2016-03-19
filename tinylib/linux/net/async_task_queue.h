@@ -1,4 +1,6 @@
 
+/** 协助 loop 实现异步任务功能，非对外操作接口 */
+
 #ifndef ASYNC_TASK_QUEUE_H
 #define ASYNC_TASK_QUEUE_H
 
