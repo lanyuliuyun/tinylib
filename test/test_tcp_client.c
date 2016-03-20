@@ -1,9 +1,9 @@
 
 #ifdef WINNT
-	#include "tinylib/windows/net/tcp_client.h"
-	#include <winsock2.h>
+    #include "tinylib/windows/net/tcp_client.h"
+    #include <winsock2.h>
 #elif defined(__linux__)
-	#include "tinylib/linux/net/tcp_client.h"
+    #include "tinylib/linux/net/tcp_client.h"
 #endif
 
 #include <stdio.h>
@@ -12,7 +12,8 @@
 
 static loop_t *g_loop = NULL;
 
-static void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
+static 
+void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
     printf("%u bytes recevied from %s:%u\n", buffer_readablebytes(buffer), addr->ip, addr->port);
@@ -21,7 +22,8 @@ static void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userda
     return;
 }
 
-static void on_close(tcp_connection_t* connection, void* userdata)
+static 
+void on_close(tcp_connection_t* connection, void* userdata)
 {
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
     printf("connection to %s:%u will be closed\n", addr->ip, addr->port);
@@ -31,7 +33,8 @@ static void on_close(tcp_connection_t* connection, void* userdata)
     return;
 }
 
-static void on_connected(tcp_connection_t* connection, void *userdata)
+static 
+void on_connected(tcp_connection_t* connection, void *userdata)
 {
     char msg[5000] = "1234567890POIUYTREWQASDFGHJKLMNBVCXZ\n";
 

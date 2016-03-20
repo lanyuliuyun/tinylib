@@ -71,7 +71,8 @@ void request_delete(rtsp_request_t *request)
     return;
 }
 
-static void request_filt_response
+static 
+void request_filt_response
 (
     rtsp_request_t *request, 
     tcp_connection_t* connection, 
@@ -186,7 +187,8 @@ static void request_filt_response
     return;
 }
 
-static void request_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
+static 
+void request_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     rtsp_request_t *request;
 
@@ -368,7 +370,8 @@ static void request_ondata(tcp_connection_t* connection, buffer_t* buffer, void*
     return;
 }
 
-static void request_onclose(tcp_connection_t* connection, void* userdata)
+static 
+void request_onclose(tcp_connection_t* connection, void* userdata)
 {
     rtsp_request_t *request = (rtsp_request_t*)userdata;
     
@@ -384,7 +387,8 @@ static void request_onclose(tcp_connection_t* connection, void* userdata)
     return;
 }
 
-static void request_onconnected(tcp_connection_t* connection, void *userdata)
+static 
+void request_onconnected(tcp_connection_t* connection, void *userdata)
 {
     rtsp_request_t *request = (rtsp_request_t*)userdata;
 

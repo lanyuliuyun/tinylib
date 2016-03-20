@@ -118,14 +118,14 @@ int main(int argc, char *argv[])
     const rtsp_head_t *head;
     const rtsp_head_t *node;
     rtsp_transport_head_t *trans;
-	
-	unsigned parsed_bytes;
+    
+    unsigned parsed_bytes;
 
     int i;
 
     for (i = 0; i < (sizeof(rtsp_request_msgs)/sizeof(rtsp_request_msgs[0])); ++i)
     {
-		request_msg = rtsp_request_msg_new();
+        request_msg = rtsp_request_msg_new();
         (void)rtsp_request_msg_decode(request_msg, rtsp_request_msgs[i], strlen(rtsp_request_msgs[i]), &parsed_bytes);
 
         printf("Raw Msg:\n%s\n\n", rtsp_request_msgs[i]);
@@ -188,8 +188,8 @@ int main(int argc, char *argv[])
 
     for (i = 0; i < (sizeof(rtsp_response_msgs)/sizeof(rtsp_response_msgs[0])); ++i)
     {
-		response_msg = rtsp_response_msg_new();
-		
+        response_msg = rtsp_response_msg_new();
+        
         (void)rtsp_response_msg_decode(response_msg, rtsp_response_msgs[i], strlen(rtsp_response_msgs[i]), &parsed_bytes);
         printf("Raw Msg:\n%s\n\n", rtsp_response_msgs[i]);
         printf(

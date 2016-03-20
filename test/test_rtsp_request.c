@@ -15,18 +15,18 @@ static rtsp_request_t *g_request = NULL;
 
 static void onexpire(void* userdata)
 {
-	rtsp_request_teardown(g_request, NULL);
-	
-	return;
+    rtsp_request_teardown(g_request, NULL);
+    
+    return;
 }
 
 static void request_handler
 (
-	rtsp_request_t *request, 
-	tcp_connection_t* connection, 
-	rtsp_method_e method, 
-	const rtsp_response_msg_t* response, 
-	void *userdata
+    rtsp_request_t *request, 
+    tcp_connection_t* connection, 
+    rtsp_method_e method, 
+    const rtsp_response_msg_t* response, 
+    void *userdata
 )
 {
     rtsp_head_t head;
@@ -70,22 +70,22 @@ static void request_handler
                    "\tclient_rtcp: %u\n"
                    "\tserver_rtp: %u\n"
                    "\tserver_rtcp: %u\n"
-				   "\tssrc: %s\n"
-				   "\tinterleaved: %d\n"
-				   "\trtp_channel: %d\n"
-				   "\trtcp_channel: %d\n", 
+                   "\tssrc: %s\n"
+                   "\tinterleaved: %d\n"
+                   "\trtp_channel: %d\n"
+                   "\trtcp_channel: %d\n", 
                    trans->trans, 
-				   trans->cast, 
-				   trans->destination, 
-				   trans->source, 
+                   trans->cast, 
+                   trans->destination, 
+                   trans->source, 
                    trans->client_rtp_port, 
-				   trans->client_rtcp_port, 
-				   trans->server_rtp_port, 
-				   trans->server_rtcp_port,
+                   trans->client_rtcp_port, 
+                   trans->server_rtp_port, 
+                   trans->server_rtcp_port,
                    trans->ssrc,
-				   trans->interleaved,
-				   trans->rtp_channel,
-				   trans->rtcp_channel);
+                   trans->interleaved,
+                   trans->rtp_channel,
+                   trans->rtcp_channel);
             rtsp_transport_head_destroy(trans);
         }
 
@@ -109,7 +109,7 @@ static void request_handler
     {
         head.key = RTSP_HEAD_TRANSPORT;
         /* head.value = "RTP/AVP;unicast;client_port=61222-61223"; */
-		head.value = "RTP/AVP/TCP;unicast;interleaved=0-1";
+        head.value = "RTP/AVP/TCP;unicast;interleaved=0-1";
         head.next = NULL;
 
         sdp = sdp_parse(response->body, response->body_len);
@@ -138,9 +138,9 @@ static void request_handler
     }
     else if (RTSP_METHOD_PLAY == method)
     {
-        /* ´Ë´¦Ö»ÊÇ²âÊÔrtspĞ­ÒéÁ÷³Ì£¬ËùÒÔÖ±½ÓteardownÁË */
+        /* æ­¤å¤„åªæ˜¯æµ‹è¯•rtspåè®®æµç¨‹ï¼Œæ‰€ä»¥ç›´æ¥teardownäº† */
         /* rtsp_request_teardown(request, NULL); */
-		loop_runafter(g_loop, 2 * 1000, onexpire, NULL);
+        loop_runafter(g_loop, 2 * 1000, onexpire, NULL);
     }
     else if (RTSP_METHOD_TEARDOWN == method)
     {
@@ -151,15 +151,15 @@ static void request_handler
 
 void interleaved_sink
 (
-	rtsp_request_t *request, 
-	unsigned char channel,
-	void* packet, unsigned short size,
-	void *userdata
+    rtsp_request_t *request, 
+    unsigned char channel,
+    void* packet, unsigned short size,
+    void *userdata
 )
 {
-	printf("interleaved packet: channel: %u, size: %u\n", channel, size);
-	
-	return;
+    printf("interleaved packet: channel: %u, size: %u\n", channel, size);
+    
+    return;
 }
 
 int main(int argc, char* argv[])

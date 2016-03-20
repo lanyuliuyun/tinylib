@@ -53,7 +53,8 @@ void session_delete(rtsp_session_t* session)
     return;
 }
 
-static void session_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
+static 
+void session_ondata(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     rtsp_session_t* session;
 
@@ -227,7 +228,8 @@ static void session_ondata(tcp_connection_t* connection, buffer_t* buffer, void*
     return;
 }
 
-static void session_onclose(tcp_connection_t* connection, void* userdata)
+static 
+void session_onclose(tcp_connection_t* connection, void* userdata)
 {
     rtsp_session_t* session = (rtsp_session_t*)userdata;
 

@@ -150,7 +150,8 @@ udp_peer_t* rtp_peer_get_rtcp_udppeer(rtp_peer_t* peer)
     return NULL == peer ? NULL : peer->rtcp_udppeer;
 }
 
-static inline void build_default_bye_rtcp(rtcp_head_t *rtcp)
+static inline 
+void build_default_bye_rtcp(rtcp_head_t *rtcp)
 {
     memset(rtcp, 0, sizeof(*rtcp));
     rtcp->V = 2;

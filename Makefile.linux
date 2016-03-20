@@ -5,8 +5,9 @@ CC = gcc
 LD = gcc
 AR = ar -r
 
-CFLAGS = -Wall -Werror -g -march=native -I. -I./linux
-LDFLAGS = -L./output -lpthread
+CPP_FLAGS = -I. -I./linux
+C_FLAGS = -Wall -Werror -fno-omit-frame-pointer -march=native -g
+LD_FLAGS = -L./output -lpthread
 
 TINYLIB = output/libtinylib.a
 
@@ -110,22 +111,22 @@ test: tinylib $(TEST_ASYNC_TASK_OBJS) \
 	      $(TEST_TCP_SERVER_OBJS) \
 	      $(TEST_TIME_WHEEL_OBJS) \
 	      $(TEST_URL_OBJS)
-	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_RTSP_SERVER_OBJS) -o $(TEST_RTSP_SERVER_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_SDP_OBJS) -o $(TEST_SDP_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) -ltinylib $(LDFLAGS)
-	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) -ltinylib $(LDFLAGS)
+	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_RTSP_SERVER_OBJS) -o $(TEST_RTSP_SERVER_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_SDP_OBJS) -o $(TEST_SDP_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) -ltinylib $(LD_FLAGS)
+	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) -ltinylib $(LD_FLAGS)
 
 %.o: %.c
-	$(CC) -c $^ -o $@ $(CFLAGS)
+	$(CC) -c $^ -o $@ $(CPP_FLAGS) $(C_FLAGS)
 
 clean:
 	rm -f $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)

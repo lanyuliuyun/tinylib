@@ -2007,7 +2007,8 @@ void rtsp_authenticate_head_destroy(rtsp_authenticate_head_t* head)
 }
 
 /* 将给定的数据转换成16进制文本显示格式 */
-static inline void hex_text(const unsigned char *data, unsigned size, char *text)
+static inline 
+void hex_text(const unsigned char *data, unsigned size, char *text)
 {
     unsigned i;
     static char hex[16] = "0123456789abcdef";

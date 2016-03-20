@@ -6,7 +6,8 @@
 #include <string.h>
 #include <assert.h>
 
-static inline void sdp_session_online(sdp_session_t* session, char *line, unsigned len)
+static inline 
+void sdp_session_online(sdp_session_t* session, char *line, unsigned len)
 {
     char key;
     char *part;
@@ -160,7 +161,8 @@ static inline void sdp_session_online(sdp_session_t* session, char *line, unsign
     return;
 }
 
-static inline void sdp_media_online(sdp_media_t* media, char *line, unsigned len)
+static inline 
+void sdp_media_online(sdp_media_t* media, char *line, unsigned len)
 {
     char key;
     char *part;

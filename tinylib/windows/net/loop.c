@@ -75,7 +75,8 @@ void loop_destroy(loop_t *loop)
     return;
 }
 
-static int ensure_channel_slots(loop_t *loop)
+static 
+int ensure_channel_slots(loop_t *loop)
 {
     unsigned i;
     unsigned max_count;

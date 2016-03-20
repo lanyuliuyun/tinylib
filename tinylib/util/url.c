@@ -7,7 +7,8 @@
 
 /* rtsp://user:pass@10.0.0.1:554/demo.mp4/track1 */
 
-static inline void extrac_query_hash(url_t *u)
+static inline 
+void extrac_query_hash(url_t *u)
 {
     char *q_pos;
     char *h_pos;

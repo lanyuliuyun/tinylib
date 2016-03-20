@@ -15,7 +15,8 @@ struct buffer
     unsigned write_index;
 };
 
-static void ensure_space(buffer_t* buffer, unsigned size)
+static 
+void ensure_space(buffer_t* buffer, unsigned size)
 {
     unsigned expand;
     unsigned char* data;

@@ -27,7 +27,8 @@ struct rtsp_server
     int is_alive;
 };
 
-static inline void delete_server(rtsp_server_t *server)
+static inline 
+void delete_server(rtsp_server_t *server)
 {
     tcp_server_destroy(server->server);
     free(server);
@@ -35,7 +36,8 @@ static inline void delete_server(rtsp_server_t *server)
     return;
 }
 
-static void server_onconnection(tcp_connection_t* connection, void* userdata, const inetaddr_t* peer_addr)
+static void 
+server_onconnection(tcp_connection_t* connection, void* userdata, const inetaddr_t* peer_addr)
 {
     rtsp_server_t *server;
     rtsp_session_t *session;

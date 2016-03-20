@@ -1,8 +1,8 @@
 
 #ifdef WINNT
-	#include "tinylib/windows/net/loop.h"
+    #include "tinylib/windows/net/loop.h"
 #elif defined(__linux__)
-	#include "tinylib/linux/net/loop.h"
+    #include "tinylib/linux/net/loop.h"
 #endif
 
 #include "tinylib/util/log.h"
@@ -14,34 +14,36 @@
 
 static loop_t *g_loop = NULL;
 
-static void onexpire1(void* userdata)
+static 
+void onexpire1(void* userdata)
 {
-	log_info("onexpire1");
+    log_info("onexpire1");
 
-	return;
+    return;
 }
 
-static void onexpire2(void* userdata)
+static 
+void onexpire2(void* userdata)
 {
-	log_info("onexpire2");
+    log_info("onexpire2");
 
-	return;
+    return;
 }
 
 int main(int argc, char const *argv[])
 {
-	loop_timer_t *timer1;
-	loop_timer_t *timer2;
+    loop_timer_t *timer1;
+    loop_timer_t *timer2;
 
-	g_loop = loop_new(1);
-	assert(g_loop);
+    g_loop = loop_new(1);
+    assert(g_loop);
 
-	timer1 = loop_runevery(g_loop, 67, onexpire1, &timer1);
-	timer2 = loop_runevery(g_loop, 20, onexpire2, &timer2);
+    timer1 = loop_runevery(g_loop, 67, onexpire1, &timer1);
+    timer2 = loop_runevery(g_loop, 20, onexpire2, &timer2);
 
-	loop_loop(g_loop);
+    loop_loop(g_loop);
 
-	loop_destroy(g_loop);
-	
-	return 0;
+    loop_destroy(g_loop);
+    
+    return 0;
 }

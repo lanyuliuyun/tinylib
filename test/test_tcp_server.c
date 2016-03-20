@@ -1,9 +1,9 @@
 
 #ifdef WINNT
-	#include "tinylib/windows/net/tcp_server.h"
-	#include <winsock2.h>
+    #include "tinylib/windows/net/tcp_server.h"
+    #include <winsock2.h>
 #elif defined(__linux__)
-	#include "tinylib/linux/net/tcp_server.h"
+    #include "tinylib/linux/net/tcp_server.h"
 #endif
 
 #include <stdio.h>
@@ -12,7 +12,8 @@
 int g_run = 10;
 static loop_t *g_loop = NULL;
 
-static void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
+static 
+void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
     printf("%u bytes recevied from %s:%u\n", buffer_readablebytes(buffer), addr->ip, addr->port);
@@ -22,13 +23,14 @@ static void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userda
     return;
 }
 
-static void on_close(tcp_connection_t* connection, void* userdata)
+static 
+void on_close(tcp_connection_t* connection, void* userdata)
 {
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
     printf("connectionto %s:%u will be closed\n", addr->ip, addr->port);
 
-	tcp_connection_destroy(connection);
-	
+    tcp_connection_destroy(connection);
+    
     g_run--;
     if (0 == g_run)
     {
@@ -38,7 +40,8 @@ static void on_close(tcp_connection_t* connection, void* userdata)
     return;
 }
 
-static void on_conn(tcp_connection_t* connection, void* userdata, const inetaddr_t* addr)
+static 
+void on_conn(tcp_connection_t* connection, void* userdata, const inetaddr_t* addr)
 {
     printf("new connection from %s:%u\n", addr->ip, addr->port);
     tcp_connection_setcalback(connection, on_data, on_close, NULL);
