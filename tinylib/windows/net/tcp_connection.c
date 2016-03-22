@@ -28,6 +28,7 @@ struct tcp_connection
     int is_in_callback;
     int is_alive;
     int is_connected;
+    int need_closed_after_sent_done;
 };
 
 struct tcp_connection_msg
@@ -122,12 +123,17 @@ void connection_onevent(SOCKET fd, short event, void* userdata)
                     written = 0;
                 }
             }
+            buffer_retrieve(out_buffer, written);
 
-            if(written == total)
+            if(written >= total)
             {
                 channel_clearevent(connection->channel, POLLOUT);
+
+                if (connection->need_closed_after_sent_done)
+                {
+                    connection->is_alive = 0;
+                }
             }
-            buffer_retrieve(out_buffer, written);
         }
     }
 
@@ -183,6 +189,7 @@ tcp_connection_t* tcp_connection_new
     connection->is_in_callback = 0;
     connection->is_alive = 1;
     connection->is_connected = 1;
+    connection->need_closed_after_sent_done = 0;
     connection->peer_addr = *peer_addr;
 
     memset(&addr, 0, sizeof(addr));
@@ -195,23 +202,41 @@ tcp_connection_t* tcp_connection_new
     return connection;
 }
 
+static
+void do_tcp_connection_destroy(void *userdata)
+{
+    tcp_connection_t* connection = (tcp_connection_t*)userdata;
+
+    if (buffer_readablebytes(connection->out_buffer) > 0)
+    {
+        channel_clearevent(connection->channel, POLLIN);
+        channel_setevent(connection->channel, POLLOUT);
+
+        connection->need_closed_after_sent_done = 1;
+    }
+    else
+    {
+        if (connection->is_in_callback)
+        {
+            connection->is_alive = 0;
+        }
+        else
+        {
+            delete_connection(connection);
+        }
+    }
+
+    return;
+}
+
 void tcp_connection_destroy(tcp_connection_t* connection)
 {
     if (NULL == connection)
     {
         return;
     }
-
-    if (connection->is_in_callback)
-    {
-        connection->is_alive = 0;
-    }
-    else
-    {
-        delete_connection(connection);
-    }
-
-    return;
+    
+    loop_run_inloop(connection->loop, do_tcp_connection_destroy, connection);
 }
 
 static 

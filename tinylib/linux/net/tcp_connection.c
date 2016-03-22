@@ -34,6 +34,7 @@ struct tcp_connection
     int is_in_callback;
     int is_alive;
     int is_connected;
+    int need_closed_after_sent_done;
 };
 
 struct tcp_connection_msg
@@ -85,25 +86,33 @@ void connection_onevent(int fd, int event, void* userdata)
     {
         if (event & EPOLLIN)
         {
-            in_buffer = connection->in_buffer;
-            size = buffer_readFd(in_buffer, connection->fd);
-            if (0 == size)
+            if (connection->need_closed_after_sent_done == 0)
             {
-                assert(NULL != connection->closecb);
-                connection->is_connected = 0;
-                connection->is_in_callback = 1;
-                connection->closecb(connection, connection->userdata);
-                connection->is_in_callback = 0;
+                in_buffer = connection->in_buffer;
+                size = buffer_readFd(in_buffer, connection->fd);
+                if (0 == size)
+                {
+                    assert(NULL != connection->closecb);
+                    connection->is_connected = 0;
+                    connection->is_in_callback = 1;
+                    connection->closecb(connection, connection->userdata);
+                    connection->is_in_callback = 0;
+                }
+                else
+                {
+                    assert(NULL != connection->datacb);
+                    connection->is_in_callback = 1;
+                    connection->datacb(connection, in_buffer, connection->userdata);
+                    connection->is_in_callback = 0;
+                }
             }
             else
             {
-                assert(NULL != connection->datacb);
-                connection->is_in_callback = 1;
-                connection->datacb(connection, in_buffer, connection->userdata);
-                connection->is_in_callback = 0;
+                char temp[256];
+                while (read(fd, temp, sizeof(temp)) > 0);
             }
         }
-        
+
         if (event & EPOLLOUT)
         {
             out_buffer = connection->out_buffer;
@@ -113,7 +122,7 @@ void connection_onevent(int fd, int event, void* userdata)
             if (written < 0)
             {
                 error = errno;
-                if (error != EAGAIN)
+                if (error != EAGAIN && error != EINTR)
                 {
                     log_error("connection_onevent: write() failed, fd(%d), errno(%d), peer addr: %s:%u", fd, error, peer_addr->ip, peer_addr->port);
                     return;
@@ -124,11 +133,17 @@ void connection_onevent(int fd, int event, void* userdata)
                 }
             }
 
-            if(written == size)
+            buffer_retrieve(out_buffer, written);
+
+            if(written >= size)
             {
                 channel_clearevent(connection->channel, EPOLLOUT);
+                
+                if (connection->need_closed_after_sent_done)
+                {
+                    connection->is_alive = 0;
+                }
             }
-            buffer_retrieve(out_buffer, written);
         }
     }
 
@@ -184,6 +199,7 @@ tcp_connection_t* tcp_connection_new
     connection->is_in_callback = 0;
     connection->is_alive = 1;
     connection->is_connected = 1;
+    connection->need_closed_after_sent_done = 0;
     connection->peer_addr = *peer_addr;
 
     memset(&addr, 0, sizeof(addr));
@@ -196,21 +212,41 @@ tcp_connection_t* tcp_connection_new
     return connection;
 }
 
+static
+void do_tcp_connection_destroy(void *userdata)
+{
+    tcp_connection_t* connection = (tcp_connection_t*)userdata;
+
+    if (buffer_readablebytes(connection->out_buffer) > 0)
+    {
+        channel_clearevent(connection->channel, EPOLLIN);
+        channel_setevent(connection->channel, EPOLLOUT);
+
+        connection->need_closed_after_sent_done = 1;
+    }
+    else
+    {
+        if (connection->is_in_callback)
+        {
+            connection->is_alive = 0;
+        }
+        else
+        {
+            delete_connection(connection);
+        }
+    }
+
+    return;
+}
+
 void tcp_connection_destroy(tcp_connection_t* connection)
 {
     if (NULL == connection)
     {
         return;
     }
-
-    if (connection->is_in_callback)
-    {
-        connection->is_alive = 0;
-    }
-    else
-    {
-        delete_connection(connection);
-    }
+    
+    loop_run_inloop(connection->loop, do_tcp_connection_destroy, connection);
 
     return;
 }
