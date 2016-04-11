@@ -12,6 +12,7 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <assert.h>
+#include <sys/resource.h>
 
 #include <pthread.h>
 
@@ -188,6 +189,8 @@ void loop_loop(loop_t *loop)
     struct epoll_event *event;
     channel_t* channel;
     int error;
+	
+	struct rlimit limit;
 
     if (NULL == loop)
     {
@@ -203,7 +206,7 @@ void loop_loop(loop_t *loop)
         memset(loop->events, 0, loop->max_event_count * sizeof(struct epoll_event));
         result = epoll_wait(loop->epfd, loop->events, loop->max_event_count, timeout);
         error = errno;
-        
+
         if (result > 0)
         {
             for (i = 0; i < result; ++i)
@@ -221,10 +224,20 @@ void loop_loop(loop_t *loop)
 
             if (result == loop->max_event_count)
             {
-                result *= 2;
-                
-                loop->events = realloc(loop->events, result*sizeof(struct epoll_event));
-                loop->max_event_count = result;
+				memset(&limit, 0, sizeof(limit));
+				getrlimit(RLIMIT_NOFILE, &limit);
+
+				if (result < limit.rlim_cur)
+				{
+					result *= 2;
+					if (result > limit.rlim_cur)
+					{
+						result = limit.rlim_cur;
+					}
+
+					loop->events = realloc(loop->events, result*sizeof(struct epoll_event));
+					loop->max_event_count = result;
+				}
             }
         }
         else if (0 > result && EINTR != error)

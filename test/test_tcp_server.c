@@ -6,6 +6,8 @@
     #include "tinylib/linux/net/tcp_server.h"
 #endif
 
+#include "tinylib/util/log.h"
+
 #include <stdio.h>
 #include <assert.h>
 
@@ -16,7 +18,8 @@ static
 void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
-    printf("%u bytes recevied from %s:%u\n", buffer_readablebytes(buffer), addr->ip, addr->port);
+    log_info("%u bytes recevied from %s:%u\n", buffer_readablebytes(buffer), addr->ip, addr->port);
+	
     tcp_connection_send(connection, buffer_peek(buffer), buffer_readablebytes(buffer));
     buffer_retrieveall(buffer);
 
@@ -27,10 +30,10 @@ static
 void on_close(tcp_connection_t* connection, void* userdata)
 {
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
-    printf("connectionto %s:%u will be closed\n", addr->ip, addr->port);
+    log_info("connectionto %s:%u will be closed\n", addr->ip, addr->port);
 
     tcp_connection_destroy(connection);
-    
+
     g_run--;
     if (0 == g_run)
     {
@@ -43,7 +46,7 @@ void on_close(tcp_connection_t* connection, void* userdata)
 static 
 void on_conn(tcp_connection_t* connection, void* userdata, const inetaddr_t* addr)
 {
-    printf("new connection from %s:%u\n", addr->ip, addr->port);
+    log_info("new connection from %s:%u\n", addr->ip, addr->port);
     tcp_connection_setcalback(connection, on_data, on_close, NULL);
 
     return;
