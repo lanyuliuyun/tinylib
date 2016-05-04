@@ -26,9 +26,31 @@ struct loop
     timer_queue_t *timer_queue;
 };
 
+#ifdef _MSC_VER
+static
+__declspec(thread) DWORD t_cachedTid = 0;
+#elif defined(__GNUC__)
+static
+__thread int t_cachedTid = 0;
+#endif
+
+static
+DWORD current_tid(void)
+{
+	if (t_cachedTid == 0)
+	{
+		t_cachedTid = GetCurrentThreadId();
+	}
+
+	return t_cachedTid;
+}
+
+
 loop_t* loop_new(unsigned hint)
 {
     loop_t* loop;
+	
+	(void)current_tid();
 
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
@@ -208,7 +230,7 @@ void loop_run_inloop(loop_t* loop, void(*callback)(void *userdata), void* userda
         return;
     }
     
-    if ((loop->run == 0) || (loop->threadId == GetCurrentThreadId()))
+    if ((loop->run == 0) || (loop->threadId == current_tid()))
     {
         callback(userdata);
     }
@@ -227,7 +249,7 @@ int loop_inloopthread(loop_t* loop)
         return 0;
     }
     
-    return (loop->threadId == GetCurrentThreadId()) ? 1 : 0;
+    return (loop->threadId == current_tid()) ? 1 : 0;
 }
 
 void loop_loop(loop_t *loop)

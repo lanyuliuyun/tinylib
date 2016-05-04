@@ -13,13 +13,12 @@
 #include <errno.h>
 #include <assert.h>
 #include <sys/resource.h>
-
-#include <pthread.h>
+#include <sys/syscall.h>    /* for SYS_gettid */
 
 struct loop
 {
     unsigned run;
-    pthread_t threadId;
+    int threadId;
 
     int epfd;
     struct epoll_event *events;
@@ -29,10 +28,26 @@ struct loop
     timer_queue_t *timer_queue;
 };
 
+static
+__thread int t_cachedTid = 0;
+
+static
+int current_tid(void)
+{
+	if (t_cachedTid == 0)
+	{
+		t_cachedTid = (int)syscall(SYS_gettid);
+	}
+
+	return t_cachedTid;
+}
+
 loop_t* loop_new(unsigned hint)
 {
     loop_t* loop;
     int epfd;
+
+	(void)current_tid();
 
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
@@ -159,7 +174,7 @@ void loop_run_inloop(loop_t* loop, void(*callback)(void *userdata), void* userda
         return;
     }
 
-    if ((loop->run == 0) || pthread_equal(loop->threadId, pthread_self()))
+    if ((loop->run == 0) || (loop->threadId == current_tid()))
     {
         callback(userdata);
     }
@@ -178,7 +193,7 @@ int loop_inloopthread(loop_t* loop)
         return 0;
     }
     
-    return (pthread_equal(loop->threadId, pthread_self())) ? 1 : 0;
+    return (loop->threadId == current_tid()) ? 1 : 0;
 }
 
 void loop_loop(loop_t *loop)
@@ -197,7 +212,7 @@ void loop_loop(loop_t *loop)
         return;
     }
 
-    loop->threadId = pthread_self();
+    loop->threadId = current_tid();
     loop->run = 1;
 
     while (loop->run != 0)
