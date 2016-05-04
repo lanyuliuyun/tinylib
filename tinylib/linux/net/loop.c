@@ -93,7 +93,7 @@ void do_loop_update_channel(void* userdata)
     event = channel_getevent(channel);
     fd = channel_getfd(channel);
 
-    log_debug("loop_update_channel: fd(%d), event(%d)", fd, event);
+    log_debug("do_loop_update_channel: fd(%d), event(%d)", fd, event);
 
     memset(&epevent, 0, sizeof(epevent));
     epevent.events = event;

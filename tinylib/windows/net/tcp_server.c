@@ -88,7 +88,7 @@ void server_onevent(SOCKET fd, short event, void* userdata)
             closesocket(server->idle_fd);
             client_fd = WSAAccept(fd, (struct sockaddr*)&addr, &len, NULL, 0);
             closesocket(client_fd);
-            server->idle_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);;
+            server->idle_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
         }
         else
         {
@@ -185,16 +185,13 @@ void do_tcp_server_start(void* userdata)
 
         server->channel = channel_new(server->fd, server->loop, server_onevent, server);
 
-        if (listen(server->fd, 128) != 0)
+        if (listen(server->fd, 512) != 0)
         {
             log_error("do_tcp_server_start: listen() failed, errno: %d, local addr: %s:%u", WSAGetLastError(), server->addr.ip, server->addr.port);
             break;
         }
-        if (channel_setevent(server->channel, POLLRDNORM))
-        {
-            log_error("do_tcp_server_start: channel_setevent() failed, local addr: %s:%u", server->addr.ip, server->addr.port);
-            break;
-        }
+
+		channel_setevent(server->channel, POLLRDNORM);
 
         return;
     } while(0);

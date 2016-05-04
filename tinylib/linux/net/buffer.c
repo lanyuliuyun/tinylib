@@ -167,6 +167,8 @@ void buffer_retrieve(buffer_t *buffer, unsigned size)
 {
     unsigned readablebytes = buffer->write_index - buffer->read_index;
 
+	assert(size <= readablebytes);
+	
     if (size < readablebytes)
     {
         buffer->read_index += size;

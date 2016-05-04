@@ -48,6 +48,10 @@ RTP_OBJS = \
 TEST_ASYNC_TASK_BIN = output/test_async_task.exe
 TEST_ASYNC_TASK_OBJS = test/test_async_task.o
 
+# async_task in multi-thread
+TEST_MT_ASYNC_TASK_BIN = output/test_mt_async_task.exe
+TEST_MT_ASYNC_TASK_OBJS = test/test_mt_async_task.o
+
 ## atomic
 TEST_ATOMIC_BIN = output/test_atomic.exe
 TEST_ATOMIC_OBJS = test/test_atomic.o
@@ -59,6 +63,10 @@ TEST_LOG_OBJS = test/test_log.o
 ## loop_timer
 TEST_LOOP_TIMER_BIN = output/test_loop_timer.exe
 TEST_LOOP_TIMER_OBJS = test/test_loop_timer.o
+
+# timer in multi-thread
+TEST_MT_TIMER_BIN = output/test_mt_timer
+TEST_MT_TIMER_OBJS = test/test_mt_timer.o
 
 ## md5
 TEST_MD5_BIN = output/test_md5.exe
@@ -94,15 +102,17 @@ TEST_URL_OBJS = test/test_url.o
 
 .PHONY: all clean test
 
-all: tinylib
+all: $(TINYLIB)
 
-tinylib: $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
+$(TINYLIB): $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
 	$(AR) $(TINYLIB) $^
 
-test: tinylib $(TEST_ASYNC_TASK_OBJS) \
-          $(TEST_ATOMIC_OBJS) \
+test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
+	      $(TEST_MT_ASYNC_TASK_OBJS) \
+	      $(TEST_ATOMIC_OBJS) \
 	      $(TEST_LOG_OBJS) \
 	      $(TEST_LOOP_TIMER_OBJS) \
+	      $(TEST_MT_TIMER_OBJS) \
 	      $(TEST_MD5_OBJS) \
 	      $(TEST_MSG_CODEC_OBJS) \
 	      $(TEST_RTSP_REQUEST_OBJS)  \
@@ -113,9 +123,11 @@ test: tinylib $(TEST_ASYNC_TASK_OBJS) \
 	      $(TEST_TIME_WHEEL_OBJS) \
 	      $(TEST_URL_OBJS)
 	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) $(LD_FLAGS)
+	$(LD) $(TEST_MT_ASYNC_TASK_OBJS) -o $(TEST_MT_ASYNC_TASK_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_LOG_OBJS) -o $(TEST_LOG_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) $(LD_FLAGS)
+	$(LD) $(TEST_MT_TIMER_OBJS) -o $(TEST_MT_TIMER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) $(LD_FLAGS)
@@ -130,11 +142,14 @@ test: tinylib $(TEST_ASYNC_TASK_OBJS) \
 	$(CC) -c $^ -o $@ $(CPP_FLAGS) $(C_FLAGS)
 
 clean:
+	rm -f $(TINYLIB)
 	rm -f $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
 	rm -f $(TEST_ASYNC_TASK_OBJS) $(TEST_ASYNC_TASK_BIN)
+	rm -f $(TEST_MT_ASYNC_TASK_OBJS) $(TEST_MT_ASYNC_TASK_BIN)
 	rm -f $(TEST_ATOMIC_OBJS) $(TEST_ATOMIC_BIN)
 	rm -f $(TEST_LOG_OBJS) $(TEST_LOG_BIN)
 	rm -f $(TEST_LOOP_TIMER_OBJS) $(TEST_LOOP_TIMER_BIN)
+	rm -f $(TEST_MT_TIMER_OBJS) $(TEST_MT_TIMER_BIN)
 	rm -f $(TEST_MD5_OBJS) $(TEST_MD5_BIN)
 	rm -f $(TEST_MSG_CODEC_OBJS) $(TEST_MSG_CODEC_BIN)
 	rm -f $(TEST_RTSP_REQUEST_OBJS) $(TEST_RTSP_REQUEST_BIN)

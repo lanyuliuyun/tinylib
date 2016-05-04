@@ -77,6 +77,9 @@ void insert_timer_inloop(timer_queue_t *timer_queue, loop_timer_t *timer)
     loop_timer_t *t_iter;
 
     assert(NULL != timer_queue && NULL != timer);
+	
+    timer->prev = NULL;
+    timer->next = NULL;
 
     if (NULL == timer_queue->timer_list)
     {
@@ -101,27 +104,24 @@ void insert_timer_inloop(timer_queue_t *timer_queue, loop_timer_t *timer)
             timer->prev = timer_queue->timer_list_end;
             timer_queue->timer_list_end = timer;
         }
-        else
-        {
-            if (NULL == t_iter->prev)
-            {
-                /* 表头插入 */
-                timer->prev = NULL;
-                timer->next = t_iter;
-                t_iter->prev = timer;
-                timer_queue->timer_list = timer;
-                timer_queue->min_timestamp = timer->timestamp;
-            }
-            else
-            {
-                /* 表中间插入 */
-                t_iter->prev->next = timer;
-                timer->prev = t_iter->prev;
+        else if (NULL == t_iter->prev)
+		{
+			/* 表头插入 */
+			timer->prev = NULL;
+			timer->next = t_iter;
+			t_iter->prev = timer;
+			timer_queue->timer_list = timer;
+			timer_queue->min_timestamp = timer->timestamp;
+		}
+		else
+		{
+			/* 表中间插入 */
+			t_iter->prev->next = timer;
+			timer->prev = t_iter->prev;
 
-                timer->next = t_iter;
-                t_iter->prev = timer;
-            }
-        }
+			timer->next = t_iter;
+			t_iter->prev = timer;
+		}
     }
 
     return;
@@ -342,7 +342,7 @@ void timer_queue_process_inloop(timer_queue_t *timer_queue)
 
     get_current_timestamp(&now);
 
-    /* 寻找时间戳大于now的节点，在该节点之前的所有timer均为已超时 */
+    /* 寻找第一个时间戳大于now的节点，在该节点之前的所有timer均为已超时 */
     timer = timer_queue->timer_list;
     while (NULL != timer && timer->timestamp <= now)
     {
@@ -380,7 +380,7 @@ void timer_queue_process_inloop(timer_queue_t *timer_queue)
         timer_queue->timer_list->prev = NULL;
         timer_queue->min_timestamp = timer->timestamp;
     }
-    
+
     timer_iter = done_timer;
     while (NULL != timer_iter)
     {
