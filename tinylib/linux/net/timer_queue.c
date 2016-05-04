@@ -20,6 +20,17 @@ struct loop_timer
     int is_in_callback;
     int is_alive;
     int is_expired;
+	
+	/* 由于跨线程添加 timer 时，先返回timer句柄，后续再将 timer 添加到队列中
+	 * 因此可能存在 timer 尚未真正添加到队列中时，就被cancel
+	 * 此时，若在 timer_queue 所属的 loop 中，先于 insert_timer_inloop() 将 timer 取消
+	 * 那么会导致，后续 insert_timer_inloop() 使用已经被 free 掉的 timer，而导致内存错误
+	 *
+	 * 而在 timer_queue 所属的 loop 中， insert_timer_inloop() 先于 timer_queue_cancel_inloop()执行，则不会有问题
+	 *
+	 * 因此需要对跨线程添加的timer，记录其位置状态，是否已经添加到 timer_queue 当中， is_in_queue 作用即如此
+	 */
+	int is_in_queue;
 
     struct loop_timer *prev;
     struct loop_timer *next;
@@ -121,6 +132,8 @@ void insert_timer_inloop(timer_queue_t *timer_queue, loop_timer_t *timer)
 			t_iter->prev = timer;
 		}
     }
+	
+	timer->is_in_queue = 1;
 
     return;
 }
@@ -145,23 +158,15 @@ void remove_timer_inloop(timer_queue_t *timer_queue, loop_timer_t *timer)
     }
     else if (timer_queue->timer_list_end == timer)
     {
-        /* 是表尾节点 */
+        /* 是表尾节点，简单摘除即可 */
         timer_queue->timer_list_end = timer->prev;
         timer_queue->timer_list_end->next = NULL;
     }
     else
     {
-        /* 在timer callback中cancel_timer时，可能timer_queue中暂时没有timer记录，会直接走到此处
-         * 因此timer->next和timer->prev均为NULL，此时需要判断一下
-         */
-        if (NULL != timer->prev)
-        {
-            timer->prev->next = timer->next;
-        }
-        if (NULL != timer->next)
-        {
-            timer->next->prev = timer->prev;
-        }
+		/* 是中间节点，简单摘除即可 */
+		timer->prev->next = timer->next;
+		timer->next->prev = timer->prev;
     }
 
     return;
@@ -171,8 +176,17 @@ static
 void do_insert_timer(void *userdata)
 {
     loop_timer_t *timer = (loop_timer_t*)userdata;
-	
-    insert_timer_inloop(timer->timer_queue, timer);
+
+	if (timer->is_alive)
+	{
+		/* 普通情况，正常添加即可 */
+		insert_timer_inloop(timer->timer_queue, timer);
+	}
+    else
+	{
+		/* 可能在此之前，该timer已被cancel，则不用做添加动作，直接 free */
+		free(timer);
+	}
 
     return;
 }
@@ -198,6 +212,8 @@ loop_timer_t *timer_queue_add(timer_queue_t *timer_queue, unsigned long long tim
     timer->is_in_callback = 0;
     timer->is_alive = 1;
     timer->is_expired = 0;
+	timer->is_in_queue = 0;
+	
     timer->prev = NULL;
     timer->next = NULL;
 
@@ -210,22 +226,33 @@ loop_timer_t *timer_queue_add(timer_queue_t *timer_queue, unsigned long long tim
 static
 void timer_queue_cancel_inloop(timer_queue_t *timer_queue, loop_timer_t *timer)
 {
+	/* 在timer的回调中取消自己, 已经将 timer 从 timer_queue->timer_list 中摘除 */
     if (timer->is_in_callback)
     {
         timer->is_alive = 0;
     }
-    else
-    {
-        if (timer->is_expired)
-        {
-            timer->is_alive = 0;
-        }
-        else
-        {
-            remove_timer_inloop(timer_queue, timer);
-            free(timer);
-        }
-    }
+	/* 在timer回调中取消其他尚未执行 callback 的超时timer，同样已经将 timer 从 timer_queue->timer_list 中摘除 */
+    else if (timer->is_expired)
+	{
+		timer->is_alive = 0;
+	}
+	/* 取消未超时的timer，或在执行 timer_queue_process_inloop() 之前(在IO回调中)取消 timer，此时 timer 仍在 timer_queue->timer_list 中，需要将其从中摘除！ */
+	else
+	{
+		if (timer->is_in_queue)
+		{
+			/* 已经被记录到 timer_queue 中，正常 remove 即可 */
+			remove_timer_inloop(timer_queue, timer);
+			free(timer);
+		}
+		else
+		{
+			/* 尚未被记录到 timer_queue 表明已经被执行 cancel 动作了，将其做简单标记即可 
+			 * 在后续 do_insert_timer() 会检查 is_alive 标记
+			 */
+			timer->is_alive = 0;
+		}
+	}
 
     return;
 }
