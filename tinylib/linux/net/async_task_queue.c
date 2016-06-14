@@ -75,7 +75,6 @@ void async_task_queue_destroy(async_task_queue_t *task_queue)
     {
         task = task_queue->async_task;
         task_queue->async_task = task->next;
-        task->callback(task->userdata);
         free(task);
     }
     
