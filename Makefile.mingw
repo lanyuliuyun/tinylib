@@ -32,16 +32,6 @@ NET_OBJS = \
 	tinylib/windows/net/timer_queue.o \
 	tinylib/windows/net/udp_peer.o
 
-RTSP_OBJS = \
-	tinylib/rtsp/rtsp_message_codec.o \
-	tinylib/rtsp/rtsp_request.o \
-	tinylib/rtsp/rtsp_server.o \
-	tinylib/rtsp/rtsp_session.o \
-	tinylib/rtsp/sdp.o
-	
-RTP_OBJS = \
-	tinylib/rtp/rtp_peer.o
-
 # unit test
 
 # async_task
@@ -72,20 +62,6 @@ TEST_MT_TIMER_OBJS = test/test_mt_timer.o
 TEST_MD5_BIN = output/test_md5.exe
 TEST_MD5_OBJS = test/test_md5.o
 
-## msg codec
-TEST_MSG_CODEC_BIN = output/test_rtsp_msg_codec.exe
-TEST_MSG_CODEC_OBJS = test/test_rtsp_msg_codec.o
-
-## rtsp
-TEST_RTSP_SERVER_BIN = output/test_rtsp_server.exe
-TEST_RTSP_SERVER_OBJS = test/test_rtsp_server.o
-TEST_RTSP_REQUEST_BIN = output/test_rtsp_request.exe
-TEST_RTSP_REQUEST_OBJS = test/test_rtsp_request.o
-
-## SDP
-TEST_SDP_BIN = output/test_sdp_parser.exe
-TEST_SDP_OBJS = test/test_sdp_parser.o
-
 ## tcp
 TEST_TCP_SERVER_BIN = output/test_tcp_server.exe
 TEST_TCP_SERVER_OBJS = test/test_tcp_server.o
@@ -104,7 +80,7 @@ TEST_URL_OBJS = test/test_url.o
 
 all: $(TINYLIB)
 
-$(TINYLIB): $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
+$(TINYLIB): $(NET_OBJS) $(UTIL_OBJS)
 	$(AR) $(TINYLIB) $^
 
 test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
@@ -114,10 +90,6 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	      $(TEST_LOOP_TIMER_OBJS) \
 	      $(TEST_MT_TIMER_OBJS) \
 	      $(TEST_MD5_OBJS) \
-	      $(TEST_MSG_CODEC_OBJS) \
-	      $(TEST_RTSP_REQUEST_OBJS)  \
-	      $(TEST_RTSP_SERVER_OBJS) \
-	      $(TEST_SDP_OBJS) \
 	      $(TEST_TCP_CLIENT_OBJS) \
 	      $(TEST_TCP_SERVER_OBJS) \
 	      $(TEST_TIME_WHEEL_OBJS) \
@@ -129,10 +101,6 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	$(LD) $(TEST_LOOP_TIMER_OBJS) -o $(TEST_LOOP_TIMER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MT_TIMER_OBJS) -o $(TEST_MT_TIMER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) $(LD_FLAGS)
-	$(LD) $(TEST_MSG_CODEC_OBJS) -o $(TEST_MSG_CODEC_BIN) $(LD_FLAGS)
-	$(LD) $(TEST_RTSP_REQUEST_OBJS) -o $(TEST_RTSP_REQUEST_BIN) $(LD_FLAGS)
-	$(LD) $(TEST_RTSP_SERVER_OBJS) -o $(TEST_RTSP_SERVER_BIN) $(LD_FLAGS)
-	$(LD) $(TEST_SDP_OBJS) -o $(TEST_SDP_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) $(LD_FLAGS)
