@@ -20,11 +20,11 @@
 struct tcp_server
 {
     loop_t* loop;
-	int idle_fd;
+    int idle_fd;
 
     int fd;
     channel_t *channel;
-	
+    
     on_connection_f on_connection;
     void *userdata;
 
@@ -71,7 +71,7 @@ static
 void server_onevent(int fd, int event, void* userdata)
 {
     tcp_server_t *server = (tcp_server_t *)userdata;
-	int error;
+    int error;
 
     tcp_connection_t* connection;
     int client_fd;
@@ -86,18 +86,18 @@ void server_onevent(int fd, int event, void* userdata)
     client_fd = accept(server->fd, (struct sockaddr*)&addr, &len);
     if (client_fd < 0)
     {
-		error = errno;
-		if (EMFILE == error)
-		{
-			close(server->idle_fd);
-			client_fd = accept(server->fd, (struct sockaddr*)&addr, &len);
-			close(client_fd);
-			server->idle_fd = open("/dev/null", O_RDONLY);
-		}
-		else
-		{
-			log_error("failed to accept a connection request, error: %d, local addr: %s:%u", error, server->addr.ip, server->addr.port);
-		}
+        error = errno;
+        if (EMFILE == error)
+        {
+            close(server->idle_fd);
+            client_fd = accept(server->fd, (struct sockaddr*)&addr, &len);
+            close(client_fd);
+            server->idle_fd = open("/dev/null", O_RDONLY);
+        }
+        else
+        {
+            log_error("failed to accept a connection request, error: %d, local addr: %s:%u", error, server->addr.ip, server->addr.port);
+        }
 
         return;
     }
@@ -139,8 +139,8 @@ tcp_server_t* tcp_server_new
     memset(server, 0, sizeof(*server));
 
     server->loop = loop;
-	server->idle_fd = open("/dev/null", O_RDONLY);
-	
+    server->idle_fd = open("/dev/null", O_RDONLY);
+    
     server->fd = -1;
     server->channel = NULL;
     server->on_connection = on_connection;
@@ -252,7 +252,7 @@ void do_tcp_server_stop(void* userdata)
     channel_detach(server->channel);
     channel_destroy(server->channel);
     server->channel = NULL;
-	close(server->idle_fd);
+    close(server->idle_fd);
     server->idle_fd = -1;
     close(server->fd);
     server->fd = -1;

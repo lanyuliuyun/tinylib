@@ -34,12 +34,12 @@ __thread int t_cachedTid = 0;
 static
 int current_tid(void)
 {
-	if (t_cachedTid == 0)
-	{
-		t_cachedTid = (int)syscall(SYS_gettid);
-	}
+    if (t_cachedTid == 0)
+    {
+        t_cachedTid = (int)syscall(SYS_gettid);
+    }
 
-	return t_cachedTid;
+    return t_cachedTid;
 }
 
 loop_t* loop_new(unsigned hint)
@@ -47,7 +47,7 @@ loop_t* loop_new(unsigned hint)
     loop_t* loop;
     int epfd;
 
-	(void)current_tid();
+    (void)current_tid();
 
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
@@ -204,8 +204,8 @@ void loop_loop(loop_t *loop)
     struct epoll_event *event;
     channel_t* channel;
     int error;
-	
-	struct rlimit limit;
+    
+    struct rlimit limit;
 
     if (NULL == loop)
     {
@@ -239,20 +239,20 @@ void loop_loop(loop_t *loop)
 
             if (result == loop->max_event_count)
             {
-				memset(&limit, 0, sizeof(limit));
-				getrlimit(RLIMIT_NOFILE, &limit);
+                memset(&limit, 0, sizeof(limit));
+                getrlimit(RLIMIT_NOFILE, &limit);
 
-				if (result < limit.rlim_cur)
-				{
-					result *= 2;
-					if (result > limit.rlim_cur)
-					{
-						result = limit.rlim_cur;
-					}
+                if (result < limit.rlim_cur)
+                {
+                    result *= 2;
+                    if (result > limit.rlim_cur)
+                    {
+                        result = limit.rlim_cur;
+                    }
 
-					loop->events = realloc(loop->events, result*sizeof(struct epoll_event));
-					loop->max_event_count = result;
-				}
+                    loop->events = realloc(loop->events, result*sizeof(struct epoll_event));
+                    loop->max_event_count = result;
+                }
             }
         }
         else if (0 > result && EINTR != error)
@@ -278,10 +278,10 @@ void loop_quit(loop_t* loop)
 {
     if (NULL == loop)
     {
-		return;
+        return;
     }
-	
-	loop_run_inloop(loop, do_loop_quit, loop);
+    
+    loop_run_inloop(loop, do_loop_quit, loop);
 
     return;
 }

@@ -16,7 +16,7 @@ typedef void (*on_connected_f)(tcp_connection_t* connection, void *userdata);
 
 tcp_client_t* tcp_client_new
 (
-	loop_t *loop, const char* ip, unsigned short port, 
+    loop_t *loop, const char* ip, unsigned short port, 
     on_connected_f connectedcb, on_data_f datacb, on_close_f closecb, void* userdata
 );
 

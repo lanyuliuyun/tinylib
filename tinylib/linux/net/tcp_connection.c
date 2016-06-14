@@ -47,15 +47,15 @@ struct tcp_connection_msg
 static 
 void delete_connection(tcp_connection_t *connection)
 {
-	log_debug("connection to %s:%u will be destroyed", connection->peer_addr.ip, connection->peer_addr.port);
+    log_debug("connection to %s:%u will be destroyed", connection->peer_addr.ip, connection->peer_addr.port);
 
-	channel_detach(connection->channel);
-	channel_destroy(connection->channel);
-	shutdown(connection->fd, SHUT_RDWR);
-	close(connection->fd);
-	buffer_destory(connection->in_buffer);
-	buffer_destory(connection->out_buffer);
-	free(connection);
+    channel_detach(connection->channel);
+    channel_destroy(connection->channel);
+    shutdown(connection->fd, SHUT_RDWR);
+    close(connection->fd);
+    buffer_destory(connection->in_buffer);
+    buffer_destory(connection->out_buffer);
+    free(connection);
 
     return;
 }
@@ -64,8 +64,8 @@ static
 void connection_onevent(int fd, int event, void* userdata)
 {
     tcp_connection_t *connection = (tcp_connection_t*)userdata;
-	inetaddr_t *peer_addr = &connection->peer_addr;
-	
+    inetaddr_t *peer_addr = &connection->peer_addr;
+    
     buffer_t* in_buffer;
     buffer_t* out_buffer;
     void* data;
@@ -175,7 +175,7 @@ tcp_connection_t* tcp_connection_new
     }
 
     connection = (tcp_connection_t*)malloc(sizeof(*connection));
-	memset(connection, 0, sizeof(*connection));
+    memset(connection, 0, sizeof(*connection));
 
     flag = 1;
     setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &flag, sizeof(flag));
@@ -254,8 +254,8 @@ void tcp_connection_destroy(tcp_connection_t* connection)
 static 
 int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, unsigned size)
 {
-	inetaddr_t *peer_addr = &connection->peer_addr;
-	
+    inetaddr_t *peer_addr = &connection->peer_addr;
+    
     int fd;
     void* buffer_data;
     channel_t *channel;

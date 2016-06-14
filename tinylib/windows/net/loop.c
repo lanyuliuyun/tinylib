@@ -37,20 +37,20 @@ __thread int t_cachedTid = 0;
 static
 DWORD current_tid(void)
 {
-	if (t_cachedTid == 0)
-	{
-		t_cachedTid = GetCurrentThreadId();
-	}
+    if (t_cachedTid == 0)
+    {
+        t_cachedTid = GetCurrentThreadId();
+    }
 
-	return t_cachedTid;
+    return t_cachedTid;
 }
 
 
 loop_t* loop_new(unsigned hint)
 {
     loop_t* loop;
-	
-	(void)current_tid();
+    
+    (void)current_tid();
 
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
