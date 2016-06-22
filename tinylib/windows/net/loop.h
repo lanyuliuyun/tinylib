@@ -60,6 +60,11 @@ loop_timer_t* loop_runafter(loop_t* loop, unsigned interval, onexpire_f expirecb
 loop_timer_t* loop_runevery(loop_t* loop, unsigned interval, onexpire_f expirecb, void *userdata);
 
 /* 取消周期性timer或未超时的一次性timer
+ * 
+ * !!! 注意: 跨线程取消 timer 的结果时序，不能完全保证，只是最大努力去取消！
+ * !!! 此种情况，可能会出现，本调用返回之后，对应超时回调仍然被执行！
+ * 
+ * 因此不建议跨线程起 timer
  */
 void loop_cancel(loop_t* loop, loop_timer_t *timer);
 
