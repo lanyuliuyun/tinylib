@@ -48,7 +48,7 @@ void ensure_space(buffer_t* buffer, unsigned size)
         /* 若此处空间分配若失败，则无力回天了! */
         assert(NULL != data);
         buffer->data = data;
-        buffer->len += size;
+        buffer->len += expand;
     }
 
     return;
