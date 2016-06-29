@@ -5,3 +5,5 @@
 除此之外，还额外提供了atomic/base64/md5/time_wheel/url解析/基本log框架，适用于基本的开发需要。
 
 具体的使用方法见test目录下的用例。
+
+IMPORTANCE: This repo is NOT product-ready ! You guys are at your own RISK to use it in your development !
