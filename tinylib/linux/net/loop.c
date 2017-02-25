@@ -32,6 +32,9 @@ static
 __thread int t_cachedTid = 0;
 
 static
+int s_max_open_files = 0;
+
+static
 int current_tid(void)
 {
     if (t_cachedTid == 0)
@@ -42,17 +45,32 @@ int current_tid(void)
     return t_cachedTid;
 }
 
+static
+void get_max_open_files(void)
+{
+    if (s_max_open_files == 0)
+    {
+        struct rlimit limit;
+        memset(&limit, 0, sizeof(limit));
+        getrlimit(RLIMIT_NOFILE, &limit);
+        s_max_open_files = limit.rlim_cur;
+    }
+
+    return;
+}
+
 loop_t* loop_new(unsigned hint)
 {
     loop_t* loop;
     int epfd;
 
     (void)current_tid();
+    get_max_open_files();
 
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
     loop->run = 0;
-    
+
     if (hint < 64)
     {
         hint = 64;
@@ -84,13 +102,13 @@ void loop_destroy(loop_t *loop)
     {
         return;
     }
-    
+
     timer_queue_destroy(loop->timer_queue);
     async_task_queue_destroy(loop->task_queue);
     free(loop->events);
     close(loop->epfd);
     free(loop);
-    
+
     return;
 }
 
@@ -99,7 +117,7 @@ void do_loop_update_channel(void* userdata)
 {
     channel_t* channel = (channel_t*)userdata;
     loop_t *loop = channel_getloop(channel);
-    
+
     int fd;
     int event;
     int operate;
@@ -137,7 +155,7 @@ void do_loop_update_channel(void* userdata)
         log_error("loop_update_channel: epoll_ctl() failed, operate(%d) fd(%d), errno: %d", operate, fd, errno);
         return;
     }
-    
+
     return;
 }
 
@@ -192,7 +210,7 @@ int loop_inloopthread(loop_t* loop)
     {
         return 0;
     }
-    
+
     return (loop->threadId == current_tid()) ? 1 : 0;
 }
 
@@ -204,8 +222,6 @@ void loop_loop(loop_t *loop)
     struct epoll_event *event;
     channel_t* channel;
     int error;
-    
-    struct rlimit limit;
 
     if (NULL == loop)
     {
@@ -239,15 +255,12 @@ void loop_loop(loop_t *loop)
 
             if (result == loop->max_event_count)
             {
-                memset(&limit, 0, sizeof(limit));
-                getrlimit(RLIMIT_NOFILE, &limit);
-
-                if (result < limit.rlim_cur)
+                if (result < s_max_open_files)
                 {
                     result *= 2;
-                    if (result > limit.rlim_cur)
+                    if (result > s_max_open_files)
                     {
-                        result = limit.rlim_cur;
+                        result = s_max_open_files;
                     }
 
                     loop->events = realloc(loop->events, result*sizeof(struct epoll_event));
@@ -266,7 +279,7 @@ void loop_loop(loop_t *loop)
     return;
 }
 
-static 
+static
 void do_loop_quit(void *userdata)
 {
     ((loop_t*)userdata)->run = 0;
@@ -280,7 +293,7 @@ void loop_quit(loop_t* loop)
     {
         return;
     }
-    
+
     loop_run_inloop(loop, do_loop_quit, loop);
 
     return;
