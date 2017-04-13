@@ -85,7 +85,7 @@ void lock_uninit(lock_t *lock)
 static inline
 int lock_it(lock_t *lock)
 {
-    int ret = pthread_mutex_destroy((pthread_mutex_t*)lock);
+    int ret = pthread_mutex_lock((pthread_mutex_t*)lock);
     if (0 != ret)
     {
         log_error("lock_uninit: pthread_mutex_destroy(), errno: %d", ret);
