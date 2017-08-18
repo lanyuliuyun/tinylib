@@ -29,12 +29,10 @@ void loop_destroy(loop_t *loop);
 int loop_update_channel(loop_t *loop, channel_t* channel);
 
 /* 提交一个异步执行任务，调用立即返回
- * 请不要频繁的提交异步任务，否则会使得内核态执行时间明显上升 
  */
 void loop_async(loop_t* loop, void(*callback)(void *userdata), void* userdata);
 
 /* 在指定循环中执行一个回调方法，如果已经在 loop 运行的线程里，则直接执行提供的回调
- * 请不要频繁地跨线程使用该接口，否则会使得内核态执行时间明显上升
  */
 void loop_run_inloop(loop_t* loop, void(*callback)(void *userdata), void* userdata);
 
