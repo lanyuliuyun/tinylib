@@ -1,6 +1,6 @@
 
-#ifndef UDP_PEER_H
-#define UDP_PEER_H
+#ifndef TINYLIB_UDP_PEER_H
+#define TINYLIB_UDP_PEER_H
 
 struct udp_peer;
 typedef struct udp_peer udp_peer_t;
@@ -8,7 +8,7 @@ typedef struct udp_peer udp_peer_t;
 #include "tinylib/windows/net/loop.h"
 #include "tinylib/windows/net/inetaddr.h"
 
-#include <winsock2.h>
+struct sockaddr_in;
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,4 +42,4 @@ void udp_peer_expand_recv_buffer(udp_peer_t* peer, unsigned size);
 }
 #endif
 
-#endif /* !UDP_PEER_H */
+#endif /* !TINYLIB_UDP_PEER_H */

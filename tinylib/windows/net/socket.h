@@ -1,6 +1,6 @@
 
-#ifndef NET_SOCKET_H
-#define NET_SOCKET_H
+#ifndef TINYLIB_NET_SOCKET_H
+#define TINYLIB_NET_SOCKET_H
 
 #include <winsock2.h>
 
@@ -26,4 +26,4 @@ int socketpair(SOCKET fds[2]);
 }
 #endif
 
-#endif /* !NET_SOCKET_H */
+#endif /* !TINYLIB_NET_SOCKET_H */

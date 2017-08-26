@@ -1,6 +1,6 @@
 
-#ifndef NET_SOCKET_H
-#define NET_SOCKET_H
+#ifndef TINYLIB_NET_SOCKET_H
+#define TINYLIB_NET_SOCKET_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,5 +22,5 @@ int create_udp_socket(unsigned short port, const char *ip);
 }
 #endif
 
-#endif /* !NET_SOCKET_H */
+#endif /* !TINYLIB_NET_SOCKET_H */
 

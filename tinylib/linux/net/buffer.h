@@ -1,8 +1,8 @@
 
 /** buffer对象接口 */
 
-#ifndef NET_BUFFER_H
-#define NET_BUFFER_H
+#ifndef TINYLIB_NET_BUFFER_H
+#define TINYLIB_NET_BUFFER_H
 
 struct buffer;
 typedef struct buffer buffer_t;
@@ -38,5 +38,5 @@ void buffer_retrieveall(buffer_t *buffer);
 }
 #endif
 
-#endif /* !NET_BUFFER_H */
+#endif /* !TINYLIB_NET_BUFFER_H */
 

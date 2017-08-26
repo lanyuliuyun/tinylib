@@ -4,8 +4,8 @@
  *  现统称为timer
  */
 
-#ifndef UTIL_TIME_WHEEL_H
-#define UTIL_TIME_WHEEL_H
+#ifndef TINYLIB_UTIL_TIME_WHEEL_H
+#define TINYLIB_UTIL_TIME_WHEEL_H
 
 struct time_wheel;
 typedef struct time_wheel time_wheel_t;

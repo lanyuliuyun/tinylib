@@ -1,8 +1,8 @@
 
 /** 协助 loop 实现异步任务功能，非对外操作接口 */
 
-#ifndef ASYNC_TASK_QUEUE_H
-#define ASYNC_TASK_QUEUE_H
+#ifndef TINYLIB_ASYNC_TASK_QUEUE_H
+#define TINYLIB_ASYNC_TASK_QUEUE_H
 
 struct async_task_queue;
 typedef struct async_task_queue async_task_queue_t;
@@ -23,4 +23,4 @@ void async_task_queue_submit(async_task_queue_t *task_queue, void(*callback)(voi
 }
 #endif
 
-#endif /* !ASYNC_TASK_QUEUE_H */
+#endif /* !TINYLIB_ASYNC_TASK_QUEUE_H */

@@ -1,8 +1,8 @@
 
 /** 本 eventloop 对外接口功能，接口方法均是线程安全的 */
 
-#ifndef NET_LOOP_H
-#define NET_LOOP_H
+#ifndef TINYLIB_NET_LOOP_H
+#define TINYLIB_NET_LOOP_H
 
 struct loop;
 typedef struct loop loop_t;
@@ -74,5 +74,5 @@ void loop_refresh(loop_t* loop, loop_timer_t *timer);
 }
 #endif
 
-#endif /* NET_LOOP_H */
+#endif /* TINYLIB_NET_LOOP_H */
 

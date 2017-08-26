@@ -1,6 +1,6 @@
 
-#ifndef NET_TCP_CLIENT_H
-#define NET_TCP_CLIENT_H
+#ifndef TINYLIB_NET_TCP_CLIENT_H
+#define TINYLIB_NET_TCP_CLIENT_H
 
 struct tcp_client;
 typedef struct tcp_client tcp_client_t;
@@ -30,4 +30,4 @@ void tcp_client_destroy(tcp_client_t* client);
 }
 #endif
 
-#endif /* !NET_TCP_CLIENT_H */
+#endif /* !TINYLIB_NET_TCP_CLIENT_H */

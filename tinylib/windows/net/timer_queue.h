@@ -1,8 +1,8 @@
 
 /** 协助 loop 实现timer，非对外操作接口 */
 
-#ifndef NET_TIMER_QUEUE_H
-#define NET_TIMER_QUEUE_H
+#ifndef TINYLIB_NET_TIMER_QUEUE_H
+#define TINYLIB_NET_TIMER_QUEUE_H
 
 struct timer_queue;
 typedef struct timer_queue timer_queue_t;
@@ -34,4 +34,4 @@ void timer_queue_process_inloop(timer_queue_t *timer_queue);
 }
 #endif
 
-#endif /* !NET_TIMER_QUEUE_H */
+#endif /* !TINYLIB_NET_TIMER_QUEUE_H */

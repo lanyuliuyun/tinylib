@@ -77,20 +77,20 @@ void connection_onevent(int fd, int event, void* userdata)
 
     if (event & EPOLLHUP)
     {
-		if (connection->need_closed_after_sent_done == 0)
-		{
-			connection->is_connected = 0;
-			connection->is_in_callback = 1;
-			connection->closecb(connection, connection->userdata);
-			connection->is_in_callback = 0;
-		}
-		else
-		{
-			/* 至此，connection 已被执行 destroy 过，仅仅是为了尝试将余下的数据尽可能的发出去而被保留到现在
-			 * 但不幸的是，链接已经被远端断开了，此时只能放弃该链接，将其销毁
-			 */
-			connection->is_alive = 0;
-		}
+        if (connection->need_closed_after_sent_done == 0)
+        {
+            connection->is_connected = 0;
+            connection->is_in_callback = 1;
+            connection->closecb(connection, connection->userdata);
+            connection->is_in_callback = 0;
+        }
+        else
+        {
+            /* 至此，connection 已被执行 destroy 过，仅仅是为了尝试将余下的数据尽可能的发出去而被保留到现在
+             * 但不幸的是，链接已经被远端断开了，此时只能放弃该链接，将其销毁
+             */
+            connection->is_alive = 0;
+        }
     }
     else
     {
@@ -300,17 +300,17 @@ int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, un
                 log_error("tcp_connection_sendInLoop: writev() failed, errno: %d, peer addr: %s:%u", errno, peer_addr->ip, peer_addr->port);
                 return -1;
             }
-			else
-			{
-				/* 尚未有数据提交发送OK，将本次新给的数据放入发送buffer，在后续 EPOLLOUT 事件中继续发送 */
-				buffer_append(out_buffer, data, size);
-				channel_setevent(channel, EPOLLOUT);
-			}
+            else
+            {
+                /* 尚未有数据提交发送OK，将本次新给的数据放入发送buffer，在后续 EPOLLOUT 事件中继续发送 */
+                buffer_append(out_buffer, data, size);
+                channel_setevent(channel, EPOLLOUT);
+            }
         }
         else if (written == (buffer_left_data_size+size))
         {
             /* 当前所有的数据都发送完毕，一切安好则去除EPOLLOUT事件 */
-			buffer_retrieveall(out_buffer);
+            buffer_retrieveall(out_buffer);
             channel_clearevent(channel, EPOLLOUT);
         }
         else if (written < buffer_left_data_size)
@@ -322,7 +322,7 @@ int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, un
         }
         else if (written < (buffer_left_data_size+size))
         {
-			/* out_buffer 中的数据发送完毕，但本次提交的数据部分未成功发送，将其放入 out_buffer 中，在后续 EPOLLOUT 事件中继续发送  */
+            /* out_buffer 中的数据发送完毕，但本次提交的数据部分未成功发送，将其放入 out_buffer 中，在后续 EPOLLOUT 事件中继续发送  */
             buffer_retrieveall(out_buffer);
             buffer_append(out_buffer, ((const char*)data+written-buffer_left_data_size), ((buffer_left_data_size+size)-written));
             channel_setevent(channel, EPOLLOUT);
@@ -333,28 +333,28 @@ int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, un
         written = write(fd, data, size);
         if (written < 0)
         {
-			error = errno;
+            error = errno;
             if (error != EAGAIN && error != EINTR)
             {
-				log_error("tcp_connection_sendInLoop: write() failed, errno: %d, peer addr: %s:%u", errno, peer_addr->ip, peer_addr->port);
-				return -1;
-			}
-			else
-			{
-				buffer_append(out_buffer, data, size);
-				channel_setevent(channel, EPOLLOUT);
-			}
+                log_error("tcp_connection_sendInLoop: write() failed, errno: %d, peer addr: %s:%u", errno, peer_addr->ip, peer_addr->port);
+                return -1;
+            }
+            else
+            {
+                buffer_append(out_buffer, data, size);
+                channel_setevent(channel, EPOLLOUT);
+            }
         }
         else if (written < size)
         {
             buffer_append(out_buffer, ((const char*)data+written), (size-written));
             channel_setevent(channel, EPOLLOUT);
         }
-		else
-		{
+        else
+        {
             /* 当前所有的数据都发送完毕，一切安好则去除EPOLLOUT事件 */
             channel_clearevent(channel, EPOLLOUT);
-		}
+        }
     }
 
     return 0;

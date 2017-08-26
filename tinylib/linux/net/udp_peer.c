@@ -399,7 +399,7 @@ int udp_peer_send2(udp_peer_t* peer, const void *message, unsigned len, const st
     }
 
     ret = 0;
-    result = sendto(peer->fd, message, len, 0, (const struct sockaddr*)&peer_addr, sizeof(*peer_addr));
+    result = sendto(peer->fd, message, len, 0, (const struct sockaddr*)peer_addr, sizeof(*peer_addr));
     if (len != result)
     {
         log_warn("udp_peer_send2: sendto() failed, errno: %d", errno);

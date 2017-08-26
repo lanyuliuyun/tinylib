@@ -2,7 +2,7 @@
 #include "tinylib/util/util.h"
 #include "tinylib/util/log.h"
 
-#ifdef WINNT
+#ifdef WIN32
 
 #include <windows.h>
 

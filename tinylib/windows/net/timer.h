@@ -1,6 +1,6 @@
 
-#ifndef NET_TIMER_H
-#define NET_TIMER_H
+#ifndef TINYLIB_NET_TIMER_H
+#define TINYLIB_NET_TIMER_H
 
 struct loop_timer;
 typedef struct loop_timer loop_timer_t;
@@ -15,4 +15,4 @@ typedef void (*onexpire_f)(void* userdata);
 }
 #endif
 
-#endif /* !NET_TIMER_H */
+#endif /* !TINYLIB_NET_TIMER_H */

@@ -1,6 +1,6 @@
 
-#ifndef UTIL_LOG_H
-#define UTIL_LOG_H
+#ifndef TINYLIB_UTIL_LOG_H
+#define TINYLIB_UTIL_LOG_H
 
 #include <stdarg.h>  /* for va_list */
 
@@ -65,4 +65,4 @@ void log_print(log_level_e level, const char *file, int line, const char *fmt, .
 }
 #endif
 
-#endif /* !UTIL_LOG_H */
+#endif /* !TINYLIB_UTIL_LOG_H */

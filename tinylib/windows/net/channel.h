@@ -1,8 +1,8 @@
 
 /** 协助 loop 实现IO事件检测功能，每个待检测的fd，请对应分配一个channel */
 
-#ifndef NET_CHANNEL_H
-#define NET_CHANNEL_H
+#ifndef TINYLIB_NET_CHANNEL_H
+#define TINYLIB_NET_CHANNEL_H
 
 struct channel;
 typedef struct channel channel_t;
@@ -47,5 +47,5 @@ void channel_setindex(channel_t* channel, int idx);
 }
 #endif
 
-#endif /* !NET_CHANNEL_H */
+#endif /* !TINYLIB_NET_CHANNEL_H */
 

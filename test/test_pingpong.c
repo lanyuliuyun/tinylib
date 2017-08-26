@@ -1,9 +1,9 @@
 
-#ifdef WINNT
-    #include "tinylib/net/udp_peer.h"
+#ifdef WIN32
+    #include "tinylib/windows/net/udp_peer.h"
     #include <winsock2.h>
 #elif defined(__linux__)
-    #include "tinylib/linux/udp_peer.h"
+    #include "tinylib/linux/net/udp_peer.h"
 #endif
 
 #include "tinylib/util/log.h"
@@ -38,7 +38,7 @@ void on_expire(void* userdata)
 
 int main(int argc, char *argv[])
 {
-    #ifdef WINNT
+    #ifdef WIN32
     WSADATA wsa_data;
     
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     udp_peer_destroy(g_udp_peer);
     loop_destroy(g_loop);
 
-    #ifdef WINNT
+    #ifdef WIN32
     WSACleanup();
     #endif
     

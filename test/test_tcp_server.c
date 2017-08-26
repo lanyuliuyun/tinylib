@@ -1,5 +1,5 @@
 
-#ifdef WINNT
+#ifdef WIN32
     #include "tinylib/windows/net/tcp_server.h"
     #include <winsock2.h>
 #elif defined(__linux__)
@@ -19,7 +19,7 @@ void on_data(tcp_connection_t* connection, buffer_t* buffer, void* userdata)
 {
     const inetaddr_t* addr = tcp_connection_getpeeraddr(connection);
     log_info("%u bytes recevied from %s:%u\n", buffer_readablebytes(buffer), addr->ip, addr->port);
-	
+    
     tcp_connection_send(connection, buffer_peek(buffer), buffer_readablebytes(buffer));
     buffer_retrieveall(buffer);
 
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     tcp_server_t *server;
     const char *ip;
 
-    #ifdef WINNT
+    #ifdef WIN32
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif    
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     tcp_server_destroy(server);
     loop_destroy(g_loop);
 
-    #ifdef WINNT
+    #ifdef WIN32
     WSACleanup();
     #endif    
 

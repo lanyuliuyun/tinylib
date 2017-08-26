@@ -1,5 +1,5 @@
-#ifndef NET_TCP_SERVER_H
-#define NET_TCP_SERVER_H
+#ifndef TINYLIB_NET_TCP_SERVER_H
+#define TINYLIB_NET_TCP_SERVER_H
 
 struct tcp_server;
 typedef struct tcp_server tcp_server_t;
@@ -29,4 +29,4 @@ void tcp_server_stop(tcp_server_t *server);
 }
 #endif
 
-#endif /* !NET_TCP_SERVER_H */
+#endif /* !TINYLIB_NET_TCP_SERVER_H */

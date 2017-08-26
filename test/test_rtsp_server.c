@@ -16,9 +16,9 @@ static
 void session_hander
 (
     rtsp_session_t* session, 
-	tcp_connection_t* connection, 
-	rtsp_request_msg_t *request_msg, 
-	void *userdata
+    tcp_connection_t* connection, 
+    rtsp_request_msg_t *request_msg, 
+    void *userdata
 )
 {
     char response[1024];
@@ -36,17 +36,17 @@ void session_hander
     const char *body;
     size_t body_len;
 
-	if (NULL == request_msg)
-	{
-		if (tcp_connection_connected(connection) == 0)
-		{
-			rtsp_session_end(session);
-			return;
-		}
+    if (NULL == request_msg)
+    {
+        if (tcp_connection_connected(connection) == 0)
+        {
+            rtsp_session_end(session);
+            return;
+        }
 
-		return;
-	}
-	
+        return;
+    }
+    
     printf("new request arrived:\n"
         "method: %d\n"
         "url: %s\n"
@@ -72,10 +72,10 @@ void session_hander
                        "\tclient_rtcp: %u\n"
                        "\tserver_rtp: %u\n"
                        "\tserver_rcp: %u\n"
-					   "\tssrc: %s\n"
-					   "\tinterleaved: %d\n"
-					   "\trtp_channel: %d\n"
-					   "\trtcp_channel: %d\n", 
+                       "\tssrc: %s\n"
+                       "\tinterleaved: %d\n"
+                       "\trtp_channel: %d\n"
+                       "\trtcp_channel: %d\n", 
                     transport->trans,
                     transport->cast,
                     transport->destination,
@@ -84,10 +84,10 @@ void session_hander
                     transport->client_rtcp_port,
                     transport->server_rtp_port,
                     transport->server_rtcp_port,
-					transport->ssrc,
-					transport->interleaved,
-					transport->rtp_channel,
-					transport->rtcp_channel);
+                    transport->ssrc,
+                    transport->interleaved,
+                    transport->rtp_channel,
+                    transport->rtcp_channel);
                 rtsp_transport_head_destroy(transport);
             }
             
@@ -139,7 +139,7 @@ void session_hander
     {
         transport_head.key = RTSP_HEAD_TRANSPORT;
         /* transport_head.value = "RTP/AVP;unicast;destination=192.168.0.1;source=192.168.0.2;client_port=61222-61223;server_port=6970-6971"; */
-		transport_head.value = "RTP/AVP/TCP;unicast;interleaved=0-1";
+        transport_head.value = "RTP/AVP/TCP;unicast;interleaved=0-1";
         transport_head.next = NULL;
 
         session_head.key = RTSP_HEAD_SESSION;
@@ -168,15 +168,15 @@ void session_hander
 static
 void interleaved_sink
 (
-	rtsp_session_t* session, 
-	unsigned char channel,
-	void* packet, unsigned short size,
-	void *userdata
+    rtsp_session_t* session, 
+    unsigned char channel,
+    void* packet, unsigned short size,
+    void *userdata
 )
 {
-	printf("interleaved packet: channel: %u, size: %u\n\n", channel, size);
-	
-	return;
+    printf("interleaved packet: channel: %u, size: %u\n\n", channel, size);
+    
+    return;
 }
 
 int main()

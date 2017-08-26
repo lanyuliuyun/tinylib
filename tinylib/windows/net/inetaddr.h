@@ -1,6 +1,6 @@
 
-#ifndef NET_INET_ADDR_H
-#define NET_INET_ADDR_H
+#ifndef TINYLIB_NET_INET_ADDR_H
+#define TINYLIB_NET_INET_ADDR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,5 +21,5 @@ void inetaddr_initbyipport(inetaddr_t *addr, const char *ip, unsigned short port
 }
 #endif
 
-#endif /* !NET_INET_ADDR_H  */
+#endif /* !TINYLIB_NET_INET_ADDR_H  */
 

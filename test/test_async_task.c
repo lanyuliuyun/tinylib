@@ -1,5 +1,5 @@
 
-#ifdef WINNT
+#ifdef WIN32
     #include "tinylib/windows/net/loop.h"
     #include <winsock2.h>
 #elif defined(__linux__)

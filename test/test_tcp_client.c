@@ -1,5 +1,5 @@
 
-#ifdef WINNT
+#ifdef WIN32
     #include "tinylib/windows/net/tcp_client.h"
     #include <winsock2.h>
 #elif defined(__linux__)
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     tcp_client_t* client1;
     const char *ip;
 
-    #ifdef WINNT
+    #ifdef WIN32
     WSADATA wsa_data;
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     tcp_client_destroy(client1);
     loop_destroy(g_loop);
 
-    #ifdef WINNT
+    #ifdef WIN32
     WSACleanup();
     #endif
 

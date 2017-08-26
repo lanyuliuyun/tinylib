@@ -1,10 +1,10 @@
 
-#ifndef UTIL_ATOMIC_H
-#define UTIL_ATOMIC_H
+#ifndef TINYLIB_UTIL_ATOMIC_H
+#define TINYLIB_UTIL_ATOMIC_H
 
 typedef long atomic_t;
 
-#ifdef WINNT
+#ifdef WIN32
 
 #include <windows.h>
 
@@ -46,4 +46,4 @@ typedef long atomic_t;
 
 #endif
 
-#endif /* !UTIL_ATOMIC_H */
+#endif /* !TINYLIB_UTIL_ATOMIC_H */

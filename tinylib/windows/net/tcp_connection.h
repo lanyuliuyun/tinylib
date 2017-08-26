@@ -1,8 +1,8 @@
 
 /* 表示一个一个活动的tcp连接 */
 
-#ifndef NET_TCP_CONNECTION_H
-#define NET_TCP_CONNECTION_H
+#ifndef TINYLIB_NET_TCP_CONNECTION_H
+#define TINYLIB_NET_TCP_CONNECTION_H
 
 struct tcp_connection;
 typedef struct tcp_connection tcp_connection_t;
@@ -53,5 +53,5 @@ void tcp_connection_expand_recv_buffer(tcp_connection_t *connection, unsigned si
 }
 #endif
 
-#endif /* !NET_TCP_CONNECTION_H */
+#endif /* !TINYLIB_NET_TCP_CONNECTION_H */
 

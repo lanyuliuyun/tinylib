@@ -5,14 +5,13 @@ CC = gcc
 LD = gcc
 AR = ar -r
 
-CPP_FLAGS = -I. -D_WIN32_WINNT=0x0601 -DWIN32_LEAN_AND_MEAN
-C_FLAGS = -Wall -Werror -fno-omit-frame-pointer -g
-LD_FLAGS = -L./output -ltinylib -lpthread -lws2_32
+CPP_FLAGS = -I.
+C_FLAGS = -Wall -Werror -fno-omit-frame-pointer -O0 -ggdb
+LD_FLAGS = -L./output -ltinylib -lpthread
 
 TINYLIB = output/libtinylib.a
 
 UTIL_OBJS = \
-	tinylib/util/base64.o \
 	tinylib/util/log.o \
 	tinylib/util/md5.o \
 	tinylib/util/time_wheel.o \
@@ -20,38 +19,38 @@ UTIL_OBJS = \
 	tinylib/util/util.o
 
 NET_OBJS = \
-	tinylib/windows/net/async_task_queue.o \
-	tinylib/windows/net/buffer.o \
-	tinylib/windows/net/channel.o \
-	tinylib/windows/net/inetaddr.o \
-	tinylib/windows/net/loop.o \
-	tinylib/windows/net/socket.o \
-	tinylib/windows/net/tcp_client.o \
-	tinylib/windows/net/tcp_connection.o \
-	tinylib/windows/net/tcp_server.o \
-	tinylib/windows/net/timer_queue.o \
-	tinylib/windows/net/udp_peer.o
+	tinylib/linux/net/async_task_queue.o \
+	tinylib/linux/net/buffer.o \
+	tinylib/linux/net/channel.o \
+	tinylib/linux/net/inetaddr.o \
+	tinylib/linux/net/loop.o \
+	tinylib/linux/net/socket.o \
+	tinylib/linux/net/tcp_client.o \
+	tinylib/linux/net/tcp_connection.o \
+	tinylib/linux/net/tcp_server.o \
+	tinylib/linux/net/timer_queue.o \
+	tinylib/linux/net/udp_peer.o
 
 # unit test
 
 # async_task
-TEST_ASYNC_TASK_BIN = output/test_async_task.exe
+TEST_ASYNC_TASK_BIN = output/test_async_task
 TEST_ASYNC_TASK_OBJS = test/test_async_task.o
 
 # async_task in multi-thread
-TEST_MT_ASYNC_TASK_BIN = output/test_mt_async_task.exe
+TEST_MT_ASYNC_TASK_BIN = output/test_mt_async_task
 TEST_MT_ASYNC_TASK_OBJS = test/test_mt_async_task.o
 
 ## atomic
-TEST_ATOMIC_BIN = output/test_atomic.exe
+TEST_ATOMIC_BIN = output/test_atomic
 TEST_ATOMIC_OBJS = test/test_atomic.o
 
 ## log
-TEST_LOG_BIN = output/test_log.exe
+TEST_LOG_BIN = output/test_log
 TEST_LOG_OBJS = test/test_log.o
 
 ## loop_timer
-TEST_LOOP_TIMER_BIN = output/test_loop_timer.exe
+TEST_LOOP_TIMER_BIN = output/test_loop_timer
 TEST_LOOP_TIMER_OBJS = test/test_loop_timer.o
 
 # timer in multi-thread
@@ -59,22 +58,26 @@ TEST_MT_TIMER_BIN = output/test_mt_timer
 TEST_MT_TIMER_OBJS = test/test_mt_timer.o
 
 ## md5
-TEST_MD5_BIN = output/test_md5.exe
+TEST_MD5_BIN = output/test_md5
 TEST_MD5_OBJS = test/test_md5.o
 
 ## tcp
-TEST_TCP_SERVER_BIN = output/test_tcp_server.exe
+TEST_TCP_SERVER_BIN = output/test_tcp_server
 TEST_TCP_SERVER_OBJS = test/test_tcp_server.o
-TEST_TCP_CLIENT_BIN = output/test_tcp_client.exe
+TEST_TCP_CLIENT_BIN = output/test_tcp_client
 TEST_TCP_CLIENT_OBJS = test/test_tcp_client.o
 
 ## time_wheel
-TEST_TIME_WHEEL_BIN = output/test_time_wheel.exe
+TEST_TIME_WHEEL_BIN = output/test_time_wheel
 TEST_TIME_WHEEL_OBJS = test/test_time_wheel.o
 
 ## url
-TEST_URL_BIN = output/test_url.exe
+TEST_URL_BIN = output/test_url
 TEST_URL_OBJS = test/test_url.o
+
+## test_pingpong
+TEST_PINGPONG_BIN = output/test_pingpong
+TEST_PINGPONG_OBJS = test/test_pingpong.o
 
 .PHONY: all clean test
 
@@ -93,7 +96,8 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	      $(TEST_TCP_CLIENT_OBJS) \
 	      $(TEST_TCP_SERVER_OBJS) \
 	      $(TEST_TIME_WHEEL_OBJS) \
-	      $(TEST_URL_OBJS)
+	      $(TEST_URL_OBJS) \
+		  $(TEST_PINGPONG_OBJS)
 	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MT_ASYNC_TASK_OBJS) -o $(TEST_MT_ASYNC_TASK_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) $(LD_FLAGS)
@@ -105,6 +109,7 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) $(LD_FLAGS)
+	$(LD) $(TEST_PINGPONG_OBJS) -o $(TEST_PINGPONG_BIN) $(LD_FLAGS)
 
 %.o: %.c
 	$(CC) -c $^ -o $@ $(CPP_FLAGS) $(C_FLAGS)
@@ -119,11 +124,8 @@ clean:
 	rm -f $(TEST_LOOP_TIMER_OBJS) $(TEST_LOOP_TIMER_BIN)
 	rm -f $(TEST_MT_TIMER_OBJS) $(TEST_MT_TIMER_BIN)
 	rm -f $(TEST_MD5_OBJS) $(TEST_MD5_BIN)
-	rm -f $(TEST_MSG_CODEC_OBJS) $(TEST_MSG_CODEC_BIN)
-	rm -f $(TEST_RTSP_REQUEST_OBJS) $(TEST_RTSP_REQUEST_BIN)
-	rm -f $(TEST_RTSP_SERVER_OBJS) $(TEST_RTSP_SERVER_BIN)
-	rm -f $(TEST_SDP_OBJS) $(TEST_SDP_BIN)
 	rm -f $(TEST_TCP_CLIENT_OBJS) $(TEST_TCP_CLIENT_BIN)
 	rm -f $(TEST_TCP_SERVER_OBJS) $(TEST_TCP_SERVER_BIN)
 	rm -f $(TEST_TIME_WHEEL_OBJS) $(TEST_TIME_WHEEL_BIN)
 	rm -f $(TEST_URL_OBJS) $(TEST_URL_BIN)
+	rm -f $(TEST_PINGPONG_OBJS) $(TEST_PINGPONG_BIN)

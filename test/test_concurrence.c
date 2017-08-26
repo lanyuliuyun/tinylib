@@ -1,5 +1,5 @@
 
-#ifdef WINNT
+#ifdef WIN32
     #include "tinylib/net/udp_peer.h"
     #include <winsock2.h>
 #elif defined(__linux__)
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     udp_peer_t *udp_peers[1024];
     int i;
     
-    #ifdef WINNT
+    #ifdef WIN32
     WSADATA wsa_data;
     
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     
     loop_destroy(loop);
     
-    #ifdef WINNT
+    #ifdef WIN32
     WSACleanup();
     #endif
     

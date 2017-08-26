@@ -15,22 +15,22 @@ extern "C" {
 struct rtp_peer;
 typedef struct rtp_peer rtp_peer_t;
 
-/* ³õÊ¼»¯Ò»¸örtp_peer³Ø
- * start_port Ö¸¶¨ËùÊ¹ÓÃµÄ¼àÌı¶Ë¿ÚµÄÆğÊ¼Öµ
- * peer_count Ö¸¶¨×î¶àÓĞ¶àÉÙ¸örtp_peer£¬Ò»¸örtp_peerÍ¬Ê±°üº¬rtp/rtcp¶Ëµã
- * ¹Ê¶øÊµ¼Ê×î¶à½«Õ¼ÓÃpeer_count * 2¸öUDP¶Ë¿Ú
+/* åˆå§‹åŒ–ä¸€ä¸ªrtp_peeræ± 
+ * start_port æŒ‡å®šæ‰€ä½¿ç”¨çš„ç›‘å¬ç«¯å£çš„èµ·å§‹å€¼
+ * peer_count æŒ‡å®šæœ€å¤šæœ‰å¤šå°‘ä¸ªrtp_peerï¼Œä¸€ä¸ªrtp_peeråŒæ—¶åŒ…å«rtp/rtcpç«¯ç‚¹
+ * æ•…è€Œå®é™…æœ€å¤šå°†å ç”¨peer_count * 2ä¸ªUDPç«¯å£
  */
 void rtp_peer_pool_init(unsigned start_port, unsigned peer_count);
 void rtp_peer_pool_uninit(void);
 
-/* ÔÚ¸ø¶¨µÄipÉÏ·ÖÅäÒ»¸örtp_peer£¬rtp/rtcp¶Ë¿ÚÊÇÅ¼ÆæÏàÁÚµÄ
- * rtpwritecb/rtcpwritecbÎªNULLÊ±±íÊ¾²»¸ĞÖª¶ÔÓ¦ÏûÏ¢µÄwriteÊÂ¼ş£¬ĞèÒªÊ±ÇëÀûÓÃudp_peer_onwrite()×ÔĞĞ½øĞĞ¹Ò½Ó
+/* åœ¨ç»™å®šçš„ipä¸Šåˆ†é…ä¸€ä¸ªrtp_peerï¼Œrtp/rtcpç«¯å£æ˜¯å¶å¥‡ç›¸é‚»çš„
+ * rtpwritecb/rtcpwritecbä¸ºNULLæ—¶è¡¨ç¤ºä¸æ„ŸçŸ¥å¯¹åº”æ¶ˆæ¯çš„writeäº‹ä»¶ï¼Œéœ€è¦æ—¶è¯·åˆ©ç”¨udp_peer_onwrite()è‡ªè¡Œè¿›è¡ŒæŒ‚æ¥
  */
 rtp_peer_t* rtp_peer_alloc
 (
-	loop_t* loop, const char *ip, 
-	on_message_f rtpcb, on_writable_f rtpwritecb, 
-	on_message_f rtcpcb, on_writable_f rtcpwritecb, void* userdata
+    loop_t* loop, const char *ip, 
+    on_message_f rtpcb, on_writable_f rtpwritecb, 
+    on_message_f rtcpcb, on_writable_f rtcpwritecb, void* userdata
 );
 
 void rtp_peer_free(rtp_peer_t* peer);
@@ -43,7 +43,7 @@ udp_peer_t* rtp_peer_get_rtp_udppeer(rtp_peer_t* peer);
 
 udp_peer_t* rtp_peer_get_rtcp_udppeer(rtp_peer_t* peer);
 
-/* ÏòÖ¸¶¨µÄµØÖ··¢ËÍÒ»¸öRTCP BYEÏûÏ¢ */
+/* å‘æŒ‡å®šçš„åœ°å€å‘é€ä¸€ä¸ªRTCP BYEæ¶ˆæ¯ */
 void rtp_peer_bye(rtp_peer_t* peer, const inetaddr_t *peer_addr);
 
 #ifdef __cplusplus

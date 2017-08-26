@@ -6,7 +6,7 @@
 #include <time.h>
 #include <string.h>
 
-#ifdef WINNT
+#ifdef WIN32
     #include <windows.h>        /* for GetLocalTime() */
 #elif defined(__linux__)
     #include <sys/time.h>        /* for gettimeofday() */
@@ -26,7 +26,7 @@ void log_write(log_level_e level, const char *file, int line, const char *fmt, v
     
     FILE *fp;
 
-  #ifdef WINNT
+  #ifdef WIN32
     SYSTEMTIME systime;
     DWORD threadId;
   #elif defined(__linux__)
@@ -63,7 +63,7 @@ void log_write(log_level_e level, const char *file, int line, const char *fmt, v
     }
 
     memset(time_head, 0, sizeof(time_head));
-  #ifdef WINNT
+  #ifdef WIN32
     GetLocalTime(&systime);
     snprintf(time_head, sizeof(time_head)-1, "%u-%02u-%02u %02u:%02u:%02u.%03u", 
         systime.wYear, systime.wMonth, systime.wDay, systime.wHour, systime.wMinute, systime.wSecond, systime.wMilliseconds);

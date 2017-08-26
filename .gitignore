@@ -3,3 +3,6 @@
 *.o.cubie
 *.o.raspi
 *.exe
+output/
+build/
+.vscode/

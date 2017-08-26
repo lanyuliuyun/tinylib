@@ -18,154 +18,145 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\windows\net\udp_peer.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\async_task_queue.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\buffer.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\channel.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\inetaddr.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\loop.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\socket.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\tcp_client.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\tcp_connection.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\tcp_server.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\timer.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\windows\net\timer_queue.h">
-      <Filter>windows\net</Filter>
-    </ClInclude>
-    <ClInclude Include="..\rtsp\sdp.h">
+    <ClCompile Include="..\tinylib\rtsp\rtsp_message_codec.c">
       <Filter>rtsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\rtsp\rtsp_message_codec.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\rtsp\rtsp_request.c">
       <Filter>rtsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\rtsp\rtsp_request.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\rtsp\rtsp_server.c">
       <Filter>rtsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\rtsp\rtsp_server.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\rtsp\rtsp_session.c">
       <Filter>rtsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\rtsp\rtsp_session.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\rtsp\sdp.c">
       <Filter>rtsp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\rtp\rtp_peer.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\rtp\rtp_peer.c">
       <Filter>rtp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\atomic.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\util\log.c">
       <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\log.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\util\time_wheel.c">
       <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\md5.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\util\url.c">
       <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\time_wheel.h">
+    </ClCompile>
+    <ClCompile Include="..\tinylib\util\util.c">
       <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\url.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\util.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\base64.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\util\lock.h">
-      <Filter>util</Filter>
-    </ClInclude>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\async_task_queue.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\buffer.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\channel.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\inetaddr.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\loop.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\socket.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\tcp_client.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\tcp_connection.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\tcp_server.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\timer_queue.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tinylib\windows\net\udp_peer.c">
+      <Filter>windows\net</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\windows\net\async_task_queue.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\buffer.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\channel.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\inetaddr.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\loop.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\socket.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\tcp_client.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\tcp_connection.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\tcp_server.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\timer_queue.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\windows\net\udp_peer.c">
-      <Filter>windows\net</Filter>
-    </ClCompile>
-    <ClCompile Include="..\rtsp\rtsp_message_codec.c">
+    <ClInclude Include="..\tinylib\rtsp\rtsp_message_codec.h">
       <Filter>rtsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\rtsp\rtsp_request.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\rtsp\rtsp_request.h">
       <Filter>rtsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\rtsp\rtsp_server.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\rtsp\rtsp_server.h">
       <Filter>rtsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\rtsp\rtsp_session.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\rtsp\rtsp_session.h">
       <Filter>rtsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\rtsp\sdp.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\rtsp\sdp.h">
       <Filter>rtsp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\rtp\rtp_peer.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\rtp\rtp_peer.h">
       <Filter>rtp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\log.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\rtp\rtp_rtcp_packet.h">
+      <Filter>rtp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\util\atomic.h">
       <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\md5.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\util\lock.h">
       <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\time_wheel.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\util\log.h">
       <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\url.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\util\time_wheel.h">
       <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\util.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\util\url.h">
       <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\util\base64.c">
+    </ClInclude>
+    <ClInclude Include="..\tinylib\util\util.h">
       <Filter>util</Filter>
-    </ClCompile>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\async_task_queue.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\buffer.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\channel.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\inetaddr.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\loop.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\socket.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\tcp_client.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\tcp_connection.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\tcp_server.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\timer.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\timer_queue.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
+    <ClInclude Include="..\tinylib\windows\net\udp_peer.h">
+      <Filter>windows\net</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
