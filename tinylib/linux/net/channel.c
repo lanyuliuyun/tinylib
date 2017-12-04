@@ -4,6 +4,7 @@
 #include "tinylib/util/log.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <unistd.h>
 #include <sys/epoll.h>

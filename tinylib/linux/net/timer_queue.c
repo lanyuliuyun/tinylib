@@ -55,7 +55,7 @@ timer_queue_t* timer_queue_create(loop_t *loop)
     timer_queue->loop = loop;
     timer_queue->timer_list = NULL;
     timer_queue->timer_list_end = NULL;
-    get_current_timestamp(&timer_queue->min_timestamp);
+    timer_queue->min_timestamp = ts_ms();
 
     return timer_queue;
 }
@@ -153,7 +153,7 @@ void remove_timer_inloop(timer_queue_t *timer_queue, loop_timer_t *timer)
         else
         {
             timer_queue->timer_list_end = NULL;
-            get_current_timestamp(&timer_queue->min_timestamp);
+            timer_queue->min_timestamp = ts_ms();
         }
     }
     else if (timer_queue->timer_list_end == timer)
@@ -284,12 +284,9 @@ void do_timer_queue_refresh(void *userdata)
 {
     loop_timer_t *timer = (loop_timer_t*)userdata;
     timer_queue_t *timer_queue = timer->timer_queue;
-    
-    unsigned long long now;
 
     remove_timer_inloop(timer_queue, timer);
-    get_current_timestamp(&now);
-    timer->timestamp = now + timer->interval;
+    timer->timestamp = ts_ms() + timer->interval;
     timer->prev = NULL;
     timer->next = NULL;
     insert_timer_inloop(timer_queue, timer);
@@ -328,8 +325,7 @@ long timer_queue_gettimeout(timer_queue_t *timer_queue)
         return 100;
     }
 
-    get_current_timestamp(&now);
-
+    now = ts_ms();
     interval = (long)(timer_queue->min_timestamp - now);
 
     timeout = 100;
@@ -365,7 +361,7 @@ void timer_queue_process_inloop(timer_queue_t *timer_queue)
         return;
     }
 
-    get_current_timestamp(&now);
+    now = ts_ms();
 
     /* 寻找第一个时间戳大于now的节点，在该节点之前的所有timer均为已超时 */
     timer = timer_queue->timer_list;

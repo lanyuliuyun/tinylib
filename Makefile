@@ -1,9 +1,11 @@
 
 # makfile for a tiny net/rtsp library written by huangsanyi
 
-CC = gcc
-LD = gcc
-AR = ar -r
+TOOLCHAIN_PREFIX ?= arm-sunxiA20-linux-gnueabi-
+
+CC = $(TOOLCHAIN_PREFIX)gcc
+LD = $(TOOLCHAIN_PREFIX)gcc
+AR = $(TOOLCHAIN_PREFIX)ar -r
 
 CPP_FLAGS = -I.
 C_FLAGS = -Wall -Werror -fno-omit-frame-pointer -O0 -ggdb

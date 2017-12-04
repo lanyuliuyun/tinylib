@@ -339,9 +339,7 @@ loop_timer_t* loop_runafter(loop_t* loop, unsigned interval, onexpire_f expirecb
         return NULL;
     }
 
-    get_current_timestamp(&timestamp);
-    timestamp += interval;
-
+    timestamp = ts_ms() + interval;
     return timer_queue_add(loop->timer_queue, timestamp, 0, expirecb, userdata);
 }
 
@@ -355,9 +353,7 @@ loop_timer_t* loop_runevery(loop_t* loop, unsigned interval, onexpire_f expirecb
         return NULL;
     }
 
-    get_current_timestamp(&timestamp);
-    timestamp += interval;
-
+    timestamp = ts_ms() + interval;
     return timer_queue_add(loop->timer_queue, timestamp, interval, expirecb, userdata);
 }
 

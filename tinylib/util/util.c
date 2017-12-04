@@ -6,44 +6,38 @@
 
 #include <windows.h>
 
-void get_current_timestamp(unsigned long long *timestamp)
+unsigned long long now_ms(void)
 {
-    FILETIME now;
-    ULARGE_INTEGER ularg;
+    FILETIME now_fs;
+    GetSystemTimeAsFileTime(&now_fs);
 
-    if (NULL == timestamp)
-    {
-        log_error("get_current_timestamp: bad timestamp");
-        return;
-    }
+    return ((ULARGE_INTEGER*)&now_fs)->QuadPart / 10000;
+}
 
-    GetSystemTimeAsFileTime(&now);
-    memcpy(&ularg, &now, sizeof(ularg));
-
-    /* ularg单位为100ns，除以10000转换成ms */
-    *timestamp = ularg.QuadPart / 10000;
-
-    return;
+unsigned long long ts_ms(void)
+{
+    return now_ms();
 }
 
 #elif defined(__linux__)
 
+#include <time.h>
 #include <sys/time.h>
 
-void get_current_timestamp(unsigned long long *timestamp)
+unsigned long long now_ms(void)
 {
     struct timeval tv;
-
-    if (NULL == timestamp)
-    {
-        log_error("get_current_timestamp: bad timestamp");
-        return;
-    }
-
     gettimeofday(&tv, NULL);
-    *timestamp = tv.tv_sec * 1000 + tv.tv_usec / 1000;
 
-    return;
+    return tv.tv_sec * 1000 + tv.tv_usec / 1000;
+}
+
+unsigned long long ts_ms(void)
+{
+    struct timespec tspec;
+    clock_gettime(CLOCK_MONOTONIC, &tspec);
+
+    return tspec.tv_sec * 1000 + tspec.tv_nsec / 1000000;
 }
 
 #endif
