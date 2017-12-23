@@ -42,6 +42,7 @@ void delete_client(tcp_client_t* client)
     channel_detach(client->channel);
     channel_destroy(client->channel);
     tcp_connection_destroy(client->connection);
+    close(client->fd);
     free(client);
 
     return;
@@ -99,9 +100,6 @@ void client_onevent(int fd, int event, void* userdata)
     {
         log_error("failed to make connection to %s:%u, errno: %d", client->peer_addr.ip, client->peer_addr.port, errno);
 
-        close(client->fd);
-        client->fd = -1;
-        
         /* 通知用户连接失败了 */
         client->is_in_callback = 1;
         client->connectedcb(NULL, client->userdata);

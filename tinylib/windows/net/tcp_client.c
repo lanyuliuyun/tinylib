@@ -36,6 +36,7 @@ void delete_client(tcp_client_t* client)
     channel_detach(client->channel);
     channel_destroy(client->channel);
     tcp_connection_destroy(client->connection);
+    closesocket(client->fd);
     free(client);
 
     return;
@@ -107,8 +108,8 @@ void client_onevent(SOCKET fd, short event, void* userdata)
 
         return;
     }
-    
-    if (POLLWRNORM & event)
+
+    if (POLLOUT & event)
     {
         log_debug("connection to %s:%u is ready", client->peer_addr.ip, client->peer_addr.port);
 
@@ -208,13 +209,12 @@ void do_tcp_client_connect(void *userdata)
     {
         client->channel = channel_new(fd, client->loop, client_onevent, client);
         client->fd = fd;
-        channel_setevent(client->channel, POLLWRNORM);
+        channel_setevent(client->channel, POLLOUT);
     }
     else
     {
         log_error("tcp_client_connect: WSAConnect() failed, errno: %d, dest: %s:%u", error, client->peer_addr.ip, client->peer_addr.port);
 
-        closesocket(fd);
         client->is_in_callback = 1;
         client->connectedcb(NULL, client->userdata);
         client->is_in_callback = 0;
