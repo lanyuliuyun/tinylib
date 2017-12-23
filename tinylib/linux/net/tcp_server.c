@@ -199,7 +199,7 @@ void do_tcp_server_start(void* userdata)
 
         server->channel = channel_new(server->fd, server->loop, server_onevent, server);
 
-        if (listen(server->fd, 512) != 0)
+        if (listen(server->fd, SOMAXCONN) != 0)
         {
             log_error("do_tcp_server_start: listen() failed, errno: %d, local addr: %s:%u", errno, server->addr.ip, server->addr.port);
             break;
