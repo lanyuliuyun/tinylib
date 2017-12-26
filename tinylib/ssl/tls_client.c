@@ -84,10 +84,10 @@ void delete_tls_client(tls_client_t* tls_client)
     return;
 }
 
-tls_client_t* tls_client_new(loop_t *loop, 
-    const char *server_ip, unsigned short server_port, 
-    tls_client_on_connect_f connectcb, tls_client_on_data_f datacb, tls_client_on_close_f closecb, void *userdata,
-    const char* ca_file, const char *private_key_file, const char *ca_pwd
+tls_client_t* tls_client_new
+(
+    loop_t *loop, const char *server_ip, unsigned short server_port, 
+    tls_client_on_connect_f connectcb, tls_client_on_data_f datacb, tls_client_on_close_f closecb, void *userdata
 )
 {
     tls_client_t *tls_client;
@@ -95,10 +95,7 @@ tls_client_t* tls_client_new(loop_t *loop,
     SSL_CTX *ssl_ctx;
     SSL *ssl;
 
-    if (loop == NULL || 
-        server_ip == NULL  || server_port == 0 || 
-        connectcb == NULL || datacb == NULL || closecb == NULL || 
-        ca_file == NULL || private_key_file == NULL || ca_pwd == NULL)
+    if (loop == NULL || server_ip == NULL  || server_port == 0 || connectcb == NULL || datacb == NULL || closecb == NULL)
     {
         return NULL;
     }
@@ -110,28 +107,7 @@ tls_client_t* tls_client_new(loop_t *loop,
             server_ip, server_port, errno);
         return NULL;
     }
-    
-    /* client端是否需要配置证书，要看server的协商要求
-     * 类似普通https之类的通信，无需client提供证书证明自己的身份
-     * 而类似Apple APNS消息推送和网银等场景，server端在协商结果里则要求client提供身份证书
-     */
-  #if 0
-    if (SSL_CTX_use_certificate_file(ssl_ctx, ca_file, SSL_FILETYPE_PEM) != 1)
-    {
-        log_error("tls_client_new: failed to load CA, server addr: %s:%u, errno: %d", server_ip, server_port, errno);
-        SSL_CTX_free(ssl_ctx);
-        return NULL;
-    }
-    SSL_CTX_set_default_passwd_cb_userdata(ssl_ctx, (char*)ca_pwd);
-    
-    if (private_key_file && SSL_CTX_use_PrivateKey_file(ssl_ctx, private_key_file, SSL_FILETYPE_PEM) != 1)
-    {
-        log_error("tls_client_new: failed to load CA private key, server addr: %s:%u, errno: %d", server_ip, server_port, errno);
-        SSL_CTX_free(ssl_ctx);
-        return NULL;
-    }
-  #endif
-    
+
     SSL_CTX_set_mode(ssl_ctx, SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER | SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_AUTO_RETRY);
 
     ssl = SSL_new(ssl_ctx);
@@ -168,6 +144,41 @@ tls_client_t* tls_client_new(loop_t *loop,
     tls_client->out_buffer = buffer_new(4096);
 
     return tls_client;
+}
+
+int tls_client_use_ca(tls_client_t* tls_client, const char* ca_file, const char *private_key_file, const char *ca_pwd)
+{
+    int ssl_ret;
+    int ssl_error;
+
+    if (tls_client == NULL || ca_file == NULL || ca_pwd == NULL)
+    {
+        return -1;
+    }
+
+    /* client端是否需要配置证书，要看server的协商要求
+     * 类似普通https之类的通信，无需client提供证书证明自己的身份
+     * 而类似Apple APNS消息推送和网银等场景，server端在协商结果里则要求client提供身份证书
+     */
+    ssl_ret = SSL_use_certificate_file(tls_client->ssl, ca_file, SSL_FILETYPE_PEM);
+    if (ssl_ret != 1)
+    {
+        ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+        log_error("tls_client_new: failed to load CA, dest server addr: %s:%u, ssl errno: %d, tls_client: %p", 
+            tls_client->server_ip, tls_client->server_port, ssl_error, tls_client);
+        return -1;
+    }
+    SSL_CTX_set_default_passwd_cb_userdata(tls_client->ssl_ctx, (char*)ca_pwd);
+
+    if (private_key_file && (ssl_ret = SSL_use_PrivateKey_file(tls_client->ssl, private_key_file, SSL_FILETYPE_PEM)) != 1)
+    {
+        ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+        log_error("tls_client_new: failed to load CA private key, dest server addr: %s:%u, ssl errno: %d, tls_client: %p", 
+            tls_client->server_ip, tls_client->server_port, ssl_error, tls_client);
+        return -1;
+    }
+
+    return 0;
 }
 
 static

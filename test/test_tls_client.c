@@ -47,7 +47,7 @@ static
 void on_close(tls_client_t* tls_client, void* userdata)
 {
     log_info("on_close: tls_client: %p", tls_client);
-    tls_client_destroy(tls_client);
+    
     loop_quit(loop);
     
     return;
@@ -56,18 +56,12 @@ void on_close(tls_client_t* tls_client, void* userdata)
 int main(int argc, char *argv[])
 {
     tls_client_t* tls_client;
-    const char *ca_file;
-    const char *key_file;
-    const char *ca_pwd;
     
-    if (argc < 4)
+    if (argc < 3)
     {
-        printf("usage: %s <ca file> <ca private key file> <ca password>\n", argv[0]);
+        printf("usage: %s <server ip> <server port>\n", argv[0]);
         return 0;
     }
-    ca_file = argv[1];
-    key_file = argv[2];
-    ca_pwd = argv[3];
 
   #ifdef WIN32
     {
@@ -75,21 +69,22 @@ int main(int argc, char *argv[])
         WSAStartup(MAKEWORD(2, 2), &wsadata);
     }
   #endif
-  
+
     SSL_library_init();
     SSL_load_error_strings();
 
     /* log_setlevel(LOG_LEVEL_DEBUG); */
 
     loop = loop_new(64);
-    tls_client = tls_client_new(loop, 
-        "192.168.137.2", 8443, 
-        on_connect, on_data, on_close, NULL, 
-        ca_file, key_file, ca_pwd);
+    tls_client = tls_client_new(loop, argv[1], (unsigned short)atoi(argv[2]), on_connect, on_data, on_close, NULL);
+    if (argc > 5)
+    {
+        tls_client_use_ca(tls_client, argv[3], argv[4], argv[5]);
+    }
     tls_client_connect(tls_client);
     loop_loop(loop);
 
-    /* tls_client_destroy(tls_client); */
+    tls_client_destroy(tls_client);
     loop_destroy(loop);
 
   #ifdef WIN32
