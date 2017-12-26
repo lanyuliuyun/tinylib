@@ -33,6 +33,10 @@ NET_OBJS = \
 	tinylib/linux/net/timer_queue.o \
 	tinylib/linux/net/udp_peer.o
 
+SSL_OBJS = \
+    tinylib/ssl/dtls_client.o \
+    tinylib/ssl/tls_client.o
+    
 # unit test
 
 # async_task
@@ -81,11 +85,21 @@ TEST_URL_OBJS = test/test_url.o
 TEST_PINGPONG_BIN = output/test_pingpong
 TEST_PINGPONG_OBJS = test/test_pingpong.o
 
-.PHONY: all clean test
+## test_pingpong
+TEST_UDPPEER_BIN = output/test_udp_peer
+TEST_UDPPEER_OBJS = test/test_udp_peer.o
+
+TEST_DTLS_CLIENT_BIN = output/test_dtls_client
+TEST_DTLS_CLIENT_OBJS = test/test_dtls_client.o
+
+TEST_TLS_CLIENT_BIN = output/test_tls_client
+TEST_TLS_CLIENT_OBJS = test/test_tls_client.o
+
+.PHONY: all clean
 
 all: $(TINYLIB)
 
-$(TINYLIB): $(NET_OBJS) $(UTIL_OBJS)
+$(TINYLIB): $(NET_OBJS) $(UTIL_OBJS) $(SSL_OBJS)
 	$(AR) $(TINYLIB) $^
 
 test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
@@ -99,7 +113,10 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	      $(TEST_TCP_SERVER_OBJS) \
 	      $(TEST_TIME_WHEEL_OBJS) \
 	      $(TEST_URL_OBJS) \
-		  $(TEST_PINGPONG_OBJS)
+		  $(TEST_PINGPONG_OBJS) \
+          $(TEST_UDPPEER_OBJS) \
+          $(TEST_DTLS_CLIENT_OBJS) \
+          $(TEST_TLS_CLIENT_OBJS)
 	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MT_ASYNC_TASK_OBJS) -o $(TEST_MT_ASYNC_TASK_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) $(LD_FLAGS)
@@ -112,13 +129,16 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_PINGPONG_OBJS) -o $(TEST_PINGPONG_BIN) $(LD_FLAGS)
+	$(LD) $(TEST_UDPPEER_OBJS) -o $(TEST_UDPPEER_BIN) $(LD_FLAGS)
+	$(LD) $(TEST_DTLS_CLIENT_OBJS) -o $(TEST_DTLS_CLIENT_BIN) $(LD_FLAGS) -lssl
+	$(LD) $(TEST_TLS_CLIENT_OBJS) -o $(TEST_TLS_CLIENT_BIN) $(LD_FLAGS) -lssl
 
 %.o: %.c
 	$(CC) -c $^ -o $@ $(CPP_FLAGS) $(C_FLAGS)
 
 clean:
 	rm -f $(TINYLIB)
-	rm -f $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS)
+	rm -f $(NET_OBJS) $(RTP_OBJS) $(RTSP_OBJS) $(UTIL_OBJS) $(SSL_OBJS)
 	rm -f $(TEST_ASYNC_TASK_OBJS) $(TEST_ASYNC_TASK_BIN)
 	rm -f $(TEST_MT_ASYNC_TASK_OBJS) $(TEST_MT_ASYNC_TASK_BIN)
 	rm -f $(TEST_ATOMIC_OBJS) $(TEST_ATOMIC_BIN)
@@ -131,3 +151,6 @@ clean:
 	rm -f $(TEST_TIME_WHEEL_OBJS) $(TEST_TIME_WHEEL_BIN)
 	rm -f $(TEST_URL_OBJS) $(TEST_URL_BIN)
 	rm -f $(TEST_PINGPONG_OBJS) $(TEST_PINGPONG_BIN)
+	rm -f $(TEST_UDPPEER_OBJS) $(TEST_UDPPEER_BIN)
+	rm -f $(TEST_DTLS_CLIENT_OBJS) $(TEST_DTLS_CLIENT_BIN)
+	rm -f $(TEST_TLS_CLIENT_OBJS) $(TEST_TLS_CLIENT_BIN)

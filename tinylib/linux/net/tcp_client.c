@@ -216,7 +216,6 @@ void do_tcp_client_connect(void *userdata)
         }
         default:
         {
-            close(fd);
             log_error("tcp_client_connect: connect() failed, peer addr: %s:%u, errno: %d", 
                 client->peer_addr.ip, client->peer_addr.port, err);
 
