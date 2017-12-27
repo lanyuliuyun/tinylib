@@ -1,5 +1,5 @@
 
-/** a basic  TLSv1.2 client implementation using openssl */
+/** a basic TLSv1.2 client implementation using openssl */
 
 #ifndef TINYLIB_SSL_TLS_CLIENT_H
 #define TINYLIB_SSL_TLS_CLIENT_H
@@ -22,10 +22,10 @@ typedef void (*tls_client_on_connect_f)(tls_client_t* tls_client, int ok, void* 
 typedef void (*tls_client_on_data_f)(tls_client_t* tls_client, buffer_t* buffer, void* userdata);
 typedef void (*tls_client_on_close_f)(tls_client_t* tls_client, void* userdata);
 
-tls_client_t* tls_client_new(
+tls_client_t* tls_client_new
+(
     loop_t *loop, const char *server_ip, unsigned short server_port, 
-    tls_client_on_connect_f connectcb, tls_client_on_data_f datacb, 
-    tls_client_on_close_f closecb, void *userdata
+    tls_client_on_connect_f connectcb, tls_client_on_data_f datacb, tls_client_on_close_f closecb, void *userdata
 );
 
 /* 根据需要，指定client端使用的证书，仅支持PEM格式 */

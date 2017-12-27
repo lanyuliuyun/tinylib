@@ -8,7 +8,7 @@ LD = $(TOOLCHAIN_PREFIX)gcc
 AR = $(TOOLCHAIN_PREFIX)ar -r
 
 CPP_FLAGS = -I.
-C_FLAGS = -Wall -Werror -fno-omit-frame-pointer -O0 -ggdb
+C_FLAGS = -Wall -Werror -fno-omit-frame-pointer -O0 -ggdb -pthread
 LD_FLAGS = -L./output -ltinylib -lpthread
 
 TINYLIB = output/libtinylib.a

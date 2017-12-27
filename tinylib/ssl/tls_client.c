@@ -37,7 +37,6 @@ enum tls_state
     TLS_STATE_INIT,
     TLS_STATE_HANDSHAKE,
     TLS_STATE_SNDRCV,
-    TLS_STATE_SHUTDOWN,
 };
 
 struct tls_client
@@ -67,12 +66,16 @@ struct tls_client
 };
 
 static inline
-void delete_tls_client(tls_client_t* tls_client)
+void delete_tls_client(tls_client_t* tls_client, int is_passive_close)
 {
-    SSL_shutdown(tls_client->ssl);
+    if (tls_client->tls_state == TLS_STATE_SNDRCV && is_passive_close == 0)
+    {
+        SSL_shutdown(tls_client->ssl);
+    }
+
     SSL_free(tls_client->ssl);
     SSL_CTX_free(tls_client->ssl_ctx);
-    
+
     buffer_destory(tls_client->in_buffer);
     buffer_destory(tls_client->out_buffer);
 
@@ -191,7 +194,7 @@ void do_tls_client_destroy(void *userdata)
     }
     else
     {
-        delete_tls_client(tls_client);
+        delete_tls_client(tls_client, 0);
     }
 
     return;
@@ -214,6 +217,7 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
     tls_client_t *tls_client = (tls_client_t*)userdata;
     int ssl_ret;
     int ssl_error;
+    int is_passive_close = 0;
 
     assert(tls_client->fd == fd);
 
@@ -301,6 +305,7 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
                 ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
                 if (ssl_error == SSL_ERROR_ZERO_RETURN)
                 {
+                    is_passive_close = 1;
                     tls_client->is_in_callback = 1;
                     tls_client->closecb(tls_client, tls_client->userdata);
                     tls_client->is_in_callback = 0;
@@ -322,16 +327,17 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
         if (event & POLLOUT)
         {
             void *data = buffer_peek(tls_client->out_buffer);
-            unsigned data_size = buffer_readablebytes(tls_client->out_buffer);
+            int data_size = (int)buffer_readablebytes(tls_client->out_buffer);
+            assert(data_size > 0);
 
-            ssl_ret = SSL_write(tls_client->ssl, data, (int)data_size);
+            ssl_ret = SSL_write(tls_client->ssl, data, data_size);
             if (ssl_ret > 0)
             {
+                assert(ssl_ret <= data_size);
                 buffer_retrieve(tls_client->out_buffer, (unsigned)ssl_ret);
                 if (ssl_ret == data_size)
                 {
                     channel_clearevent(tls_client->channel, POLLOUT);
-                    channel_setevent(tls_client->channel, POLLIN);
                 }
             }
             else
@@ -339,6 +345,7 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
                 ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
                 if (ssl_error == SSL_ERROR_ZERO_RETURN)
                 {
+                    is_passive_close = 1;
                     tls_client->is_in_callback = 1;
                     tls_client->closecb(tls_client, tls_client->userdata);
                     tls_client->is_in_callback = 0;
@@ -365,7 +372,7 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
 
     if (tls_client->is_alive == 0)
     {
-        delete_tls_client(tls_client);
+        delete_tls_client(tls_client, is_passive_close);
     }
     
     return;
@@ -400,7 +407,7 @@ void do_tls_client_connect(void *userdata)
 
         if (tls_client->is_alive == 0)
         {
-            delete_tls_client(tls_client);
+            delete_tls_client(tls_client, 0);
         }
 
         return;
@@ -452,7 +459,7 @@ void do_tls_client_connect(void *userdata)
 
             if (tls_client->is_alive == 0)
             {
-                delete_tls_client(tls_client);
+                delete_tls_client(tls_client, 0);
             }
 
             return;
@@ -489,60 +496,147 @@ struct tls_client_send_msg
 };
 
 static
-void do_tls_client_send(void *userdata)
+int do_ssl_send_inloop(tls_client_t* tls_client, const void *data, int size)
 {
-    struct tls_client_send_msg *send_msg = (struct tls_client_send_msg*)userdata;
-    tls_client_t *tls_client = send_msg->tls_client;
-    
     int ssl_ret;
     int ssl_error;
-    void *data;
-    unsigned data_size;
+    int is_passive_close = 0;
 
-    buffer_append(tls_client->out_buffer, send_msg->data, send_msg->size);
-    free(send_msg);
-    
-    data = buffer_peek(tls_client->out_buffer);
-    data_size = buffer_readablebytes(tls_client->out_buffer);
-    
-    ssl_ret = SSL_write(tls_client->ssl, data, (int)data_size);
-    if (ssl_ret > 0)
+    void *pending_data = buffer_peek(tls_client->out_buffer);
+    int pending_data_size = (int)buffer_readablebytes(tls_client->out_buffer);
+
+    if (pending_data_size > 0)
     {
-        buffer_retrieve(tls_client->out_buffer, (unsigned)ssl_ret);
-        if (ssl_ret == data_size)
+        ssl_ret = SSL_write(tls_client->ssl, pending_data, pending_data_size);
+        if (ssl_ret > 0)
         {
-            channel_clearevent(tls_client->channel, POLLOUT);
-            channel_setevent(tls_client->channel, POLLIN);
+            assert(ssl_ret <= pending_data_size);
+            buffer_retrieve(tls_client->out_buffer, (unsigned)ssl_ret);
+            pending_data_size -= ssl_ret;
+
+            if (pending_data_size > 0)
+            {
+                buffer_append(tls_client->out_buffer, data, (unsigned)size);
+                channel_setevent(tls_client->channel, POLLOUT);
+                return 0;
+            }
+
+            /* 至此表明之前的pending的数据已经全部发送完成，接下来发送新提交的数据 */
+
+            ssl_ret = SSL_write(tls_client->ssl, data, size);
+            if (ssl_ret > 0)
+            {
+                assert(ssl_ret <= size);
+                size -= ssl_ret;
+                if (size > 0)
+                {
+                    buffer_append(tls_client->out_buffer, (const char*)data+ssl_ret, (unsigned)size);
+                    channel_setevent(tls_client->channel, POLLOUT);   
+                }
+                else
+                {
+                    /* 本次的新提交的数据全部发送完毕，一些安好，nothing todo */
+                }
+
+                return 0;
+            }
+
+            /* 至此表明发送操作未能成功进行, 需要根据 error code 区分处理 */
+
+            ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+            if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
+            {
+                buffer_append(tls_client->out_buffer, data, (unsigned)size);
+                channel_setevent(tls_client->channel, POLLOUT);
+                return 0;
+            }
+            else
+            {
+                log_error("do_ssl_send_inloop: ssl write error: %d, tls_client: %p, server: %s:%u", 
+                    ssl_error, tls_client, tls_client->server_ip, tls_client->server_port);
+                tls_client->is_in_callback = 1;
+                tls_client->closecb(tls_client, tls_client->userdata);
+                tls_client->is_in_callback = 0;
+            }
+        }
+        else
+        {
+            ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+            if (ssl_error == SSL_ERROR_ZERO_RETURN)
+            {
+                is_passive_close = 1;
+                tls_client->is_in_callback = 1;
+                tls_client->closecb(tls_client, tls_client->userdata);
+                tls_client->is_in_callback = 0;
+            }
+            else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
+            {
+                buffer_append(tls_client->out_buffer, data, (unsigned)size);
+                channel_setevent(tls_client->channel, POLLOUT);
+                return 0;
+            }
+            else
+            {
+                log_error("tls_client_send: ssl write error: %d, tls_client: %p, server: %s:%u", 
+                    ssl_error, tls_client, tls_client->server_ip, tls_client->server_port);
+                tls_client->is_in_callback = 1;
+                tls_client->closecb(tls_client, tls_client->userdata);
+                tls_client->is_in_callback = 0;
+            }
         }
     }
     else
     {
-        ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
-        if (ssl_error == SSL_ERROR_ZERO_RETURN)
+        ssl_ret = SSL_write(tls_client->ssl, data, size);
+        if (ssl_ret > 0)
         {
-            tls_client->is_in_callback = 1;
-            tls_client->closecb(tls_client, tls_client->userdata);
-            tls_client->is_in_callback = 0;
+            assert(ssl_ret <= size);
+            size -= ssl_ret;
+            if (size > 0)
+            {
+                buffer_append(tls_client->out_buffer, (const char*)data+ssl_ret, (unsigned)size);
+                channel_setevent(tls_client->channel, POLLOUT);   
+            }
+            else
+            {
+                /* 本次的新提交的数据全部发送完毕，一些安好，nothing todo */
+            }
+            return 0;
         }
-        else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
+
+        /* 至此表明发送操作未能成功进行 */
+
+        ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+        if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
         {
-            /* nothing todo */
+            buffer_append(tls_client->out_buffer, data, (unsigned)size);
+            channel_setevent(tls_client->channel, POLLOUT);
+            return 0;
         }
         else
         {
-            log_error("do_tls_client_send: ssl write error: %d, tls_client: %p, server: %s:%u", 
+            log_error("do_ssl_send_inloop: ssl write error: %d, tls_client: %p, server: %s:%u", 
                 ssl_error, tls_client, tls_client->server_ip, tls_client->server_port);
             tls_client->is_in_callback = 1;
             tls_client->closecb(tls_client, tls_client->userdata);
             tls_client->is_in_callback = 0;
         }
     }
-
+    
     if (tls_client->is_alive == 0)
     {
-        delete_tls_client(tls_client);
+        delete_tls_client(tls_client, is_passive_close);
     }
 
+    return 0;
+}
+
+static
+void do_tls_client_send(void *userdata)
+{
+    struct tls_client_send_msg *send_msg = (struct tls_client_send_msg*)userdata;
+    do_ssl_send_inloop(send_msg->tls_client, send_msg->data, (int)send_msg->size);
+    free(send_msg);
     return;
 }
 
@@ -562,8 +656,7 @@ int tls_client_send(tls_client_t* tls_client, const void *data, unsigned size)
 
     if (loop_inloopthread(tls_client->loop))
     {
-        buffer_append(tls_client->out_buffer, data, size);
-        channel_setevent(tls_client->channel, POLLOUT);
+        do_ssl_send_inloop(tls_client, data, (int)size);
     }
     else
     {

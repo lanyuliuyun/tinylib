@@ -16,6 +16,14 @@ loop_t *loop;
 static
 void on_connect(tls_client_t* tls_client, int ok, void* userdata)
 {
+  #if 0
+    const char *http_request = 
+        "GET / HTTP/1.1\r\n"
+        "Host: 192.168.137.2:8443\r\n"
+        "User-Agent: curl/7.47.0\r\n"
+        "Accept: text/plain\r\n"
+        "\r\n";
+  #else
     const char *http_request = 
         "GET / HTTP/1.1\r\n"
         "Host: 192.168.137.2:8443\r\n"
@@ -23,11 +31,12 @@ void on_connect(tls_client_t* tls_client, int ok, void* userdata)
         "Connection: close\r\n"
         "Accept: text/plain\r\n"
         "\r\n";
-    
+  #endif
+
     log_info("on_connect: tls_client: %p, ok: %d", tls_client, ok);
-    
+
     tls_client_send(tls_client, http_request, strlen(http_request));
-    
+
     return;
 }
 
@@ -39,6 +48,16 @@ void on_data(tls_client_t* tls_client, buffer_t* buffer, void* userdata)
     
     fwrite(data, 1, size, stdout);
     fwrite("\n\n", 1, 2, stdout);
+    
+    buffer_retrieveall(buffer);
+
+  #if 0
+    tls_client_destroy(tls_client);
+  #endif
+
+  #if 0
+    loop_quit(loop);
+  #endif
 
     return;
 }
@@ -84,7 +103,7 @@ int main(int argc, char *argv[])
     tls_client_connect(tls_client);
     loop_loop(loop);
 
-    tls_client_destroy(tls_client);
+    /* tls_client_destroy(tls_client); */
     loop_destroy(loop);
 
   #ifdef WIN32
