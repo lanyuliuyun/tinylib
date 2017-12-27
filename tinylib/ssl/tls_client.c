@@ -44,7 +44,7 @@ struct tls_client
     loop_t *loop;
     SOCKET fd;    
     channel_t *channel;
-    
+
     tls_client_on_connect_f connectcb;
     tls_client_on_data_f datacb;
     tls_client_on_close_f closecb;
@@ -52,11 +52,12 @@ struct tls_client
 
     char server_ip[16];
     unsigned short server_port;
-    
+
     SSL_CTX *ssl_ctx;
     SSL *ssl;
     enum tls_state tls_state;
-    
+    char *ca_password;
+
     int is_in_callback;
     int is_alive;
 
@@ -75,6 +76,7 @@ void delete_tls_client(tls_client_t* tls_client, int is_passive_close)
 
     SSL_free(tls_client->ssl);
     SSL_CTX_free(tls_client->ssl_ctx);
+    free(tls_client->ca_password);
 
     buffer_destory(tls_client->in_buffer);
     buffer_destory(tls_client->out_buffer);
@@ -83,7 +85,7 @@ void delete_tls_client(tls_client_t* tls_client, int is_passive_close)
     channel_destroy(tls_client->channel);
     closesocket(tls_client->fd);
     free(tls_client);
-    
+
     return;
 }
 
@@ -132,14 +134,15 @@ tls_client_t* tls_client_new
     tls_client->datacb = datacb;
     tls_client->closecb = closecb;
     tls_client->userdata = userdata;
-    
+
     strncpy(tls_client->server_ip, server_ip, sizeof(tls_client->server_ip));
     tls_client->server_port = server_port;
 
     tls_client->ssl_ctx = ssl_ctx;
     tls_client->ssl = ssl;
     tls_client->tls_state = TLS_STATE_INIT;
-    
+    tls_client->ca_password = NULL;
+
     tls_client->is_in_callback = 0;
     tls_client->is_alive = 1;
 
@@ -149,14 +152,31 @@ tls_client_t* tls_client_new
     return tls_client;
 }
 
+static
+int default_pem_passwd_cb(char *buf, int size, int rwflag, void *password)
+{
+    size_t password_len = strlen(password);
+    strncpy(buf, password, (password_len)+1);
+
+    return (int)password_len;
+}
+
 int tls_client_use_ca(tls_client_t* tls_client, const char* ca_file, const char *private_key_file, const char *ca_pwd)
 {
     int ssl_ret;
     int ssl_error;
 
-    if (tls_client == NULL || ca_file == NULL || ca_pwd == NULL)
+    if (tls_client == NULL || ca_file == NULL)
     {
         return -1;
+    }
+    
+    /* 仅当是证书加密过的才需要提供密码 */
+    if (ca_pwd != NULL)
+    {
+        SSL_CTX_set_default_passwd_cb(tls_client->ssl_ctx, default_pem_passwd_cb);
+        tls_client->ca_password = strdup(ca_pwd);
+        SSL_CTX_set_default_passwd_cb_userdata(tls_client->ssl_ctx, tls_client->ca_password);
     }
 
     /* client端是否需要配置证书，要看server的协商要求
@@ -167,19 +187,27 @@ int tls_client_use_ca(tls_client_t* tls_client, const char* ca_file, const char 
     if (ssl_ret != 1)
     {
         ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
-        log_error("tls_client_new: failed to load CA, dest server addr: %s:%u, ssl errno: %d, tls_client: %p", 
-            tls_client->server_ip, tls_client->server_port, ssl_error, tls_client);
+        log_error("tls_client_new: failed to load CA, ssl errno: %d, tls_client: %p", 
+            ssl_error, tls_client);
         return -1;
     }
-    SSL_CTX_set_default_passwd_cb_userdata(tls_client->ssl_ctx, (char*)ca_pwd);
 
     if (private_key_file && (ssl_ret = SSL_use_PrivateKey_file(tls_client->ssl, private_key_file, SSL_FILETYPE_PEM)) != 1)
     {
         ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
-        log_error("tls_client_new: failed to load CA private key, dest server addr: %s:%u, ssl errno: %d, tls_client: %p", 
-            tls_client->server_ip, tls_client->server_port, ssl_error, tls_client);
+        log_error("tls_client_new: failed to load CA private key, ssl errno: %d, tls_client: %p", 
+            ssl_error, tls_client);
         return -1;
     }
+
+    ssl_ret = SSL_check_private_key(tls_client->ssl);
+    if (ssl_ret != 1)
+    {
+        ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+        log_error("tls_client_new: check ssl private key failed, ssl errno: %d, tls_client: %p", ssl_error, tls_client);
+        return -1;
+    }
+    
 
     return 0;
 }
@@ -227,7 +255,6 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
         if (event & (POLLHUP | POLLERR))
         {
             log_error("tls_client_onevent: fatal to connect to %s:%u, tls_client: %p", tls_client->server_ip, tls_client->server_port, tls_client);
-            
             tls_client->is_in_callback = 1;
             tls_client->connectcb(tls_client, 0, tls_client->userdata);
             tls_client->is_in_callback = 0;
@@ -244,12 +271,11 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
             if (ssl_ret == 1)
             {
                 tls_client->tls_state = TLS_STATE_SNDRCV;
-
                 tls_client->is_in_callback = 1;
                 tls_client->connectcb(tls_client, 1, tls_client->userdata);
                 tls_client->is_in_callback = 0;
             }
-            else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
+            else if (ssl_ret < 0 && (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE))
             {
                 /* keep going and nothing todo */
             }
@@ -264,103 +290,122 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
     }
     else if (tls_client->tls_state == TLS_STATE_HANDSHAKE)
     {
-        ssl_ret = SSL_connect(tls_client->ssl);
-        ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
-        if (ssl_ret == 1)
+        if (event & (POLLHUP | POLLERR))
         {
-            tls_client->tls_state = TLS_STATE_SNDRCV;
-
+            log_error("tls_client_onevent: handeshake state, connection to %s:%u was broken, tls_client: %p", tls_client->server_ip, tls_client->server_port, tls_client);
             tls_client->is_in_callback = 1;
-            tls_client->connectcb(tls_client, 1, tls_client->userdata);
+            tls_client->connectcb(tls_client, 0, tls_client->userdata);
             tls_client->is_in_callback = 0;
-        }
-        else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
-        {
-            /* keep going and nothing todo */
         }
         else
         {
-            log_error("tls_client_onevent: fatal ssl error: %d, tls state: %d, tls_client: %p", ssl_error, tls_client->tls_state, tls_client);
-            
-            tls_client->is_in_callback = 1;
-            tls_client->connectcb(tls_client, 0, tls_client->userdata);
-            tls_client->is_in_callback = 1;
+            ssl_ret = SSL_connect(tls_client->ssl);
+            ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+            if (ssl_ret == 1)
+            {
+                tls_client->tls_state = TLS_STATE_SNDRCV;
+                tls_client->is_in_callback = 1;
+                tls_client->connectcb(tls_client, 1, tls_client->userdata);
+                tls_client->is_in_callback = 0;
+            }
+            else if (ssl_ret < 0 && (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE))
+            {
+                /* keep going and nothing todo */
+            }
+            else
+            {
+                log_error("tls_client_onevent: handeshake state, fatal ssl error: %d, tls state: %d, tls_client: %p", ssl_error, tls_client->tls_state, tls_client);
+                tls_client->is_in_callback = 1;
+                tls_client->connectcb(tls_client, 0, tls_client->userdata);
+                tls_client->is_in_callback = 1;
+            }
         }
     }
     else if (tls_client->tls_state == TLS_STATE_SNDRCV)
     {
-        if (event & POLLIN)
+        if (event & (POLLHUP | POLLERR))
         {
-            ssl_ret = SSL_read(tls_client->ssl, tls_client->temp_buffer, sizeof(tls_client->temp_buffer));
-            if (ssl_ret > 0)
-            {
-                buffer_append(tls_client->in_buffer, tls_client->temp_buffer, ssl_ret);
-                
-                tls_client->is_in_callback = 1;
-                tls_client->datacb(tls_client, tls_client->in_buffer, tls_client->userdata);
-                tls_client->is_in_callback = 0;
-            }
-            else
-            {
-                ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
-                if (ssl_error == SSL_ERROR_ZERO_RETURN)
-                {
-                    is_passive_close = 1;
-                    tls_client->is_in_callback = 1;
-                    tls_client->closecb(tls_client, tls_client->userdata);
-                    tls_client->is_in_callback = 0;
-                }
-                else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
-                {
-                    /* nothing todo */
-                }
-                else
-                {
-                    log_error("tls_client_onevent: ssl read error: %d, tls_client: %p, server: %s:%u", 
-                        ssl_error, tls_client, tls_client->server_ip, tls_client->server_port);
-                    tls_client->is_in_callback = 1;
-                    tls_client->closecb(tls_client, tls_client->userdata);
-                    tls_client->is_in_callback = 0;
-                }
-            }
+            log_error("tls_client_onevent: snd-recv state, connection to %s:%u was broken, tls_client: %p", tls_client->server_ip, tls_client->server_port, tls_client);
+            is_passive_close = 1;
+            tls_client->is_in_callback = 1;
+            tls_client->closecb(tls_client, tls_client->userdata);
+            tls_client->is_in_callback = 0;
         }
-        if (event & POLLOUT)
+        else
         {
-            void *data = buffer_peek(tls_client->out_buffer);
-            int data_size = (int)buffer_readablebytes(tls_client->out_buffer);
-            assert(data_size > 0);
-
-            ssl_ret = SSL_write(tls_client->ssl, data, data_size);
-            if (ssl_ret > 0)
+            if (event & POLLIN)
             {
-                assert(ssl_ret <= data_size);
-                buffer_retrieve(tls_client->out_buffer, (unsigned)ssl_ret);
-                if (ssl_ret == data_size)
+                ssl_ret = SSL_read(tls_client->ssl, tls_client->temp_buffer, sizeof(tls_client->temp_buffer));
+                if (ssl_ret > 0)
                 {
-                    channel_clearevent(tls_client->channel, POLLOUT);
-                }
-            }
-            else
-            {
-                ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
-                if (ssl_error == SSL_ERROR_ZERO_RETURN)
-                {
-                    is_passive_close = 1;
+                    buffer_append(tls_client->in_buffer, tls_client->temp_buffer, ssl_ret);
+                    
                     tls_client->is_in_callback = 1;
-                    tls_client->closecb(tls_client, tls_client->userdata);
+                    tls_client->datacb(tls_client, tls_client->in_buffer, tls_client->userdata);
                     tls_client->is_in_callback = 0;
-                }
-                else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
-                {
-                    /* nothing todo */
                 }
                 else
                 {
-                    log_error("tls_client_onevent: ssl write error: %d, tls_client: %p, server: %s:%u", 
-                        ssl_error, tls_client, tls_client->server_ip, tls_client->server_port);
-                    tls_client->is_in_callback = 1;
-                    tls_client->closecb(tls_client, tls_client->userdata);
-                    tls_client->is_in_callback = 0;
+                    ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+                    if (ssl_error == SSL_ERROR_ZERO_RETURN)
+                    {
+                        is_passive_close = 1;
+                        tls_client->is_in_callback = 1;
+                        tls_client->closecb(tls_client, tls_client->userdata);
+                        tls_client->is_in_callback = 0;
+                    }
+                    else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
+                    {
+                        /* nothing todo */
+                    }
+                    else
+                    {
+                        log_error("tls_client_onevent: ssl read error: %d, tls_client: %p, server: %s:%u", 
+                            ssl_error, tls_client, tls_client->server_ip, tls_client->server_port);
+                        tls_client->is_in_callback = 1;
+                        tls_client->closecb(tls_client, tls_client->userdata);
+                        tls_client->is_in_callback = 0;
+                    }
+                }
+            }
+            if (event & POLLOUT)
+            {
+                void *data = buffer_peek(tls_client->out_buffer);
+                int data_size = (int)buffer_readablebytes(tls_client->out_buffer);
+                assert(data_size > 0);
+
+                ssl_ret = SSL_write(tls_client->ssl, data, data_size);
+                if (ssl_ret > 0)
+                {
+                    assert(ssl_ret <= data_size);
+                    buffer_retrieve(tls_client->out_buffer, (unsigned)ssl_ret);
+                    if (ssl_ret == data_size)
+                    {
+                        channel_clearevent(tls_client->channel, POLLOUT);
+                    }
+                }
+                else
+                {
+                    ssl_error = SSL_get_error(tls_client->ssl, ssl_ret);
+                    if (ssl_error == SSL_ERROR_ZERO_RETURN)
+                    {
+                        is_passive_close = 1;
+                        tls_client->is_in_callback = 1;
+                        tls_client->closecb(tls_client, tls_client->userdata);
+                        tls_client->is_in_callback = 0;
+                    }
+                    else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
+                    {
+                        /* nothing todo */
+                    }
+                    else
+                    {
+                        log_error("tls_client_onevent: ssl write error: %d, tls_client: %p, server: %s:%u", 
+                            ssl_error, tls_client, tls_client->server_ip, tls_client->server_port);
+                        tls_client->is_in_callback = 1;
+                        tls_client->closecb(tls_client, tls_client->userdata);
+                        tls_client->is_in_callback = 0;
+                    }
                 }
             }
         }
@@ -374,7 +419,7 @@ void tls_client_onevent(SOCKET fd, int event, void* userdata)
     {
         delete_tls_client(tls_client, is_passive_close);
     }
-    
+
     return;
 }
 
