@@ -72,6 +72,8 @@ TEST_TCP_SERVER_BIN = output/test_tcp_server
 TEST_TCP_SERVER_OBJS = test/test_tcp_server.o
 TEST_TCP_CLIENT_BIN = output/test_tcp_client
 TEST_TCP_CLIENT_OBJS = test/test_tcp_client.o
+TEST_TCP_CLIENT_BENCH_BIN = output/test_tcp_client_bench
+TEST_TCP_CLIENT_BENCH_OBJS = test/test_tcp_client_bench.o
 
 ## time_wheel
 TEST_TIME_WHEEL_BIN = output/test_time_wheel
@@ -95,6 +97,9 @@ TEST_DTLS_CLIENT_OBJS = test/test_dtls_client.o
 TEST_TLS_CLIENT_BIN = output/test_tls_client
 TEST_TLS_CLIENT_OBJS = test/test_tls_client.o
 
+TEST_TLS_CLIENT_BENCH_BIN = output/test_tls_client_bench
+TEST_TLS_CLIENT_BENCH_OBJS = test/test_tls_client_bench.o
+
 .PHONY: all clean
 
 all: $(TINYLIB)
@@ -102,21 +107,24 @@ all: $(TINYLIB)
 $(TINYLIB): $(NET_OBJS) $(UTIL_OBJS) $(SSL_OBJS)
 	$(AR) $(TINYLIB) $^
 
-test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
-	      $(TEST_MT_ASYNC_TASK_OBJS) \
-	      $(TEST_ATOMIC_OBJS) \
-	      $(TEST_LOG_OBJS) \
-	      $(TEST_LOOP_TIMER_OBJS) \
-	      $(TEST_MT_TIMER_OBJS) \
-	      $(TEST_MD5_OBJS) \
-	      $(TEST_TCP_CLIENT_OBJS) \
-	      $(TEST_TCP_SERVER_OBJS) \
-	      $(TEST_TIME_WHEEL_OBJS) \
-	      $(TEST_URL_OBJS) \
-		  $(TEST_PINGPONG_OBJS) \
-          $(TEST_UDPPEER_OBJS) \
-          $(TEST_DTLS_CLIENT_OBJS) \
-          $(TEST_TLS_CLIENT_OBJS)
+test: $(TINYLIB) \
+        $(TEST_ASYNC_TASK_OBJS) \
+        $(TEST_MT_ASYNC_TASK_OBJS) \
+        $(TEST_ATOMIC_OBJS) \
+        $(TEST_LOG_OBJS) \
+        $(TEST_LOOP_TIMER_OBJS) \
+        $(TEST_MT_TIMER_OBJS) \
+        $(TEST_MD5_OBJS) \
+        $(TEST_TCP_CLIENT_OBJS) \
+        $(TEST_TCP_CLIENT_BENCH_OBJS) \
+        $(TEST_TCP_SERVER_OBJS) \
+        $(TEST_TIME_WHEEL_OBJS) \
+        $(TEST_URL_OBJS) \
+        $(TEST_PINGPONG_OBJS) \
+        $(TEST_UDPPEER_OBJS) \
+        $(TEST_DTLS_CLIENT_OBJS) \
+        $(TEST_TLS_CLIENT_OBJS) \
+        $(TEST_TLS_CLIENT_BENCH_OBJS)
 	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MT_ASYNC_TASK_OBJS) -o $(TEST_MT_ASYNC_TASK_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_ATOMIC_OBJS) -o $(TEST_ATOMIC_BIN) $(LD_FLAGS)
@@ -125,6 +133,7 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	$(LD) $(TEST_MT_TIMER_OBJS) -o $(TEST_MT_TIMER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_MD5_OBJS) -o $(TEST_MD5_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_TCP_CLIENT_OBJS) -o $(TEST_TCP_CLIENT_BIN) $(LD_FLAGS)
+	$(LD) $(TEST_TCP_CLIENT_BENCH_OBJS) -o $(TEST_TCP_CLIENT_BENCH_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_TCP_SERVER_OBJS) -o $(TEST_TCP_SERVER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_TIME_WHEEL_OBJS) -o $(TEST_TIME_WHEEL_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) $(LD_FLAGS)
@@ -132,6 +141,7 @@ test: $(TINYLIB) $(TEST_ASYNC_TASK_OBJS) \
 	$(LD) $(TEST_UDPPEER_OBJS) -o $(TEST_UDPPEER_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_DTLS_CLIENT_OBJS) -o $(TEST_DTLS_CLIENT_BIN) $(LD_FLAGS) -lssl
 	$(LD) $(TEST_TLS_CLIENT_OBJS) -o $(TEST_TLS_CLIENT_BIN) $(LD_FLAGS) -lssl
+	$(LD) $(TEST_TLS_CLIENT_BENCH_OBJS) -o $(TEST_TLS_CLIENT_BENCH_BIN) $(LD_FLAGS) -lssl
 
 %.o: %.c
 	$(CC) -c $^ -o $@ $(CPP_FLAGS) $(C_FLAGS)
@@ -147,6 +157,7 @@ clean:
 	rm -f $(TEST_MT_TIMER_OBJS) $(TEST_MT_TIMER_BIN)
 	rm -f $(TEST_MD5_OBJS) $(TEST_MD5_BIN)
 	rm -f $(TEST_TCP_CLIENT_OBJS) $(TEST_TCP_CLIENT_BIN)
+	rm -f $(TEST_TCP_CLIENT_BENCH_OBJS) $(TEST_TCP_CLIENT_BENCH_BIN)
 	rm -f $(TEST_TCP_SERVER_OBJS) $(TEST_TCP_SERVER_BIN)
 	rm -f $(TEST_TIME_WHEEL_OBJS) $(TEST_TIME_WHEEL_BIN)
 	rm -f $(TEST_URL_OBJS) $(TEST_URL_BIN)
@@ -154,3 +165,4 @@ clean:
 	rm -f $(TEST_UDPPEER_OBJS) $(TEST_UDPPEER_BIN)
 	rm -f $(TEST_DTLS_CLIENT_OBJS) $(TEST_DTLS_CLIENT_BIN)
 	rm -f $(TEST_TLS_CLIENT_OBJS) $(TEST_TLS_CLIENT_BIN)
+	rm -f $(TEST_TLS_CLIENT_BENCH_OBJS) $(TEST_TLS_CLIENT_BENCH_BIN)
