@@ -13,7 +13,8 @@
 
 struct loop
 {
-    int run;
+    int started;
+    int quited;
     DWORD threadId;
 
     struct pollfd *pollfds;
@@ -55,7 +56,8 @@ loop_t* loop_new(unsigned hint)
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
     loop->threadId = 0;
-    loop->run = 0;
+    loop->started = 0;
+    loop->quited = 0;
     
     if (hint < 64)
     {
@@ -89,7 +91,6 @@ void loop_destroy(loop_t *loop)
     
     timer_queue_destroy(loop->timer_queue);
     async_task_queue_destroy(loop->task_queue);
-    
     free(loop->pollfds);
     free(loop->channels);
     free(loop);
@@ -123,7 +124,6 @@ int ensure_channel_slots(loop_t *loop)
     {
         loop->channels[i] = NULL;
     }
-
     loop->max_count = max_count;
 
     return 0;
@@ -150,11 +150,7 @@ void do_loop_update_channel(void* userdata)
 
     if (idx < 0)
     {
-        if (ensure_channel_slots(loop) != 0)
-        {
-            log_error("do_loop_update_channel: ensure_channel_slots() failed, fd: %lu, event: %d", fd, event);
-            return;
-        }
+        ensure_channel_slots(loop);
 
         idx = loop->count;
         pollfd = &loop->pollfds[idx];
@@ -229,8 +225,8 @@ void loop_run_inloop(loop_t* loop, void(*callback)(void *userdata), void* userda
     {
         return;
     }
-    
-    if ((loop->run == 0) || (loop->threadId == current_tid()))
+
+    if ((loop->started == 0) || (loop->threadId == current_tid()) || loop->quited)
     {
         callback(userdata);
     }
@@ -248,8 +244,8 @@ int loop_inloopthread(loop_t* loop)
     {
         return 0;
     }
-    
-    return (loop->threadId == current_tid()) ? 1 : 0;
+
+    return loop->threadId == current_tid();
 }
 
 void loop_loop(loop_t *loop)
@@ -268,9 +264,9 @@ void loop_loop(loop_t *loop)
     }
 
     loop->threadId = GetCurrentThreadId();
-    loop->run = 1;
+    loop->started = 1;
 
-    while (loop->run != 0)
+    while (loop->quited == 0)
     {
         timeout = timer_queue_gettimeout(loop->timer_queue);
         ret = WSAPoll(loop->pollfds, loop->count, (int)timeout);
@@ -291,7 +287,6 @@ void loop_loop(loop_t *loop)
                     active_channels_count++;
                 }
             }
-
             for (i = 0; i < active_channels_count; ++i)
             {
                 channel = loop->active_channels[i];
@@ -312,7 +307,7 @@ void loop_loop(loop_t *loop)
 static 
 void do_loop_quit(void* userdata)
 {
-    ((loop_t*)userdata)->run = 0;
+    ((loop_t*)userdata)->quited = 1;
 
     return;
 }
