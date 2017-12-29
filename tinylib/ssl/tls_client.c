@@ -207,7 +207,6 @@ int tls_client_use_ca(tls_client_t* tls_client, const char* ca_file, const char 
         log_error("tls_client_new: check ssl private key failed, ssl errno: %d, tls_client: %p", ssl_error, tls_client);
         return -1;
     }
-    
 
     return 0;
 }

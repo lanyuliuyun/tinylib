@@ -28,7 +28,10 @@ tls_client_t* tls_client_new
     tls_client_on_connect_f connectcb, tls_client_on_data_f datacb, tls_client_on_close_f closecb, void *userdata
 );
 
-/* 根据需要，指定client端使用的证书，仅支持PEM格式 */
+/* 根据需要，指定client端使用的证书，仅支持PEM格式 
+ * 如果key文件和cert文件是分离的，请通过private_key_file额外提供
+ * 如果证书是加密过的，请通过ca_pwd提供密码
+ */
 int tls_client_use_ca(tls_client_t* tls_client, const char* ca_file, const char *private_key_file, const char *ca_pwd);
 
 void tls_client_destroy(tls_client_t* tls_client);
