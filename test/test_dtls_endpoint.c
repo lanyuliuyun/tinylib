@@ -11,20 +11,48 @@
 #include <string.h>
 #include <signal.h>
 
+#include <stdint.h>
+
 #include <openssl/ssl.h>
 #include <openssl/opensslv.h>
 
 loop_t *loop;
 
+typedef struct rtp_head
+{
+    uint16_t V:2;
+    uint16_t P:1;
+    uint16_t X:1;
+    uint16_t CC:4;
+    uint16_t M:1;
+    uint16_t PT:7;
+
+    uint16_t SN;
+
+    uint32_t timestamp;
+    uint32_t ssrc;
+}rtp_head_t;
+
 static
 void on_handshanke(dtls_endoint_t* dtls_endoint, int ok, void* userdata)
 {
-    static const char *msg = "test dtls message\n";
-    
+    static char test_dtls_rtp_msg[32];
+    rtp_head_t *rtp = (rtp_head_t*)test_dtls_rtp_msg;
+	rtp->V = 2;
+	rtp->P = 0;
+	rtp->X = 0;
+	rtp->CC = 0;
+	rtp->PT = 96;
+	rtp->ssrc = 1234567;
+    rtp->M = 0;
+    rtp->SN = 0;
+    rtp->timestamp = 0;
+    strncpy((char*)&rtp[1], "test_dtls_srtp_msg", 19);
+
     if (ok)
     {
         printf("dtls handshake ok\n");
-        dtls_endoint_send(dtls_endoint, msg, strlen(msg));
+        dtls_endoint_send(dtls_endoint, test_dtls_rtp_msg, sizeof(test_dtls_rtp_msg));
     }
     else
     {
@@ -44,9 +72,14 @@ void on_shutdown(dtls_endoint_t* dtls_endoint, int normal, void* userdata)
 
 void on_message(dtls_endoint_t* dtls_endoint, void *message, unsigned size, void* userdata)
 {
-    printf("dtls message: ");
-    fwrite(message, 1, size, stdout);
+    rtp_head_t *rtp = (rtp_head_t*)message;
+
+    printf("dtls message:\n"
+           "  rtp, V:%d, P:%d, X:%d, CC:%d, M:%d, PT:%d, SN:%u, timestamp: %u, ssrc: %u\n  ", 
+        rtp->V, rtp->P, rtp->X, rtp->CC, rtp->M, rtp->PT, rtp->SN, rtp->timestamp, rtp->ssrc);
+    fwrite(&rtp[1], 1, (size - sizeof(*rtp)), stdout);
     printf("\n");
+
     return;
 }
 
@@ -90,7 +123,7 @@ int main(int argc, char *argv[])
         WSAStartup(MAKEWORD(2, 2), &wsadata);
     }
   #endif
-  
+
     printf("openssl version: %s\n", OPENSSL_VERSION_TEXT);
 
     SSL_library_init();
@@ -101,7 +134,7 @@ int main(int argc, char *argv[])
         peer_ip, peer_port, NULL, local_port,
         on_handshanke, on_shutdown, on_message, NULL, NULL,
         ca_file, key_file, ca_pwd, endpoint_mode);
-  #if 0
+  #if 1
     dtls_endoint_enable_srtp(dtls_endoint);
   #endif
     dtls_endoint_start(dtls_endoint);
