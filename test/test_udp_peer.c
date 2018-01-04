@@ -17,8 +17,8 @@ static udp_peer_t *g_udp_peer;
 static 
 void on_message(udp_peer_t *udp_peer, void *message, unsigned size, void* userdata, const inetaddr_t *peer_addr)
 {
-    fwrite(message, 1, size, stdout);
-    fwrite("\n", 1, 1, stdout);
+    fwrite(message, 1, size, stderr);
+    fwrite("\n", 1, 1, stderr);
 
     return;
 }
@@ -31,16 +31,16 @@ int main(int argc, char *argv[])
     WSAStartup(MAKEWORD(2, 2), &wsa_data);
     #endif
     
-    if (argc < 2)
+    if (argc < 3)
     {
-        printf("usage: %s <local port>\n", argv[0]);
+        printf("usage: %s <local ip> <local port>\n", argv[0]);
         return 0;
     }
     
     log_setlevel(LOG_LEVEL_DEBUG);
 
     g_loop = loop_new(1);
-    g_udp_peer = udp_peer_new(g_loop, "0.0.0.0", (unsigned short)atoi(argv[1]), on_message, NULL, NULL);
+    g_udp_peer = udp_peer_new(g_loop, argv[1], (unsigned short)atoi(argv[2]), on_message, NULL, NULL);
 
     loop_loop(g_loop);
 

@@ -1,7 +1,7 @@
 
 # makfile for a tiny net/rtsp library written by huangsanyi
 
-TOOLCHAIN_PREFIX ?= arm-sunxiA20-linux-gnueabi-
+TOOLCHAIN_PREFIX ?=
 
 CC = $(TOOLCHAIN_PREFIX)gcc
 LD = $(TOOLCHAIN_PREFIX)gcc
@@ -34,7 +34,7 @@ NET_OBJS = \
 	tinylib/linux/net/udp_peer.o
 
 SSL_OBJS = \
-    tinylib/ssl/dtls_client.o \
+    tinylib/ssl/dtls_endpoint.o \
     tinylib/ssl/tls_client.o
     
 # unit test
@@ -91,8 +91,8 @@ TEST_PINGPONG_OBJS = test/test_pingpong.o
 TEST_UDPPEER_BIN = output/test_udp_peer
 TEST_UDPPEER_OBJS = test/test_udp_peer.o
 
-TEST_DTLS_CLIENT_BIN = output/test_dtls_client
-TEST_DTLS_CLIENT_OBJS = test/test_dtls_client.o
+TEST_DTLS_ENDPOINT_BIN = output/test_dtls_endpoint
+TEST_DTLS_ENDPOINT_OBJS = test/test_dtls_endpoint.o
 
 TEST_TLS_CLIENT_BIN = output/test_tls_client
 TEST_TLS_CLIENT_OBJS = test/test_tls_client.o
@@ -122,7 +122,7 @@ test: $(TINYLIB) \
         $(TEST_URL_OBJS) \
         $(TEST_PINGPONG_OBJS) \
         $(TEST_UDPPEER_OBJS) \
-        $(TEST_DTLS_CLIENT_OBJS) \
+        $(TEST_DTLS_ENDPOINT_OBJS) \
         $(TEST_TLS_CLIENT_OBJS) \
         $(TEST_TLS_CLIENT_BENCH_OBJS)
 	$(LD) $(TEST_ASYNC_TASK_OBJS) -o $(TEST_ASYNC_TASK_BIN) $(LD_FLAGS)
@@ -139,7 +139,7 @@ test: $(TINYLIB) \
 	$(LD) $(TEST_URL_OBJS) -o $(TEST_URL_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_PINGPONG_OBJS) -o $(TEST_PINGPONG_BIN) $(LD_FLAGS)
 	$(LD) $(TEST_UDPPEER_OBJS) -o $(TEST_UDPPEER_BIN) $(LD_FLAGS)
-	$(LD) $(TEST_DTLS_CLIENT_OBJS) -o $(TEST_DTLS_CLIENT_BIN) $(LD_FLAGS) -lssl
+	$(LD) $(TEST_DTLS_ENDPOINT_OBJS) -o $(TEST_DTLS_ENDPOINT_BIN) $(LD_FLAGS) -lssl -lcrypto
 	$(LD) $(TEST_TLS_CLIENT_OBJS) -o $(TEST_TLS_CLIENT_BIN) $(LD_FLAGS) -lssl
 	$(LD) $(TEST_TLS_CLIENT_BENCH_OBJS) -o $(TEST_TLS_CLIENT_BENCH_BIN) $(LD_FLAGS) -lssl
 
@@ -163,6 +163,6 @@ clean:
 	rm -f $(TEST_URL_OBJS) $(TEST_URL_BIN)
 	rm -f $(TEST_PINGPONG_OBJS) $(TEST_PINGPONG_BIN)
 	rm -f $(TEST_UDPPEER_OBJS) $(TEST_UDPPEER_BIN)
-	rm -f $(TEST_DTLS_CLIENT_OBJS) $(TEST_DTLS_CLIENT_BIN)
+	rm -f $(TEST_DTLS_ENDPOINT_OBJS) $(TEST_DTLS_ENDPOINT_BIN)
 	rm -f $(TEST_TLS_CLIENT_OBJS) $(TEST_TLS_CLIENT_BIN)
 	rm -f $(TEST_TLS_CLIENT_BENCH_OBJS) $(TEST_TLS_CLIENT_BENCH_BIN)
