@@ -1,5 +1,6 @@
 
 #include "tinylib/util/log.h"
+#include "tinylib/util/util.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -9,9 +10,7 @@
 #ifdef WIN32
     #include <windows.h>        /* for GetLocalTime() */
 #elif defined(__linux__)
-    #include <sys/time.h>        /* for gettimeofday() */
-    #include <sys/syscall.h>    /* for SYS_gettid */
-    #include <unistd.h>            /* for syscall() */
+    #include <sys/time.h>       /* for gettimeofday() */
 #endif
 
 static log_level_e g_log_level = LOG_LEVEL_INFO;
@@ -28,12 +27,10 @@ void log_write(log_level_e level, const char *file, int line, const char *fmt, v
 
   #ifdef WIN32
     SYSTEMTIME systime;
-    DWORD threadId;
   #elif defined(__linux__)
     struct timeval tv;
     time_t tt;
     struct tm *tm;
-    pid_t threadId;
   #endif
 
     if (g_log_level < level)
@@ -67,14 +64,12 @@ void log_write(log_level_e level, const char *file, int line, const char *fmt, v
     GetLocalTime(&systime);
     snprintf(time_head, sizeof(time_head)-1, "%u-%02u-%02u %02u:%02u:%02u.%03u", 
         systime.wYear, systime.wMonth, systime.wDay, systime.wHour, systime.wMinute, systime.wSecond, systime.wMilliseconds);
-    threadId = GetCurrentThreadId();
   #elif defined(__linux__)
     gettimeofday(&tv, NULL);
     tt = tv.tv_sec;
     tm = localtime(&tt);
     snprintf(time_head, sizeof(time_head)-1, "%u-%02u-%02u %02u:%02u:%02u.%03u", 
         tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec, (unsigned)(tv.tv_usec/1000));
-    threadId = syscall(SYS_gettid);
   #endif
 
     memset(content, 0, sizeof(content));
@@ -86,7 +81,7 @@ void log_write(log_level_e level, const char *file, int line, const char *fmt, v
         fp = stderr;
     }
 
-    fprintf(fp, "[%s][%s] thread: %u on %s:%d %s\n", time_head, level_text, ((unsigned)threadId), file, line, content);
+    fprintf(fp, "[%s][%s] thread: %d on %s:%d %s\n", time_head, level_text, current_tid(), file, line, content);
 
     return;
 }

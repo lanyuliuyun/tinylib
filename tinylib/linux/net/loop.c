@@ -13,7 +13,6 @@
 #include <errno.h>
 #include <assert.h>
 #include <sys/resource.h>
-#include <sys/syscall.h>    /* for SYS_gettid */
 
 struct loop
 {
@@ -30,21 +29,7 @@ struct loop
 };
 
 static
-__thread int t_cachedTid = 0;
-
-static
 int s_max_open_files = 0;
-
-static
-int current_tid(void)
-{
-    if (t_cachedTid == 0)
-    {
-        t_cachedTid = (int)syscall(SYS_gettid);
-    }
-
-    return t_cachedTid;
-}
 
 static
 void get_max_open_files(void)
@@ -65,7 +50,6 @@ loop_t* loop_new(unsigned hint)
     loop_t* loop;
     int epfd;
 
-    (void)current_tid();
     get_max_open_files();
 
     loop = (loop_t*)malloc(sizeof(loop_t));

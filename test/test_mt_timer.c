@@ -24,7 +24,7 @@ static
 void user_routine(void* userdata)
 {
     log_info("user_routine");
-    
+
     return;
 }
 
@@ -33,6 +33,7 @@ void* thread_entry(void* arg)
 {
     while (1)
     {
+        log_info("sub thread call loop_runafter()");
         loop_runafter(loop, 1000, user_routine, NULL);
         usleep((random() % 1000) + 1594);
     }

@@ -9,6 +9,8 @@
 extern "C" {
 #endif
 
+int current_tid(void);
+
 /* 获取当前的时间戳，以ms为单位 */
 unsigned long long now_ms(void);
 

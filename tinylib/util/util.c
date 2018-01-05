@@ -6,6 +6,22 @@
 
 #include <windows.h>
 
+#ifdef _MSC_VER
+__declspec(thread) int t_cachedTid = 0;
+#elif defined(__GNUC__)
+__thread int t_cachedTid = 0;
+#endif
+
+int current_tid(void)
+{
+    if (t_cachedTid == 0)
+    {
+        t_cachedTid = (int)GetCurrentThreadId();
+    }
+
+    return t_cachedTid;
+}
+
 unsigned long long now_ms(void)
 {
     FILETIME now_fs;
@@ -23,6 +39,20 @@ unsigned long long ts_ms(void)
 
 #include <time.h>
 #include <sys/time.h>
+#include <sys/syscall.h>    /* for SYS_gettid */
+#include <unistd.h>         /* for syscall() */
+
+__thread int t_cachedTid = 0;
+
+int current_tid(void)
+{
+    if (t_cachedTid == 0)
+    {
+        t_cachedTid = (int)syscall(SYS_gettid);
+    }
+
+    return t_cachedTid;
+}
 
 unsigned long long now_ms(void)
 {

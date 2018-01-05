@@ -15,7 +15,7 @@ struct loop
 {
     int started;
     int quited;
-    DWORD threadId;
+    int threadId;
 
     struct pollfd *pollfds;
     channel_t **channels;
@@ -27,31 +27,9 @@ struct loop
     timer_queue_t *timer_queue;
 };
 
-#ifdef _MSC_VER
-static
-__declspec(thread) DWORD t_cachedTid = 0;
-#elif defined(__GNUC__)
-static
-__thread int t_cachedTid = 0;
-#endif
-
-static
-DWORD current_tid(void)
-{
-    if (t_cachedTid == 0)
-    {
-        t_cachedTid = GetCurrentThreadId();
-    }
-
-    return t_cachedTid;
-}
-
-
 loop_t* loop_new(unsigned hint)
 {
     loop_t* loop;
-    
-    (void)current_tid();
 
     loop = (loop_t*)malloc(sizeof(loop_t));
     memset(loop, 0, sizeof(*loop));
@@ -263,7 +241,7 @@ void loop_loop(loop_t *loop)
         return;
     }
 
-    loop->threadId = GetCurrentThreadId();
+    loop->threadId = current_tid();
     loop->started = 1;
 
     while (loop->quited == 0)
