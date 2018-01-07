@@ -7,3 +7,7 @@
 具体的使用方法见test目录下的用例。
 
 IMPORTANCE: This repo is NOT product-ready ! You guys are at your own RISK to use it in your development !
+
+TODO:
+1, 目前可读事件响应时，只执行了一次读操作，可优化为重复读直至读清，以减少事件通知浪费。
+2, 为UDP发送增加显示指定固定目标目标地址的接口，以减少内核中重复临时connect的消耗。
