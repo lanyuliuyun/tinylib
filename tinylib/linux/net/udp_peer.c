@@ -85,7 +85,7 @@ void udp_peer_onevent(int fd, int event, void* userdata)
             memset(&addr, 0, sizeof(addr));
             addr_len = sizeof(addr);
             ret = recvfrom(peer->fd, chunk_buffer, max_chunk_size, 0, (struct sockaddr*)&addr, &addr_len);
-            if (ret > 0)
+            if (ret >= 0)
             {
                 *chunk_size = (unsigned short)ret;
                 inetaddr_init(addr_buffer, &addr);

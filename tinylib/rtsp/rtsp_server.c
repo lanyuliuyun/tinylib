@@ -1,11 +1,6 @@
 
 #include "tinylib/rtsp/rtsp_server.h"
-#ifdef WIN32
-  #include "tinylib/windows/net/tcp_server.h"
-#else
-  #include "tinylib/linux/net/tcp_server.h"
-#endif
-
+#include "tinylib/net/tcp_server.h"
 #include "tinylib/util/log.h"
 
 #include <string.h>

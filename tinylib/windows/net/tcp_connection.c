@@ -81,6 +81,7 @@ void connection_onevent(SOCKET fd, short event, void* userdata)
     {
         if (POLLIN & event)
         {
+            /* FIXME:每次响应可读事件，只执行一次 read 操作，有些浪费 poller 的通知，考虑循环读至读清 */
             in_buffer = connection->in_buffer;
             size = buffer_readFd(in_buffer, connection->fd);
             if (0 == size)

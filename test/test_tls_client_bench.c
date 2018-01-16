@@ -2,8 +2,8 @@
 #include "tinylib/ssl/tls_client.h"
 #include "tinylib/util/log.h"
 
-#ifdef WIN32
-#include <winsock2.h>
+#if defined(WIN32)
+  #include <winsock2.h>
 #endif
 
 #include <stdio.h>

@@ -1,12 +1,7 @@
 
 #include "tinylib/rtsp/rtsp_session.h"
 
-#ifdef WIN32
-  #include "tinylib/windows/net/buffer.h"
-#else
-  #include "tinylib/linux/net/buffer.h"
-#endif
-
+#include "tinylib/net/buffer.h"
 #include "tinylib/rtsp/rtsp_message_codec.h"
 #include "tinylib/util/log.h"
 

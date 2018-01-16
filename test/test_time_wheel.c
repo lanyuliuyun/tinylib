@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-#ifdef WIN32
+#if defined(WIN32)
     #include <windows.h>
     #define usleep Sleep
 #elif defined(__linux__)

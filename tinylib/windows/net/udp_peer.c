@@ -360,6 +360,8 @@ void udp_peer_destroy(udp_peer_t* peer)
     return;
 }
 
+/* TODO: 若发送目的地是固定不变的，可考虑 connect() 显式的指定目标地址，省去kernel中重复临时connect() 操作 */
+
 /* 由于udp的简单性，请使用者自行完成报文分片，保证每次的message尺寸小于mtu, 本发送接口只做简单发送，不做缓存重发 */
 int udp_peer_send(udp_peer_t* peer, const void *message, unsigned len, const inetaddr_t *peer_addr)
 {

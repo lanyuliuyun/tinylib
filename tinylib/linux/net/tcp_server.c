@@ -80,7 +80,8 @@ void server_onevent(int fd, int event, void* userdata)
     inetaddr_t peer_addr;
 
     log_debug("server_onevent: fd(%d), event(%d), local addr(%s:%u)", fd, event, server->addr.ip, server->addr.port);
-
+    
+    /* FIXME:每次响应可读事件，只执行一次 accept() 操作，有些浪费 poller 的通知，考虑循环 accept() 直至读清 */
     len = sizeof(addr);
     memset(&addr, 0, len);
     client_fd = accept(server->fd, (struct sockaddr*)&addr, &len);
@@ -101,6 +102,8 @@ void server_onevent(int fd, int event, void* userdata)
 
         return;
     }
+
+    /* FIXME: when the errno is EINTR/ECONNABORTED, when we should go back and try again */
 
     inetaddr_init(&peer_addr, &addr);
 

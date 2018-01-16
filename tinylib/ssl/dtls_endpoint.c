@@ -2,12 +2,12 @@
 #include "tinylib/ssl/dtls_endpoint.h"
 #include "tinylib/util/log.h"
 
-#ifdef WIN32
+#if defined(WIN32)
   #include "tinylib/windows/net/socket.h"
   #include <winsock2.h>
 
   #define errno WSAGetLastError()
-#else
+#elif defined(__linux__)
   #include "tinylib/linux/net/socket.h"
   #include <unistd.h>
   #include <errno.h>
@@ -43,11 +43,7 @@ enum dtls_state
 struct dtls_endoint
 {
     loop_t *loop;
-  #ifdef WIN32
     SOCKET fd;
-  #else
-    int fd;
-  #endif
     channel_t *channel;
     
     dtls_endoint_on_handshanke_f handshakecb;
@@ -110,6 +106,23 @@ void dtls_endoint_onevent(SOCKET fd, int event, void* userdata)
             dtls_endoint->is_in_callback = 1;
             dtls_endoint->handshakecb(dtls_endoint, 1, dtls_endoint->userdata);
             dtls_endoint->is_in_callback = 0;
+            
+          #if 1
+            {
+                SRTP_PROTECTION_PROFILE *srtp_profile = SSL_get_selected_srtp_profile(dtls_endoint->ssl);
+                if (srtp_profile)
+                {
+                    SSL_SESSION *ssl_sess = SSL_get_session(dtls_endoint->ssl);
+                    printf("=== ssl master key: 0x");
+                    for (int i = 0; i < ssl_sess->master_key_length; ++i)
+                    {
+                        printf("%X", ssl_sess->master_key[i]);
+                    }
+                    printf(" ===\n");
+                    printf("=== selected srtp profile, id: %lu, name: %s ===\n", srtp_profile->id, srtp_profile->name);
+                }
+            }
+          #endif
         }
         else if (ssl_error == SSL_ERROR_WANT_READ || ssl_error == SSL_ERROR_WANT_WRITE)
         {

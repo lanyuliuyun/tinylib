@@ -6,13 +6,8 @@
 
 typedef struct tls_client tls_client_t;
 
-#ifdef WIN32
-  #include "tinylib/windows/net/loop.h"
-  #include "tinylib/windows/net/buffer.h"
-#else
-  #include "tinylib/linux/net/loop.h"
-  #include "tinylib/linux/net/buffer.h"
-#endif
+#include "tinylib/net/loop.h"
+#include "tinylib/net/buffer.h"
 
 #ifdef __cplusplus
 extern "C" {

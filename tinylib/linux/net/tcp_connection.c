@@ -96,6 +96,7 @@ void connection_onevent(int fd, int event, void* userdata)
     {
         if (event & EPOLLIN)
         {
+            /* FIXME:每次响应可读事件，只执行一次 read 操作，有些浪费 poller 的通知，考虑循环读至读清 */
             if (connection->need_closed_after_sent_done == 0)
             {
                 in_buffer = connection->in_buffer;

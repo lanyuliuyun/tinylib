@@ -1,11 +1,9 @@
 
-#ifdef WIN32
-    #include "tinylib/windows/net/udp_peer.h"
-    #include <winsock2.h>
-#elif defined(__linux__)
-    #include "tinylib/linux/net/udp_peer.h"
+#if defined(WIN32)
+  #include <winsock2.h>
 #endif
 
+#include "tinylib/net/udp_peer.h"
 #include "tinylib/util/log.h"
 
 #include <stdlib.h>

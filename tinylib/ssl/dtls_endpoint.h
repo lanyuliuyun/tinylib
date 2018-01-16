@@ -12,11 +12,7 @@ enum dtls_endpoint_mode {
     DTLS_ENDPOINT_MODE_SERVER,
 };
 
-#ifdef WIN32
-  #include "tinylib/windows/net/loop.h"
-#else
-  #include "tinylib/linux/net/loop.h"
-#endif
+#include "tinylib/linux/net/loop.h"
 
 #ifdef __cplusplus
 extern "C" {

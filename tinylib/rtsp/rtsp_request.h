@@ -7,11 +7,7 @@
 struct rtsp_request;
 typedef struct rtsp_request rtsp_request_t;
 
-#ifdef WIN32
-  #include "tinylib/windows/net/tcp_connection.h"
-#else
-  #include "tinylib/linux/net/tcp_connection.h"
-#endif
+#include "tinylib/net/tcp_connection.h"
 #include "tinylib/rtsp/rtsp_message_codec.h"
 
 #ifdef __cplusplus

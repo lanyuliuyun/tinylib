@@ -1,10 +1,8 @@
 
-#ifdef WIN32
-    #include "tinylib/windows/net/tcp_client.h"
-    #include <winsock2.h>
-#elif defined(__linux__)
-    #include "tinylib/linux/net/tcp_client.h"
+#if defined(WIN32)
+  #include <winsock2.h>
 #endif
+#include "tinylib/linux/net/tcp_client.h"
 
 #include <stdio.h>
 #include <string.h>

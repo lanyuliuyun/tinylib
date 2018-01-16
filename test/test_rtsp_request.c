@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef WIN32
-#include <winsock2.h>
+#if defined(WIN32)
+  #include <winsock2.h>
 #endif
 
 static loop_t *g_loop = NULL;

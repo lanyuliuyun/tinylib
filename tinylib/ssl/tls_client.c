@@ -2,12 +2,12 @@
 #include "tinylib/ssl/tls_client.h"
 #include "tinylib/util/log.h"
 
-#ifdef WIN32
+#if defined(WIN32)
   #include "tinylib/windows/net/socket.h"
   #include <winsock2.h>
 
   #define errno WSAGetLastError()
-#else
+#elif defined(__linux__)
   #include "tinylib/linux/net/socket.h"
   #include <unistd.h>
   #include <errno.h>

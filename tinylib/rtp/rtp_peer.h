@@ -2,11 +2,7 @@
 #ifndef TINYLIB_RTP_PEER_H
 #define TINYLIB_RTP_PEER_H
 
-#ifdef WIN32
-  #include "tinylib/windows/net/udp_peer.h"
-#else
-  #include "tinylib/linux/net/udp_peer.h"
-#endif
+#include "tinylib/net/udp_peer.h"
 
 #ifdef __cplusplus
 extern "C" {

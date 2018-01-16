@@ -3,12 +3,7 @@
 #include "tinylib/rtsp/rtsp_message_codec.h"
 #include "tinylib/util/url.h"
 #include "tinylib/util/log.h"
-
-#ifdef WIN32
-  #include "tinylib/windows/net/tcp_client.h"
-#else
-  #include "tinylib/linux/net/tcp_client.h"
-#endif
+#include "tinylib/net/tcp_client.h"
 
 #include <string.h>
 #include <stdio.h>

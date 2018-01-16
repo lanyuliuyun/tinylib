@@ -77,6 +77,7 @@ void server_onevent(SOCKET fd, short event, void* userdata)
 
     log_debug("server_onevent: fd(%lu), event(%d), local addr(%s:%u)", fd, event, server->addr.ip, server->addr.port);
     
+    /* FIXME:每次响应可读事件，只执行一次 accept() 操作，有些浪费 poller 的通知，考虑循环 accept() 直至读清 */
     len = sizeof(addr);
     memset(&addr, 0, len);
     client_fd = WSAAccept(fd, (struct sockaddr*)&addr, &len, NULL, 0);
