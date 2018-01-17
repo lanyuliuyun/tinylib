@@ -121,7 +121,7 @@ void do_loop_update_channel(void* userdata)
     channel_t* last_channel;
 
     fd = channel_getfd(channel);
-    event = channel_getevent(channel);    
+    event = (short)channel_getevent(channel);
     idx = channel_getindex(channel);
 
     log_debug("do_loop_update_channel: fd(%lu), event(%d)", (unsigned long)fd, event);

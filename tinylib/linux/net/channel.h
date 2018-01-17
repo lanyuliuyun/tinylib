@@ -37,8 +37,10 @@ int channel_getfd(channel_t* channel);
 
 loop_t* channel_getloop(channel_t* channel);
 
+/* private */
 int channel_monitored(channel_t* channel);
 
+/* private */
 void channel_set_monitored(channel_t* channel, int on);
 
 #ifdef __cplusplus

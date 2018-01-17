@@ -64,7 +64,7 @@ void server_onclose(tcp_connection_t* connection, void* userdata)
 }
 
 static 
-void server_onevent(SOCKET fd, short event, void* userdata)
+void server_onevent(SOCKET fd, int event, void* userdata)
 {
     tcp_server_t *server = (tcp_server_t *)userdata;
     int error;

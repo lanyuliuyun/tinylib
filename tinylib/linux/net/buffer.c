@@ -10,20 +10,20 @@
 
 struct buffer
 {
-    unsigned char* data;
-    unsigned len;
+    char* data;
+    int len;
 
-    unsigned read_index;
-    unsigned write_index;
+    int read_index;
+    int write_index;
 };
 
 static 
-void ensure_space(buffer_t* buffer, unsigned size)
+void ensure_space(buffer_t* buffer, int size)
 {
     unsigned expand;
-    unsigned char* data;
-    
-    assert(NULL != buffer);
+    char* data;
+
+    assert(NULL != buffer && size > 0);
 
     /* buffer尾部的空闲空间已经足够 */
     if ((buffer->len - buffer->write_index) >= size)
@@ -44,9 +44,7 @@ void ensure_space(buffer_t* buffer, unsigned size)
     {
         /* buffe中整体的空闲空间也不够，需要扩容 */
         expand = ((size+1023)>>10)<<10;
-        data = (unsigned char*)realloc(buffer->data, (buffer->len + expand));
-        /* 若此处空间分配若失败，则无力回天了! */
-        assert(NULL != data);
+        data = (char*)realloc(buffer->data, (buffer->len + expand));
         buffer->data = data;
         buffer->len += expand;
     }
@@ -54,11 +52,11 @@ void ensure_space(buffer_t* buffer, unsigned size)
     return;
 }
 
-buffer_t* buffer_new(unsigned size)
+buffer_t* buffer_new(int size)
 {
     buffer_t* buffer;
 
-    if (size == 0)
+    if (size <= 0)
     {
         log_error("buffer_new: bad size");
         return NULL;
@@ -67,7 +65,7 @@ buffer_t* buffer_new(unsigned size)
     buffer = (buffer_t*)malloc(sizeof(buffer_t));
     memset(buffer, 0, sizeof(buffer_t));
 
-    buffer->data = (unsigned char*)malloc(size);
+    buffer->data = (char*)malloc(size);
     memset(buffer->data, 0, size);
     buffer->len = size;
     buffer->read_index = 0;
@@ -98,7 +96,7 @@ void* buffer_peek(buffer_t* buffer)
     return (buffer->data + buffer->read_index);
 }
 
-unsigned buffer_readablebytes(buffer_t* buffer)
+int buffer_readablebytes(buffer_t* buffer)
 {
     if (NULL == buffer)
     {
@@ -108,7 +106,7 @@ unsigned buffer_readablebytes(buffer_t* buffer)
     return (buffer->write_index - buffer->read_index);
 }
 
-unsigned buffer_append(buffer_t* buffer, const void* data, unsigned size)
+int buffer_append(buffer_t* buffer, const void* data, int size)
 {
     if (NULL == buffer || NULL == data || 0 == size)
     {
@@ -121,15 +119,16 @@ unsigned buffer_append(buffer_t* buffer, const void* data, unsigned size)
     memcpy((buffer->data + buffer->write_index), data, size);
     buffer->write_index += size;
 
-    return 0;
+    return size;
 }
 
-unsigned buffer_readFd(buffer_t* buffer, int fd)
+int buffer_readFd(buffer_t* buffer, int fd)
 {
     char extra[4096];
     unsigned extra_bytes;
     struct iovec vecs[2];
     int n;
+    int saved_errno;
 
     if (NULL == buffer || fd < 0)
     {
@@ -146,29 +145,35 @@ unsigned buffer_readFd(buffer_t* buffer, int fd)
     n = readv(fd, vecs, 2);
     if (n < 0)
     {
-        log_error("buffer_readFd: readv() failed, fd(%d), errno(%d)", fd, errno);
-        return 0;
+        saved_errno = errno;
+        if (saved_errno != EAGAIN && saved_errno != EINTR)
+        {
+            log_error("buffer_readFd: readv() failed, fd(%d), errno(%d)", fd, errno);
+        }
     }
-    else if (n <= (buffer->len - buffer->write_index))
+    else if (n > 0)
     {
-        buffer->write_index += n;
-    }
-    else
-    {
-        extra_bytes = n - (buffer->len - buffer->write_index);
-        buffer->write_index = buffer->len;
-        buffer_append(buffer, extra, extra_bytes);
+        if (n <= (buffer->len - buffer->write_index))
+        {
+            buffer->write_index += n;
+        }
+        else
+        {
+            extra_bytes = n - (buffer->len - buffer->write_index);
+            buffer->write_index = buffer->len;
+            buffer_append(buffer, extra, extra_bytes);
+        }
     }
 
     return n;
 }
 
-void buffer_retrieve(buffer_t *buffer, unsigned size)
+void buffer_retrieve(buffer_t *buffer, int size)
 {
-    unsigned readablebytes = buffer->write_index - buffer->read_index;
+    int readablebytes = buffer->write_index - buffer->read_index;
 
-    assert(size <= readablebytes);
-    
+    assert(readablebytes >= 0 && size <= readablebytes);
+
     if (size < readablebytes)
     {
         buffer->read_index += size;
@@ -189,7 +194,7 @@ void buffer_retrieveall(buffer_t *buffer)
         buffer->read_index = 0;
         buffer->write_index = 0;
     }
-    
+
     return;
 }
 

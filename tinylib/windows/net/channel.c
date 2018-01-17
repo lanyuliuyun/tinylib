@@ -18,8 +18,8 @@ struct channel
     int is_in_callback;
     int is_alive;
 
-    short event;
-    short revent;
+    int event;
+    int revent;
     int index;
 };
 
@@ -83,7 +83,7 @@ short channel_getevent(channel_t* channel)
     return (NULL == channel) ? 0 : channel->event;
 }
 
-int channel_setevent(channel_t* channel, short event)
+int channel_setevent(channel_t* channel, int event)
 {
     if (NULL == channel)
     {
@@ -109,7 +109,7 @@ int channel_setevent(channel_t* channel, short event)
     return 0;
 }
 
-void channel_setrevent(channel_t* channel, short event)
+void channel_setrevent(channel_t* channel, int event)
 {
     if (NULL != channel)
     {
@@ -120,7 +120,7 @@ void channel_setrevent(channel_t* channel, short event)
     return;
 }
 
-int channel_clearevent(channel_t* channel, short event)
+int channel_clearevent(channel_t* channel, int event)
 {
     if (NULL == channel)
     {

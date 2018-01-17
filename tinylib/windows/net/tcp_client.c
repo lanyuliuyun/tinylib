@@ -77,7 +77,7 @@ void client_onclose(tcp_connection_t* connection, void* userdata)
 }
 
 static 
-void client_onevent(SOCKET fd, short event, void* userdata)
+void client_onevent(SOCKET fd, int event, void* userdata)
 {
     tcp_client_t* client;
     tcp_connection_t *connection;

@@ -70,9 +70,9 @@ int rtsp_request_play(rtsp_request_t* request, rtsp_head_t* head);
 
 int rtsp_request_teardown(rtsp_request_t* request, rtsp_head_t* head);
 
-int rtsp_request_get_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, unsigned body_len);
+int rtsp_request_get_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, int body_len);
 
-int rtsp_request_set_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, unsigned body_len);
+int rtsp_request_set_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, int body_len);
 
 #ifdef __cplusplus
 }

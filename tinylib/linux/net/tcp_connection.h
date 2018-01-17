@@ -24,7 +24,7 @@ const inetaddr_t* tcp_connection_getpeeraddr(tcp_connection_t* connection);
 
 const inetaddr_t* tcp_connection_getlocaladdr(tcp_connection_t* connection);
 
-int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned size);
+int tcp_connection_send(tcp_connection_t* connection, const void* data, int size);
 
 void tcp_connection_setcalback(tcp_connection_t* connection, on_data_f datacb, on_close_f closecb, void* userdata);
 

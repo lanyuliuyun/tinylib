@@ -143,7 +143,7 @@ void rtsp_request_msg_destroy(rtsp_request_msg_t* request_msg);
  * 
  * parsed_bytes 表示成功解析到一个rtsp请求消息时（即返回值为0时），消耗了多少字节；其他情况，该输出参数无意义
  */
-int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, unsigned size, unsigned *parsed_bytes);
+int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, int size, int *parsed_bytes);
 
 /* 对请求消息进行原子性的引用计数操作，主要在跨线程的环境里使用 */
 /** 增加一次引用计数 */
@@ -160,7 +160,7 @@ rtsp_response_msg_t* rtsp_response_msg_new(void);
  * 
  * parsed_bytes 表示成功解析到一个rtsp请求消息时（即返回值为0时），消耗了多少字节；其他情况，该输出参数无意义
  */
-int rtsp_response_msg_decode(rtsp_response_msg_t* response_msg, const char *data, unsigned size, unsigned *parsed_bytes);
+int rtsp_response_msg_decode(rtsp_response_msg_t* response_msg, const char *data, int size, int *parsed_bytes);
 
 void rtsp_response_msg_destroy(rtsp_response_msg_t* response_msg);
 
@@ -173,14 +173,14 @@ int rtsp_response_msg_unref(rtsp_response_msg_t* response_msg);
 /** 构建相应消息，其中time-header和cseq-header 内部会自行填充，其余的header由head指定 */
 int rtsp_msg_build_response
 (
-    char *response_msg, unsigned len, int cseq, int code,
-    rtsp_head_t* head, const char* body, unsigned body_len
+    char *response_msg, int len, int cseq, int code,
+    rtsp_head_t* head, const char* body, int body_len
 );
 
 int rtsp_msg_buid_request
 (
-    char* request_msg, unsigned len, int cseq, rtsp_method_e method, const char* url, 
-    rtsp_head_t* head, const char* body, unsigned body_len
+    char* request_msg, int len, int cseq, rtsp_method_e method, const char* url, 
+    rtsp_head_t* head, const char* body, int body_len
 );
 
 rtsp_transport_head_t* rtsp_transport_head_decode(const char *transport);
@@ -190,9 +190,9 @@ rtsp_authenticate_head_t* rtsp_authenticate_head_decode(const char *auth);
 void rtsp_authenticate_head_destroy(rtsp_authenticate_head_t* head);
 
 /* 根据给定的user, password, method, url, realm, nonce计算response, 并组织authorization信息 */
-unsigned rtsp_authorization_head
+int rtsp_authorization_head
 (
-    char *auth, unsigned len, const char *user, const char *password, 
+    char *auth, int len, const char *user, const char *password, 
     const char *method, const char *url, const char *realm, const char *nonce
 );
 

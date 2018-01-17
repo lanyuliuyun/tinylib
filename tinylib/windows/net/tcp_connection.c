@@ -55,18 +55,18 @@ void delete_connection(tcp_connection_t *connection)
 }
 
 static 
-void connection_onevent(SOCKET fd, short event, void* userdata)
+void connection_onevent(SOCKET fd, int event, void* userdata)
 {
     tcp_connection_t *connection = (tcp_connection_t*)userdata;
     inetaddr_t *peer_addr = &connection->peer_addr;
-    
+
     buffer_t* in_buffer;
     buffer_t* out_buffer;
-    unsigned size;
+    int size;
     WSABUF wsabuf;
     unsigned total;
     DWORD written;
-    int error;
+    int saved_error;
 
     log_debug("connection_onevent: fd(%lu), event(%d), peer addr: %s:%u", fd, event, peer_addr->ip, peer_addr->port);
 
@@ -113,20 +113,16 @@ void connection_onevent(SOCKET fd, short event, void* userdata)
             written = 0;
             if (WSASend(connection->fd, &wsabuf, 1, &written, 0, NULL, NULL) != 0)
             {
-                error = WSAGetLastError();
-                if (error != WSAEWOULDBLOCK)
+                saved_error = WSAGetLastError();
+                if (saved_error != WSAEWOULDBLOCK)
                 {
                     log_error("connection_onevent: WSASend() failed, fd(%lu), errno(%d), peer addr: %s:%u", connection->fd, error, peer_addr->ip, peer_addr->port);
-                    return;
                 }
-                else
-                {
-                    written = 0;
-                }
+                return;
             }
             buffer_retrieve(out_buffer, written);
 
-            if(written >= total)
+            if (written >= total)
             {
                 channel_clearevent(connection->channel, POLLOUT);
 
@@ -241,7 +237,7 @@ void tcp_connection_destroy(tcp_connection_t* connection)
 }
 
 static 
-int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, unsigned size)
+int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, int size)
 {
     inetaddr_t *peer_addr = &connection->peer_addr;
     
@@ -335,11 +331,11 @@ void do_tcp_connection_send(void *userdata)
     return;
 }
 
-int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned size)
+int tcp_connection_send(tcp_connection_t* connection, const void* data, int size)
 {
     struct tcp_connection_msg *connection_msg;
     
-    if (NULL == connection || NULL == data || 0 == size)
+    if (NULL == connection || NULL == data || 0 >= size)
     {
         log_error("tcp_connection_send: bad connection(%p) or bad data(%p) or bad size(%u)", connection, data, size);
         return -1;
@@ -362,7 +358,7 @@ int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned
         connection_msg->data = &connection_msg[1];
         connection_msg->size = size;
         memcpy(connection_msg->data, data, size);
-        
+
         loop_async(connection->loop, do_tcp_connection_send, connection_msg);
     }
 

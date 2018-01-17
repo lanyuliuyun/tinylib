@@ -630,7 +630,7 @@ rtsp_request_msg_t* rtsp_request_msg_new(void)
     return request_msg;
 }
 
-int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, unsigned size, unsigned *parsed_bytes)
+int rtsp_request_msg_decode(rtsp_request_msg_t* request_msg, const char *data, int size, int *parsed_bytes)
 {
     struct request_msg_private *priv;
     
@@ -1139,7 +1139,7 @@ rtsp_response_msg_t* rtsp_response_msg_new(void)
     return response_msg;
 }
 
-int rtsp_response_msg_decode(rtsp_response_msg_t* response_msg, const char *data, unsigned size, unsigned *parsed_bytes)
+int rtsp_response_msg_decode(rtsp_response_msg_t* response_msg, const char *data, int size, unsigned *parsed_bytes)
 {
     struct response_msg_private *priv;
     
@@ -1549,8 +1549,8 @@ int rtsp_response_msg_unref(rtsp_response_msg_t* response_msg)
 
 int rtsp_msg_build_response
 (
-    char *response_msg, unsigned len, int cseq, int code, 
-    rtsp_head_t* head, const char* body, unsigned body_len
+    char *response_msg, int len, int cseq, int code, 
+    rtsp_head_t* head, const char* body, int body_len
 )
 {
     int total;
@@ -1613,8 +1613,8 @@ int rtsp_msg_build_response
 
 int rtsp_msg_buid_request
 (
-    char* request_msg, unsigned len, int cseq, rtsp_method_e method, const char* url, 
-    rtsp_head_t* head, const char* body, unsigned body_len
+    char* request_msg, int len, int cseq, rtsp_method_e method, const char* url, 
+    rtsp_head_t* head, const char* body, int body_len
 )
 {
     int total;
@@ -2052,9 +2052,9 @@ static inline void hex_text(const unsigned char *data, unsigned size, char *text
 /* 产生的头类似于如下内容
 Digest username="admin", realm="8ce748cedf4c", nonce="b80c3869d2adcaee62d0a60a233d722d", uri="rtsp://10.10.8.33", response="e0e5638a0a5b3b0e8bb61ff0b4996618"
  */
-unsigned rtsp_authorization_head
+int rtsp_authorization_head
 (
-    char *auth, unsigned len, const char *user, const char *password, 
+    char *auth, int len, const char *user, const char *password, 
     const char *method, const char *url, const char *realm, const char *nonce
 )
 {
@@ -2073,7 +2073,7 @@ unsigned rtsp_authorization_head
     unsigned char response_digest[MD5_DIGEST_LENGTH];
     char response_text[33];
 
-    unsigned total;
+    int total;
 
     if (NULL == auth || 0 == len || NULL == user || NULL == password || NULL == method || NULL == url || NULL == realm || NULL == nonce)
     {

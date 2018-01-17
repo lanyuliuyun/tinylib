@@ -181,9 +181,9 @@ static void request_ondata(tcp_connection_t* connection, buffer_t* buffer, void*
 {
     rtsp_request_t *request;
 
-    unsigned parsed_bytes;
+    int parsed_bytes;
     char* data;
-    unsigned size;
+    int size;
     char ch;
 
     uint16_t interleaved_len;
@@ -403,7 +403,7 @@ rtsp_request_t* rtsp_request_new
     rtsp_request_t *request;
     tcp_client_t *client;
     url_t *u;
-    unsigned len;
+    int len;
 
     if (NULL == url || NULL == loop || NULL == request_handler || NULL == interleaved_sink)
     {
@@ -708,7 +708,7 @@ int rtsp_request_teardown(rtsp_request_t* request, rtsp_head_t* head)
     return 0;
 }
 
-int rtsp_request_get_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, unsigned body_len)
+int rtsp_request_get_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, int body_len)
 {
     char buffer[1024];
     int len;
@@ -753,7 +753,7 @@ int rtsp_request_get_parameter(rtsp_request_t* request, rtsp_head_t* head, const
     return 0;
 }
 
-int rtsp_request_set_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, unsigned body_len)
+int rtsp_request_set_parameter(rtsp_request_t* request, rtsp_head_t* head, const char* body, int body_len)
 {
     char buffer[1024];
     int len;

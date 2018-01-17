@@ -15,7 +15,7 @@ typedef struct channel channel_t;
 extern "C" {
 #endif
 
-typedef void (*on_event_f)(SOCKET fd, short event, void* userdata);
+typedef void (*on_event_f)(SOCKET fd, int event, void* userdata);
 
 channel_t* channel_new(SOCKET fd, loop_t* loop, on_event_f callback, void* userdata);
 
@@ -23,11 +23,11 @@ void channel_destroy(channel_t* channel);
 
 short channel_getevent(channel_t* channel);
 
-int channel_setevent(channel_t* channel, short event);
+int channel_setevent(channel_t* channel, int event);
 
-void channel_setrevent(channel_t* channel, short event);
+void channel_setrevent(channel_t* channel, int event);
 
-int channel_clearevent(channel_t* channel, short event);
+int channel_clearevent(channel_t* channel, int event);
 
 void channel_detach(channel_t* channel);
 
@@ -39,8 +39,10 @@ SOCKET channel_getfd(channel_t* channel);
 
 loop_t* channel_getloop(channel_t* channel);
 
+/* private */
 int channel_getindex(channel_t* channel);
 
+/* private */
 void channel_setindex(channel_t* channel, int idx); 
 
 #ifdef __cplusplus

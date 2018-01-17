@@ -41,7 +41,7 @@ struct tcp_connection_msg
 {
     tcp_connection_t* connection;
     void* data;
-    unsigned size;
+    int size;
 };
 
 static 
@@ -69,9 +69,9 @@ void connection_onevent(int fd, int event, void* userdata)
     buffer_t* in_buffer;
     buffer_t* out_buffer;
     void* data;
-    unsigned size;
+    int size;
     int written;
-    int error;
+    int saved_errno;
 
     log_debug("connection_onevent: fd(%d), event(%d), peer addr: %s:%u", fd, event, peer_addr->ip, peer_addr->port);
 
@@ -101,7 +101,7 @@ void connection_onevent(int fd, int event, void* userdata)
             {
                 in_buffer = connection->in_buffer;
                 size = buffer_readFd(in_buffer, connection->fd);
-                if (0 == size)
+                if (size == 0)
                 {
                     assert(NULL != connection->closecb);
                     connection->is_connected = 0;
@@ -109,7 +109,7 @@ void connection_onevent(int fd, int event, void* userdata)
                     connection->closecb(connection, connection->userdata);
                     connection->is_in_callback = 0;
                 }
-                else
+                else if (size > 0)
                 {
                     assert(NULL != connection->datacb);
                     connection->is_in_callback = 1;
@@ -132,10 +132,10 @@ void connection_onevent(int fd, int event, void* userdata)
             written = write(connection->fd, data, size);
             if (written < 0)
             {
-                error = errno;
-                if (error != EAGAIN && error != EINTR)
+                saved_errno = errno;
+                if (saved_errno != EAGAIN && saved_errno != EINTR)
                 {
-                    log_error("connection_onevent: write() failed, fd(%d), errno(%d), peer addr: %s:%u", fd, error, peer_addr->ip, peer_addr->port);
+                    log_error("connection_onevent: write() failed, fd(%d), errno(%d), peer addr: %s:%u", fd, saved_errno, peer_addr->ip, peer_addr->port);
                     return;
                 }
                 else
@@ -263,7 +263,7 @@ void tcp_connection_destroy(tcp_connection_t* connection)
 }
 
 static 
-int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, unsigned size)
+int tcp_connection_sendInLoop(tcp_connection_t* connection, const void* data, int size)
 {
     inetaddr_t *peer_addr = &connection->peer_addr;
     
@@ -373,11 +373,11 @@ void do_tcp_connection_send(void *userdata)
     return;
 }
 
-int tcp_connection_send(tcp_connection_t* connection, const void* data, unsigned size)
+int tcp_connection_send(tcp_connection_t* connection, const void* data, int size)
 {
     struct tcp_connection_msg *connection_msg;
     
-    if (NULL == connection || NULL == data || 0 == size)
+    if (connection == NULL || data == NULL || size <= 0)
     {
         log_error("tcp_connection_send: bad connection(%p) or bad data(%p) or bad size(%u)", connection, data, size);
         return -1;

@@ -53,9 +53,9 @@ static void session_ondata(tcp_connection_t* connection, buffer_t* buffer, void*
 {
     rtsp_session_t* session;
 
-    unsigned parsed_bytes;
+    int parsed_bytes;
     char* data;
-    unsigned size;
+    int size;
     uint8_t ch;
 
     uint16_t interleaved_len;
