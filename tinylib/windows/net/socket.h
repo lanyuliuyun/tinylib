@@ -20,7 +20,8 @@ void set_socket_nodelay(SOCKET fd, int on);
 
 SOCKET create_udp_socket(unsigned short port, const char *ip);
 
-int socketpair(SOCKET fds[2]);
+/* type: SOCK_STREAM,SOCK_DGRAM */
+int socketpair(int type, SOCKET fds[2]);
 
 #ifdef __cplusplus
 }

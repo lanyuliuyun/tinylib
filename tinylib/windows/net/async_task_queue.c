@@ -49,7 +49,7 @@ async_task_queue_t* async_task_queue_create(loop_t* loop)
 
     task_queue->loop = loop;
 
-    socketpair(task_queue->fds);
+    socketpair(SOCK_DGRAM, task_queue->fds);
     
     task_queue->channel = channel_new(task_queue->fds[0], loop, async_task_event, task_queue);
     channel_setevent(task_queue->channel, POLLIN);
