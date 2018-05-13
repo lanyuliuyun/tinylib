@@ -32,7 +32,7 @@ static
 void async_task_queue_process(async_task_queue_t *task_queue);
 
 static
-void async_task_event(SOCKET fd, short event, void* userdata)
+void async_task_event(SOCKET fd, int event, void* userdata)
 {
     char data[32];
     while(recv(fd, data, sizeof(data), 0) > 0);
