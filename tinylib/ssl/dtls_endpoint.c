@@ -265,11 +265,11 @@ dtls_endoint_t* dtls_endoint_new(loop_t *loop,
 
     if (mode == DTLS_ENDPOINT_MODE_CLIENT)
     {
-        ssl_ctx = SSL_CTX_new(DTLSv1_client_method());
+        ssl_ctx = SSL_CTX_new(DTLS_client_method());
     }
     else /* if (mode == DTLS_ENDPOINT_MODE_SERVER) */
     {
-        ssl_ctx = SSL_CTX_new(DTLSv1_server_method());
+        ssl_ctx = SSL_CTX_new(DTLS_server_method());
     }
     
     if (ssl_ctx == NULL)
